@@ -1,0 +1,20 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Vo_uqNP3-cG-qrg3EYinM"
+uri = "file://artifacts/gkm-medical/assets/images/icon.png"
+type = "image"
+title = "medical care app icon"
+
+[[generated]]
+id = "raZMPYyamrIvBsk9vJU-Y"
+uri = "file://artifacts/gkm-medical/assets/images/onboarding-doctor.png"
+type = "image"
+title = "onboarding doctor illustration"
+
+[[generated]]
+id = "JnUhJJgPvPk5EZ7Jlto1m"
+uri = "file://artifacts/gkm-medical/assets/images/hero-heart.png"
+type = "image"
+title = "anatomical red heart hero"

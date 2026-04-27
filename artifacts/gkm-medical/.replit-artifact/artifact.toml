@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/"
+title = "GKM's Unit Medical Care"
+version = "1.0.0"
+id = "artifacts/gkm-medical"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/" ]
+localPort = 20803
+
+[services.development]
+run = "pnpm --filter @workspace/gkm-medical run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/gkm-medical", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/gkm-medical", "run", "serve" ]
+
+[services.env]
+PORT = "20803"
+BASE_PATH = "/"
