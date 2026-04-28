@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   time: {
     fontSize: 12,
     fontFamily: "Tajawal_500Medium",
-    marginEnd: 8,
+    marginStart: 8,
   },
   message: {
     fontSize: 14,

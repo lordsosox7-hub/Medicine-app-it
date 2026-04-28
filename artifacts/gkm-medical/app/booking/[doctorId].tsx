@@ -165,6 +165,7 @@ const styles = StyleSheet.create({
   },
   datesScroll: {
     paddingHorizontal: 16,
+    gap: 12,
   },
   dateCard: {
     width: 64,
@@ -173,7 +174,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginStart: 12,
   },
   dayName: {
     fontSize: 12,

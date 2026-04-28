@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
   categoriesScroll: {
     paddingHorizontal: 16,
     flexDirection: 'row',
+    gap: 8,
   },
   loadingContainer: {
     flex: 1,

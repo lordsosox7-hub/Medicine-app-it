@@ -95,6 +95,6 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 12,
     fontFamily: "Tajawal_700Bold",
-    marginEnd: 4,
+    marginStart: 4,
   },
 });

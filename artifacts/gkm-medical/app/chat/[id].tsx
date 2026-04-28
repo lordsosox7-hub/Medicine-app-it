@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     zIndex: 10,
   },
-  backBtn: { padding: 8, marginEnd: -8 },
+  backBtn: { padding: 8, marginStart: -8 },
   headerInfo: { flexDirection: "row", alignItems: "center" },
   avatar: { width: 36, height: 36, borderRadius: 18, marginEnd: 12 },
   avatarPlaceholder: {

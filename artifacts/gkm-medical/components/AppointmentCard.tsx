@@ -78,6 +78,8 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 14,
     fontFamily: "Tajawal_700Bold",
+    textAlign: 'right',
+    flexShrink: 1,
   },
   doctorInfo: {
     flexDirection: 'row',

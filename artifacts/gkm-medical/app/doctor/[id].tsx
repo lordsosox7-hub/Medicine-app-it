@@ -238,13 +238,12 @@ const styles = StyleSheet.create({
   servicesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 8,
   },
   serviceChip: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    marginStart: 8,
-    marginBottom: 8,
   },
   serviceText: {
     fontSize: 14,

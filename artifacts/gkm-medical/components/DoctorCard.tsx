@@ -100,7 +100,6 @@ const styles = StyleSheet.create({
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-end',
   },
   ratingText: {
     fontSize: 13,
@@ -109,5 +108,6 @@ const styles = StyleSheet.create({
   },
   action: {
     padding: 8,
+    alignSelf: 'center',
   }
 });
