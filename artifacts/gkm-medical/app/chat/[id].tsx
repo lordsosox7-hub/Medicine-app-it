@@ -3,25 +3,34 @@ import { View, Text, StyleSheet, TextInput, Platform, TouchableOpacity } from "r
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useDoctor, useMessages, useSendMessage, useOrCreateConversation, useRealtimeMessages } from "@/hooks/useGkmData";
+import {
+  useDoctor,
+  useMessages,
+  useSendMessage,
+  useRealtimeMessages,
+  useTypingIndicator,
+  useMarkMessagesRead,
+} from "@/hooks/useGkmData";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { FlatList } from "react-native";
-import { MessageBubble } from "@/components/MessageBubble";
+import { MessageBubble, TypingBubble } from "@/components/MessageBubble";
 import { Feather } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { RTLChevron } from "@/components/RTLChevron";
 import * as Haptics from "expo-haptics";
 
 export default function ChatScreen() {
-  const { id: conversationId, doctorId } = useLocalSearchParams<{ id: string, doctorId: string }>();
+  const { id: conversationId, doctorId } = useLocalSearchParams<{ id: string; doctorId: string }>();
   const router = useRouter();
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  
+
   const { data: doctor } = useDoctor(doctorId);
   const { data: messages } = useMessages(conversationId);
   const sendMessage = useSendMessage();
   useRealtimeMessages(conversationId);
+  useMarkMessagesRead(conversationId, "user", messages);
+  const { otherTyping, notifyTyping } = useTypingIndicator(conversationId, "user");
 
   const [text, setText] = useState("");
 
@@ -31,12 +40,21 @@ export default function ChatScreen() {
     sendMessage.mutate({
       conversation_id: conversationId,
       doctor_id: doctorId,
-      text: text.trim()
+      text: text.trim(),
     });
     setText("");
   };
 
+  const onChangeText = (v: string) => {
+    setText(v);
+    if (v.length > 0) notifyTyping();
+  };
+
   const headerTop = Platform.OS === "web" ? 67 : insets.top;
+
+  const listData: Array<{ kind: "typing" } | { kind: "msg"; id: string; msg: any }> = [];
+  if (otherTyping) listData.push({ kind: "typing" });
+  (messages ?? []).forEach((m) => listData.push({ kind: "msg", id: m.id, msg: m }));
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -52,20 +70,23 @@ export default function ChatScreen() {
               <Text style={[styles.avatarInitial, { color: colors.primary }]}>{doctor?.name_ar?.charAt(0) || "د"}</Text>
             </View>
           )}
-          <Text style={[styles.headerName, { color: colors.foreground }]}>{doctor?.name_ar}</Text>
+          <View>
+            <Text style={[styles.headerName, { color: colors.foreground }]}>{doctor?.name_ar}</Text>
+            {otherTyping && (
+              <Text style={[styles.headerStatus, { color: colors.primary }]}>يكتب الآن...</Text>
+            )}
+          </View>
         </View>
         <View style={{ width: 40 }} />
       </View>
 
-      <KeyboardAvoidingView 
-        style={{ flex: 1 }} 
-        behavior="padding"
-        keyboardVerticalOffset={0}
-      >
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" keyboardVerticalOffset={0}>
         <FlatList
-          data={messages ? [...messages].reverse() : []}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => <MessageBubble message={item} />}
+          data={[...listData].reverse()}
+          keyExtractor={(item) => (item.kind === "typing" ? "__typing" : item.id)}
+          renderItem={({ item }) =>
+            item.kind === "typing" ? <TypingBubble /> : <MessageBubble message={item.msg} viewerRole="user" />
+          }
           inverted
           contentContainerStyle={{ paddingVertical: 16 }}
           showsVerticalScrollIndicator={false}
@@ -74,8 +95,8 @@ export default function ChatScreen() {
         />
 
         <View style={[styles.inputContainer, { backgroundColor: colors.card, borderTopColor: colors.border, paddingBottom: insets.bottom || 16 }]}>
-          <TouchableOpacity 
-            style={[styles.sendButton, { backgroundColor: text.trim() ? colors.primary : colors.muted }]} 
+          <TouchableOpacity
+            style={[styles.sendButton, { backgroundColor: text.trim() ? colors.primary : colors.muted }]}
             onPress={handleSend}
             disabled={!text.trim()}
           >
@@ -86,7 +107,7 @@ export default function ChatScreen() {
             placeholder="اكتب رسالتك..."
             placeholderTextColor={colors.mutedForeground}
             value={text}
-            onChangeText={setText}
+            onChangeText={onChangeText}
             multiline
             maxLength={500}
           />
@@ -97,50 +118,32 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     zIndex: 10,
   },
-  backBtn: {
-    padding: 8,
-    marginLeft: -8,
-  },
-  headerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    marginLeft: 12,
-  },
+  backBtn: { padding: 8, marginLeft: -8 },
+  headerInfo: { flexDirection: "row", alignItems: "center" },
+  avatar: { width: 36, height: 36, borderRadius: 18, marginLeft: 12 },
   avatarPlaceholder: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginLeft: 12,
   },
-  avatarInitial: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
-  },
-  headerName: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
-  },
+  avatarInitial: { fontSize: 16, fontFamily: "Inter_700Bold" },
+  headerName: { fontSize: 16, fontFamily: "Inter_700Bold" },
+  headerStatus: { fontSize: 11, fontFamily: "Inter_500Medium", marginTop: 1 },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingTop: 12,
     borderTopWidth: 1,
@@ -154,14 +157,14 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     fontFamily: "Inter_500Medium",
     fontSize: 15,
-    textAlign: 'right',
-    marginLeft: 12, // send button is on the left in RTL
+    textAlign: "right",
+    marginLeft: 12,
   },
   sendButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  }
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

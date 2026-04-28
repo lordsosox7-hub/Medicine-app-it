@@ -2,37 +2,78 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Message } from "@/lib/supabase";
 import { useColors } from "@/hooks/useColors";
+import { Feather } from "@expo/vector-icons";
 
 interface MessageBubbleProps {
   message: Message;
+  viewerRole?: "user" | "doctor";
 }
 
-export function MessageBubble({ message }: MessageBubbleProps) {
+export function MessageBubble({ message, viewerRole = "user" }: MessageBubbleProps) {
   const colors = useColors();
-  const isUser = message.sender === "user";
+  const mine = message.sender === viewerRole;
 
   const dateObj = new Date(message.created_at);
-  const timeStr = dateObj.toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' });
+  const timeStr = dateObj.toLocaleTimeString("ar", { hour: "2-digit", minute: "2-digit" });
 
   return (
-    <View style={[styles.container, { alignItems: isUser ? 'flex-end' : 'flex-start' }]}>
+    <View style={[styles.container, { alignItems: mine ? "flex-end" : "flex-start" }]}>
       <View
         style={[
           styles.bubble,
           {
-            backgroundColor: isUser ? colors.primary : colors.muted,
-            borderBottomRightRadius: isUser ? 4 : 16,
-            borderBottomLeftRadius: !isUser ? 4 : 16,
+            backgroundColor: mine ? colors.primary : colors.muted,
+            borderBottomRightRadius: mine ? 4 : 16,
+            borderBottomLeftRadius: !mine ? 4 : 16,
           },
         ]}
       >
-        <Text style={[styles.text, { color: isUser ? colors.primaryForeground : colors.foreground }]}>
+        <Text
+          style={[
+            styles.text,
+            { color: mine ? colors.primaryForeground : colors.foreground },
+          ]}
+        >
           {message.text}
         </Text>
       </View>
-      <Text style={[styles.time, { color: colors.mutedForeground, textAlign: isUser ? 'right' : 'left' }]}>
-        {timeStr}
-      </Text>
+      <View style={[styles.metaRow, { flexDirection: mine ? "row-reverse" : "row" }]}>
+        <Text style={[styles.time, { color: colors.mutedForeground }]}>{timeStr}</Text>
+        {mine && (
+          <View style={styles.ticks}>
+            <Feather
+              name="check"
+              size={12}
+              color={message.read_at ? colors.primary : colors.mutedForeground}
+            />
+            <Feather
+              name="check"
+              size={12}
+              color={message.read_at ? colors.primary : colors.mutedForeground}
+              style={styles.secondTick}
+            />
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
+export function TypingBubble() {
+  const colors = useColors();
+  return (
+    <View style={[styles.container, { alignItems: "flex-start" }]}>
+      <View
+        style={[
+          styles.bubble,
+          styles.typingBubble,
+          { backgroundColor: colors.muted, borderBottomLeftRadius: 4 },
+        ]}
+      >
+        <View style={[styles.dot, { backgroundColor: colors.mutedForeground }]} />
+        <View style={[styles.dot, { backgroundColor: colors.mutedForeground, opacity: 0.7 }]} />
+        <View style={[styles.dot, { backgroundColor: colors.mutedForeground, opacity: 0.4 }]} />
+      </View>
     </View>
   );
 }
@@ -43,7 +84,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   bubble: {
-    maxWidth: '80%',
+    maxWidth: "80%",
     padding: 12,
     borderRadius: 16,
   },
@@ -51,12 +92,37 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "Inter_500Medium",
     lineHeight: 22,
-    textAlign: 'left',
+    textAlign: "left",
+  },
+  metaRow: {
+    alignItems: "center",
+    marginTop: 4,
+    marginHorizontal: 4,
+    gap: 4,
   },
   time: {
     fontSize: 11,
     fontFamily: "Inter_400Regular",
-    marginTop: 4,
-    marginHorizontal: 4,
+  },
+  ticks: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: 18,
+    height: 12,
+  },
+  secondTick: {
+    marginLeft: -7,
+  },
+  typingBubble: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
 });

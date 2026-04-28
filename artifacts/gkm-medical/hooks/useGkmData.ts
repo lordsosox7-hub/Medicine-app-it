@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   type Appointment,
@@ -249,11 +249,89 @@ export function useRealtimeMessages(conversationId?: string) {
           qc.invalidateQueries({ queryKey: ["conversations"] });
         },
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const updated = payload.new as Message;
+          qc.setQueryData<Message[]>(["messages", conversationId], (prev) =>
+            (prev ?? []).map((m) => (m.id === updated.id ? { ...m, ...updated } : m)),
+          );
+        },
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
   }, [conversationId, qc]);
+}
+
+export function useMarkMessagesRead(
+  conversationId: string | undefined,
+  viewerRole: "user" | "doctor",
+  messages: Message[] | undefined,
+) {
+  const lastMarkedRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!conversationId || !messages || messages.length === 0) return;
+    const otherSender = viewerRole === "user" ? "doctor" : "user";
+    const unreadIds = messages
+      .filter((m) => m.sender === otherSender && !m.read_at && !lastMarkedRef.current.has(m.id))
+      .map((m) => m.id);
+    if (unreadIds.length === 0) return;
+    unreadIds.forEach((id) => lastMarkedRef.current.add(id));
+    void supabase
+      .from("messages")
+      .update({ read_at: new Date().toISOString() })
+      .in("id", unreadIds);
+  }, [conversationId, viewerRole, messages]);
+}
+
+export function useTypingIndicator(
+  conversationId: string | undefined,
+  myRole: "user" | "doctor",
+) {
+  const [otherTyping, setOtherTyping] = useState(false);
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const clearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSentRef = useRef<number>(0);
+
+  useEffect(() => {
+    if (!conversationId) return;
+    const ch = supabase.channel(`typing:${conversationId}`, {
+      config: { broadcast: { self: false } },
+    });
+    ch.on("broadcast", { event: "typing" }, (payload) => {
+      const from = (payload.payload as { from?: string })?.from;
+      if (!from || from === myRole) return;
+      setOtherTyping(true);
+      if (clearRef.current) clearTimeout(clearRef.current);
+      clearRef.current = setTimeout(() => setOtherTyping(false), 2500);
+    });
+    ch.subscribe();
+    channelRef.current = ch;
+    return () => {
+      if (clearRef.current) clearTimeout(clearRef.current);
+      supabase.removeChannel(ch);
+      channelRef.current = null;
+    };
+  }, [conversationId, myRole]);
+
+  const notifyTyping = useCallback(() => {
+    const now = Date.now();
+    if (now - lastSentRef.current < 1500) return;
+    lastSentRef.current = now;
+    const ch = channelRef.current;
+    if (!ch) return;
+    void ch.send({ type: "broadcast", event: "typing", payload: { from: myRole } });
+  }, [myRole]);
+
+  return { otherTyping, notifyTyping };
 }
 
 export function useSendMessage() {

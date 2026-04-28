@@ -18,7 +18,10 @@ import {
   useMessages,
   useRealtimeMessages,
   useSendMessageAsDoctor,
+  useTypingIndicator,
+  useMarkMessagesRead,
 } from "@/hooks/useGkmData";
+import { MessageBubble, TypingBubble } from "@/components/MessageBubble";
 import { Feather } from "@expo/vector-icons";
 
 export default function AdminScreen() {
@@ -33,6 +36,11 @@ export default function AdminScreen() {
   );
   const { data: messages } = useMessages(selectedConvId || undefined);
   useRealtimeMessages(selectedConvId || undefined);
+  useMarkMessagesRead(selectedConvId || undefined, "doctor", messages);
+  const { otherTyping, notifyTyping } = useTypingIndicator(
+    selectedConvId || undefined,
+    "doctor",
+  );
   const sendAsDoctor = useSendMessageAsDoctor();
 
   const selectedConv = useMemo(
@@ -157,50 +165,36 @@ export default function AdminScreen() {
                 </View>
               ) : (
                 <>
-                  <FlatList
-                    data={messages ? [...messages].reverse() : []}
-                    keyExtractor={(m) => m.id}
-                    inverted
-                    contentContainerStyle={{ padding: 16, gap: 8 }}
-                    renderItem={({ item }) => {
-                      const isDoctor = item.sender === "doctor";
-                      return (
-                        <View
-                          style={[
-                            styles.bubble,
-                            {
-                              alignSelf: isDoctor ? "flex-end" : "flex-start",
-                              backgroundColor: isDoctor ? colors.primary : colors.card,
-                              borderColor: colors.border,
-                              borderWidth: isDoctor ? 0 : 1,
-                            },
-                          ]}
-                        >
-                          <Text
-                            style={{
-                              color: isDoctor ? colors.primaryForeground : colors.foreground,
-                              fontFamily: "Inter_500Medium",
-                              fontSize: 14,
-                              textAlign: "left",
-                            }}
-                          >
-                            {item.text}
-                          </Text>
-                          <Text
-                            style={{
-                              color: isDoctor ? colors.primaryForeground : colors.muted,
-                              opacity: 0.7,
-                              fontSize: 10,
-                              marginTop: 4,
-                              textAlign: "left",
-                            }}
-                          >
-                            {new Date(item.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </Text>
-                        </View>
-                      );
-                    }}
-                  />
+                  <View style={[styles.chatHeader, { borderBottomColor: colors.border, backgroundColor: colors.card }]}>
+                    <Text style={[styles.chatHeaderTitle, { color: colors.foreground }]}>
+                      Patient {selectedConv?.user_id.slice(0, 8)}
+                    </Text>
+                    {otherTyping && (
+                      <Text style={[styles.chatHeaderStatus, { color: colors.primary }]}>
+                        Patient is typing...
+                      </Text>
+                    )}
+                  </View>
+                  {(() => {
+                    const list: Array<{ kind: "typing" } | { kind: "msg"; id: string; msg: any }> = [];
+                    if (otherTyping) list.push({ kind: "typing" });
+                    (messages ?? []).forEach((m) => list.push({ kind: "msg", id: m.id, msg: m }));
+                    return (
+                      <FlatList
+                        data={[...list].reverse()}
+                        keyExtractor={(item) => (item.kind === "typing" ? "__typing" : item.id)}
+                        inverted
+                        contentContainerStyle={{ paddingVertical: 12 }}
+                        renderItem={({ item }) =>
+                          item.kind === "typing" ? (
+                            <TypingBubble />
+                          ) : (
+                            <MessageBubble message={item.msg} viewerRole="doctor" />
+                          )
+                        }
+                      />
+                    );
+                  })()}
                   <View
                     style={[
                       styles.inputBar,
@@ -209,7 +203,10 @@ export default function AdminScreen() {
                   >
                     <TextInput
                       value={text}
-                      onChangeText={setText}
+                      onChangeText={(v) => {
+                        setText(v);
+                        if (v.length > 0) notifyTyping();
+                      }}
                       placeholder="Reply as the doctor..."
                       placeholderTextColor={colors.muted}
                       style={[
@@ -283,6 +280,13 @@ const styles = StyleSheet.create({
   convName: { fontSize: 14, fontFamily: "Inter_600SemiBold", marginBottom: 2 },
   convPreview: { fontSize: 12, fontFamily: "Inter_400Regular" },
   chatPane: { flex: 1 },
+  chatHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+  },
+  chatHeaderTitle: { fontSize: 14, fontFamily: "Inter_700Bold" },
+  chatHeaderStatus: { fontSize: 11, fontFamily: "Inter_500Medium", marginTop: 2 },
   empty: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 12 },
   emptyText: {
     fontSize: 14,

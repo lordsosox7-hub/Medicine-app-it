@@ -196,3 +196,6 @@ $$;
 
 -- Enable realtime on messages so doctor replies stream into the chat instantly
 alter publication supabase_realtime add table messages;
+
+-- Read receipts: timestamp set when the recipient has seen the message
+alter table messages add column if not exists read_at timestamptz;
