@@ -48,6 +48,15 @@ function RootLayoutNav() {
       <Stack.Screen name="medical-file" options={{ title: "الملف الطبي" }} />
       <Stack.Screen name="lab-results" options={{ title: "نتائج التحاليل" }} />
       <Stack.Screen name="favorites" options={{ title: "المفضلة" }} />
+      <Stack.Screen name="profile" options={{ title: "الملف الشخصي" }} />
+      <Stack.Screen name="payments" options={{ title: "المدفوعات" }} />
+      <Stack.Screen name="address" options={{ title: "العنوان" }} />
+      <Stack.Screen name="notifications" options={{ title: "الإشعارات" }} />
+      <Stack.Screen name="language" options={{ title: "اللغة" }} />
+      <Stack.Screen name="appearance" options={{ title: "المظهر" }} />
+      <Stack.Screen name="help" options={{ title: "مساعدة ودعم" }} />
+      <Stack.Screen name="privacy" options={{ title: "سياسة الخصوصية" }} />
+      <Stack.Screen name="about" options={{ title: "حول التطبيق" }} />
     </Stack>
   );
 }

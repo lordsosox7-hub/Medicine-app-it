@@ -43,6 +43,7 @@ export default function MoreScreen() {
         {/* Profile card */}
         <TouchableOpacity
           activeOpacity={0.85}
+          onPress={() => router.push("/profile")}
           style={[
             styles.profileCard,
             {
@@ -87,10 +88,10 @@ export default function MoreScreen() {
             },
           ]}
         >
-          <MenuRow icon="user" label="الملف الشخصي" onPress={() => {}} />
+          <MenuRow icon="user" label="الملف الشخصي" onPress={() => router.push("/profile")} />
           <MenuRow icon="heart" label="المفضلة" onPress={() => router.push("/favorites")} />
-          <MenuRow icon="credit-card" label="المدفوعات" onPress={() => {}} />
-          <MenuRow icon="map-pin" label="العنوان" onPress={() => {}} />
+          <MenuRow icon="credit-card" label="المدفوعات" onPress={() => router.push("/payments")} />
+          <MenuRow icon="map-pin" label="العنوان" onPress={() => router.push("/address")} />
         </View>
 
         {/* Preferences section */}
@@ -106,9 +107,9 @@ export default function MoreScreen() {
             },
           ]}
         >
-          <MenuRow icon="bell" label="الإشعارات" onPress={() => {}} />
-          <MenuRow icon="globe" label="اللغة" onPress={() => {}} />
-          <MenuRow icon="moon" label="المظهر" onPress={() => {}} />
+          <MenuRow icon="bell" label="الإشعارات" onPress={() => router.push("/notifications")} />
+          <MenuRow icon="globe" label="اللغة" onPress={() => router.push("/language")} />
+          <MenuRow icon="moon" label="المظهر" onPress={() => router.push("/appearance")} />
         </View>
 
         {/* Support section */}
@@ -124,9 +125,9 @@ export default function MoreScreen() {
             },
           ]}
         >
-          <MenuRow icon="help-circle" label="مساعدة ودعم" onPress={() => {}} />
-          <MenuRow icon="shield" label="سياسة الخصوصية" onPress={() => {}} />
-          <MenuRow icon="info" label="حول التطبيق" onPress={() => {}} />
+          <MenuRow icon="help-circle" label="مساعدة ودعم" onPress={() => router.push("/help")} />
+          <MenuRow icon="shield" label="سياسة الخصوصية" onPress={() => router.push("/privacy")} />
+          <MenuRow icon="info" label="حول التطبيق" onPress={() => router.push("/about")} />
           <MenuRow
             icon="log-out"
             label="تسجيل الخروج"
