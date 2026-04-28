@@ -1,0 +1,141 @@
+Design a highly detailed, production-level mobile healthcare app homepage UI in Arabic (RTL layout), with a modern, clean, and premium aesthetic. The design should feel like a real-world medical app used daily by patients.
+
+📱 Screen Context:
+
+- Device: iPhone 14 Pro (mobile viewport)
+- Layout direction: Right-to-left (Arabic)
+- Grid system: 8pt spacing system
+- Safe areas respected (top notch & bottom bar)
+
+🎨 Color System:
+
+- Primary: Soft medical blue (#2D8CFF)
+- Secondary: Light blue gradient (#EAF4FF → #F7FBFF)
+- Accent colors:
+  - Green (normal/healthy)
+  - Red (alerts)
+  - Orange (warnings)
+- Background: Off-white (#F8FAFC)
+- Cards: Pure white with subtle shadow (elevation 2–4)
+
+🔤 Typography:
+
+- Font: Tajawal / Cairo (modern Arabic UI font)
+- Clear hierarchy:
+  - Heading (bold)
+  - Subheading (medium)
+  - Body (regular)
+  - Caption (light)
+- Excellent readability and spacing
+
+🔝 Top Header:
+
+- Right side:
+  - Circular profile image
+  - Greeting text:
+    "مرحباً، أحمد 👋"
+    "نتمنى لك يوماً صحياً"
+- Left side:
+  - Notification bell with badge (3 new)
+- Below header:
+  - Search bar with placeholder: "ابحث عن طبيب، تخصص، خدمة..."
+
+🟦 Hero Section (Main Card):
+
+- Large rounded card with soft gradient background
+- Medical visual: stethoscope or heart illustration
+- Text:
+  "صحتك أولويتنا"
+  "احجز مواعيدك بسهولة، تابع حالتك الصحية، واحصل على أفضل رعاية طبية."
+- Primary CTA button:
+  - "احجز موعد"
+  - With calendar icon
+- Subtle animated heartbeat line in background (optional)
+
+🧩 Quick Actions (Grid Section):
+
+- 4–6 rounded cards with soft colored icon backgrounds:
+  1. احجز موعد (calendar icon)
+  2. استشارة طبية (chat/doctor icon)
+  3. نتائج التحاليل (lab icon)
+  4. الأدوية (pill icon)
+  5. الملف الطبي (document icon)
+  6. الطوارئ (emergency icon in red)
+- Each card includes:
+  - Icon
+  - Title
+  - Short subtitle (optional)
+
+📅 Upcoming Appointments Section:
+
+- Title: "المواعيد القادمة"
+- "عرض الكل" action button
+- Card includes:
+  - Doctor image (rounded)
+  - Name: "د. محمد السعيد"
+  - Specialty: "استشاري القلب والأوعية الدموية"
+  - Date & time
+  - Location (clinic name)
+  - Status badge (confirmed)
+- CTA: "عرض التفاصيل"
+
+📊 Health Indicators Section:
+
+- Title: "المؤشرات الصحية"
+- Horizontal scroll or grid cards
+- Each card shows:
+  - Icon
+  - Metric name
+  - Value
+  - Status color:
+    - Heart rate (72 bpm)
+    - Blood pressure (120/80)
+    - Blood sugar (98 mg/dL)
+    - Weight (70 kg)
+
+💡 Smart Insights / Tips Section:
+
+- Card with health tip:
+  "اشرب الماء بانتظام للحفاظ على ضغط الدم"
+- Optional AI recommendation feel
+
+⚡ Quick Services Section:
+
+- Icons for:
+  - تواصل مع طبيب
+  - إعادة وصفة
+  - طلب زيارة منزلية
+
+🧭 Bottom Navigation Bar:
+
+- 5 items:
+  - الرئيسية (active)
+  - المواعيد
+  - الملف الطبي
+  - الرسائل
+  - المزيد
+- Active state highlighted in blue
+- Floating center button (optional)
+
+✨ Microinteractions & UX Details:
+
+- Soft shadows & neumorphism touch
+- Smooth gradients
+- Rounded corners (16–24px)
+- Subtle hover/press states
+- Clean spacing and alignment
+- High accessibility contrast
+
+🧠 Style Keywords:
+
+- Minimal
+- Premium healthcare UI
+- Soft, calm, trustworthy
+- Modern SaaS medical dashboard
+- Human-centered design
+
+🎯 Output:
+
+- Ultra high-resolution UI mockup (4K)
+- Pixel-perfect mobile interface
+- Dribbble/Behance quality presentation
