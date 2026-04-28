@@ -157,18 +157,18 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 12,
+    marginEnd: 12,
   },
   testName: {
     fontSize: 15,
     fontFamily: "Tajawal_700Bold",
     marginBottom: 4,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   testDate: {
     fontSize: 12,
     fontFamily: "Tajawal_400Regular",
-    textAlign: 'left',
+    textAlign: 'right',
   },
   cardBody: {
     flexDirection: 'row',
@@ -182,12 +182,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Tajawal_500Medium",
     marginBottom: 4,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   valueText: {
     fontSize: 16,
     fontFamily: "Tajawal_700Bold",
-    textAlign: 'left',
+    textAlign: 'right',
   },
   unitText: {
     fontSize: 12,

@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 16,
+    marginEnd: 16,
   },
   avatarText: {
     fontSize: 24,
@@ -91,12 +91,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "Tajawal_700Bold",
     marginBottom: 4,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   viewProfile: {
     fontSize: 14,
     fontFamily: "Tajawal_500Medium",
-    textAlign: 'left',
+    textAlign: 'right',
   },
   menuSection: {
     marginTop: 8,

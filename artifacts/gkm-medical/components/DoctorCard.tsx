@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     height: 72,
     borderRadius: 12,
     overflow: 'hidden',
-    marginLeft: 12, // RTL
+    marginEnd: 12, // RTL
   },
   image: {
     width: '100%',
@@ -89,13 +89,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Tajawal_700Bold",
     marginBottom: 4,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   specialty: {
     fontSize: 13,
     fontFamily: "Tajawal_500Medium",
     marginBottom: 6,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   ratingRow: {
     flexDirection: 'row',
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 13,
     fontFamily: "Tajawal_700Bold",
-    marginLeft: 4,
+    marginEnd: 4,
   },
   action: {
     padding: 8,

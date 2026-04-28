@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     height: 48,
   },
   icon: {
-    marginRight: 8,
+    marginStart: 8,
   },
   input: {
     flex: 1,

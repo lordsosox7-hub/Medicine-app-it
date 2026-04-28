@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 28,
     overflow: 'hidden',
-    marginLeft: 12,
+    marginEnd: 12,
   },
   image: {
     width: '100%',
@@ -128,16 +128,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Tajawal_700Bold",
     flex: 1,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   time: {
     fontSize: 12,
     fontFamily: "Tajawal_500Medium",
-    marginLeft: 8,
+    marginEnd: 8,
   },
   message: {
     fontSize: 14,
     fontFamily: "Tajawal_400Regular",
-    textAlign: 'left',
+    textAlign: 'right',
   }
 });

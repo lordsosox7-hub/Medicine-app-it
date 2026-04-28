@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "Tajawal_500Medium",
     lineHeight: 22,
-    textAlign: "left",
+    textAlign: "right",
   },
   metaRow: {
     alignItems: "center",
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     height: 12,
   },
   secondTick: {
-    marginLeft: -7,
+    marginEnd: -7,
   },
   typingBubble: {
     flexDirection: "row",

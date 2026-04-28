@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 12,
     overflow: "hidden",
-    marginLeft: 12,
+    marginEnd: 12,
   },
   image: { width: "100%", height: "100%" },
   placeholder: {
@@ -202,16 +202,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "Tajawal_700Bold",
     marginBottom: 4,
-    textAlign: "left",
+    textAlign: "right",
   },
   specialty: {
     fontSize: 12,
     fontFamily: "Tajawal_500Medium",
     marginBottom: 6,
-    textAlign: "left",
+    textAlign: "right",
   },
   meta: { flexDirection: "row", alignItems: "center" },
-  metaText: { fontSize: 12, fontFamily: "Tajawal_700Bold", marginLeft: 4 },
+  metaText: { fontSize: 12, fontFamily: "Tajawal_700Bold", marginEnd: 4 },
   metaDot: { fontSize: 12, marginHorizontal: 6 },
   heartBtn: {
     width: 40,

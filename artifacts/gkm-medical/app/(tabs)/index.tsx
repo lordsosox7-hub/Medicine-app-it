@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 16,
     fontFamily: "Tajawal_700Bold",
-    marginRight: 12,
+    marginStart: 12,
   },
   avatar: {
     width: 44,
@@ -186,14 +186,14 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: "Tajawal_700Bold",
     marginBottom: 8,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   heroSubtitle: {
     color: 'rgba(255,255,255,0.8)',
     fontSize: 14,
     fontFamily: "Tajawal_500Medium",
     marginBottom: 24,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   heroButton: {
     paddingHorizontal: 20,

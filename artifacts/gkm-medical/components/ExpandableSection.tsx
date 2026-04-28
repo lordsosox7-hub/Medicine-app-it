@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    marginLeft: 12,
+    marginEnd: 12,
   },
   title: {
     fontSize: 16,
@@ -88,13 +88,13 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    marginLeft: 8,
+    marginEnd: 8,
   },
   itemText: {
     fontSize: 14,
     fontFamily: "Tajawal_500Medium",
     flex: 1,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   emptyText: {
     fontSize: 14,

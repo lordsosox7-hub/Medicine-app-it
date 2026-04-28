@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 14,
     fontFamily: "Tajawal_500Medium",
-    textAlign: "left",
+    textAlign: "right",
   },
   sendBtn: {
     width: 44,

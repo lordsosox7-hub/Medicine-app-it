@@ -11,7 +11,7 @@ import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { I18nManager } from "react-native";
+import { I18nManager, Platform } from "react-native";
 import { ensureDemoData } from "@/hooks/useGkmData";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
@@ -19,6 +19,12 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 if (!I18nManager.isRTL) {
   I18nManager.allowRTL(true);
   I18nManager.forceRTL(true);
+}
+
+// On web, also flip the document direction so flex-direction:row visually reverses
+if (Platform.OS === "web" && typeof document !== "undefined") {
+  document.documentElement.setAttribute("dir", "rtl");
+  document.documentElement.setAttribute("lang", "ar");
 }
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.

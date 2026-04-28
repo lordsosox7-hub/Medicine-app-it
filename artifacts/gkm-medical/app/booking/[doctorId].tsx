@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     fontFamily: "Tajawal_700Bold",
     paddingHorizontal: 16,
     marginBottom: 16,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   datesScroll: {
     paddingHorizontal: 16,
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginStart: 12,
   },
   dayName: {
     fontSize: 12,
@@ -227,12 +227,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Tajawal_500Medium",
     marginBottom: 4,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   recapValue: {
     fontSize: 15,
     fontFamily: "Tajawal_700Bold",
     marginBottom: 2,
-    textAlign: 'left',
+    textAlign: 'right',
   }
 });

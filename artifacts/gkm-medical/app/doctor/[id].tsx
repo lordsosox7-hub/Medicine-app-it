@@ -227,13 +227,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "Tajawal_700Bold",
     marginBottom: 12,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   about: {
     fontSize: 15,
     fontFamily: "Tajawal_400Regular",
     lineHeight: 24,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   servicesGrid: {
     flexDirection: 'row',
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    marginRight: 8,
+    marginStart: 8,
     marginBottom: 8,
   },
   serviceText: {
@@ -272,12 +272,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Tajawal_500Medium",
     marginBottom: 2,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   priceValue: {
     fontSize: 18,
     fontFamily: "Tajawal_700Bold",
-    textAlign: 'left',
+    textAlign: 'right',
   },
   bookButton: {
     flex: 1.5,

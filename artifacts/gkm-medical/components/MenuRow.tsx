@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 12,
+    marginEnd: 12,
   },
   label: {
     fontSize: 16,

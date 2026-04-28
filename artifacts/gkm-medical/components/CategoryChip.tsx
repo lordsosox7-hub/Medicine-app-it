@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 24,
     borderWidth: 1,
-    marginRight: 8,
+    marginStart: 8,
   },
   label: {
     fontSize: 14,
