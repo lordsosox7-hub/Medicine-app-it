@@ -398,6 +398,42 @@ export function useMedicalFile() {
   });
 }
 
+export function useUpdateMedicalFile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: Partial<MedicalFile>): Promise<MedicalFile> => {
+      const userId = await getUserId();
+      const { data: existing } = await supabase
+        .from("medical_files")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+      const payload = { ...input, user_id: userId };
+      if (existing?.id) {
+        const { data, error } = await supabase
+          .from("medical_files")
+          .update(payload)
+          .eq("id", existing.id)
+          .select()
+          .single();
+        if (error) throw error;
+        return data as MedicalFile;
+      } else {
+        const { data, error } = await supabase
+          .from("medical_files")
+          .insert(payload)
+          .select()
+          .single();
+        if (error) throw error;
+        return data as MedicalFile;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["medical_file"] });
+    },
+  });
+}
+
 // ---------- Lab results ----------
 
 export function useLabResults(filter: "all" | "blood" | "urine" = "all") {

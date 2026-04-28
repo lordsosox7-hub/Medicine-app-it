@@ -22,7 +22,7 @@ export function ExpandableSection({ title, items, icon, defaultExpanded = false 
         style={styles.header}
       >
         <View style={styles.headerLeft}>
-          <Feather name={icon} size={20} color={colors.primary} style={styles.icon} />
+          <Feather name={icon} size={20} color={colors.primary} />
           <Text style={[styles.title, { color: colors.foreground }]}>{title}</Text>
         </View>
         <Feather name={expanded ? "chevron-up" : "chevron-down"} size={20} color={colors.mutedForeground} />
@@ -56,49 +56,52 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   header: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
   },
   headerLeft: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
-  },
-  icon: {
-    marginEnd: 12,
+    gap: 12,
   },
   title: {
     fontSize: 16,
     fontFamily: "Tajawal_700Bold",
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
   content: {
-    padding: 16,
-    paddingTop: 0,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
     borderTopWidth: 1,
-    marginTop: -8,
-    paddingTop: 16,
+    paddingTop: 12,
   },
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+    gap: 8,
+    justifyContent: 'flex-end',
   },
   bullet: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    marginEnd: 8,
   },
   itemText: {
     fontSize: 14,
     fontFamily: "Tajawal_500Medium",
     flex: 1,
     textAlign: 'right',
+    writingDirection: 'rtl',
   },
   emptyText: {
     fontSize: 14,
     fontFamily: "Tajawal_400Regular",
     fontStyle: 'italic',
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
 });
