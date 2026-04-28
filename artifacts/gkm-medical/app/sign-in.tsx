@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -17,17 +17,28 @@ import { GradientButton } from "@/components/GradientButton";
 import { supabase } from "@/lib/supabase";
 import { isOnboarded } from "@/lib/userId";
 
-type Step = "email" | "code";
+type Step = "email" | "sent";
 
 export default function SignInScreen() {
   const router = useRouter();
   const colors = useColors();
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const sendCode = async () => {
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
+        const onboarded = await isOnboarded();
+        router.replace(onboarded ? "/(tabs)" : "/onboarding");
+      }
+    });
+    return () => {
+      sub.subscription.unsubscribe();
+    };
+  }, [router]);
+
+  const sendMagicLink = async () => {
     const trimmed = email.trim().toLowerCase();
     if (!trimmed || !trimmed.includes("@")) {
       Alert.alert("خطأ", "يرجى إدخال بريد إلكتروني صحيح");
@@ -35,37 +46,21 @@ export default function SignInScreen() {
     }
     setLoading(true);
     try {
+      const redirectTo =
+        Platform.OS === "web" && typeof window !== "undefined"
+          ? window.location.origin
+          : undefined;
       const { error } = await supabase.auth.signInWithOtp({
         email: trimmed,
-        options: { shouldCreateUser: true },
+        options: {
+          shouldCreateUser: true,
+          ...(redirectTo ? { emailRedirectTo: redirectTo } : {}),
+        },
       });
       if (error) throw error;
-      setStep("code");
+      setStep("sent");
     } catch (e: any) {
       Alert.alert("تعذّر الإرسال", e?.message ?? "حدث خطأ");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const verifyCode = async () => {
-    const c = code.trim();
-    if (c.length < 6) {
-      Alert.alert("خطأ", "يرجى إدخال الرمز المكوّن من 6 أرقام");
-      return;
-    }
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        email: email.trim().toLowerCase(),
-        token: c,
-        type: "email",
-      });
-      if (error) throw error;
-      const onboarded = await isOnboarded();
-      router.replace(onboarded ? "/(tabs)" : "/onboarding");
-    } catch (e: any) {
-      Alert.alert("رمز غير صالح", e?.message ?? "تحقق من الرمز وحاول مجدداً");
     } finally {
       setLoading(false);
     }
@@ -93,7 +88,7 @@ export default function SignInScreen() {
                   تسجيل الدخول
                 </Text>
                 <Text style={[styles.subtitle, { color: colors.muted }]}>
-                  أدخل بريدك الإلكتروني وسنرسل لك رمز التحقق
+                  أدخل بريدك الإلكتروني وسنرسل لك رابط دخول سحري
                 </Text>
                 <View
                   style={[
@@ -115,8 +110,8 @@ export default function SignInScreen() {
                   />
                 </View>
                 <GradientButton
-                  title={loading ? "جارٍ الإرسال..." : "إرسال الرمز"}
-                  onPress={sendCode}
+                  title={loading ? "جارٍ الإرسال..." : "إرسال رابط الدخول"}
+                  onPress={sendMagicLink}
                 />
                 {loading && (
                   <ActivityIndicator
@@ -128,57 +123,23 @@ export default function SignInScreen() {
             ) : (
               <>
                 <Text style={[styles.title, { color: colors.foreground }]}>
-                  أدخل رمز التحقق
+                  تحقّق من بريدك
                 </Text>
                 <Text style={[styles.subtitle, { color: colors.muted }]}>
-                  أرسلنا رمزاً مكوّناً من 6 أرقام إلى{"\n"}
+                  أرسلنا رابط الدخول إلى{"\n"}
                   <Text style={{ fontFamily: "Inter_600SemiBold" }}>
                     {email}
                   </Text>
+                  {"\n"}اضغط على الرابط في البريد لإكمال تسجيل الدخول.
                 </Text>
-                <View
-                  style={[
-                    styles.inputWrap,
-                    { backgroundColor: colors.primarySoft },
-                  ]}
-                >
-                  <TextInput
-                    style={[
-                      styles.input,
-                      styles.codeInput,
-                      { color: colors.foreground },
-                    ]}
-                    placeholder="000000"
-                    placeholderTextColor={colors.muted}
-                    value={code}
-                    onChangeText={setCode}
-                    keyboardType="number-pad"
-                    maxLength={6}
-                    textAlign="center"
-                    editable={!loading}
-                  />
-                </View>
-                <GradientButton
-                  title={loading ? "جارٍ التحقق..." : "تأكيد"}
-                  onPress={verifyCode}
-                />
                 <Pressable
-                  onPress={() => {
-                    setCode("");
-                    setStep("email");
-                  }}
+                  onPress={() => setStep("email")}
                   style={styles.backBtn}
                 >
                   <Text style={[styles.backText, { color: colors.primary }]}>
-                    تغيير البريد الإلكتروني
+                    استخدم بريداً مختلفاً
                   </Text>
                 </Pressable>
-                {loading && (
-                  <ActivityIndicator
-                    color={colors.primary}
-                    style={{ marginTop: 12 }}
-                  />
-                )}
               </>
             )}
           </View>
@@ -244,11 +205,6 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 16,
     fontFamily: "Inter_500Medium",
-  },
-  codeInput: {
-    fontSize: 24,
-    letterSpacing: 8,
-    fontFamily: "Inter_700Bold",
   },
   backBtn: {
     alignItems: "center",
