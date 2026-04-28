@@ -59,10 +59,28 @@ export default function ChatScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border, paddingTop: headerTop + 10, paddingBottom: 10 }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} hitSlop={8}>
           <RTLChevron color={colors.foreground} size={24} />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
+          <View style={styles.headerTextWrap}>
+            <Text
+              style={[styles.headerName, { color: colors.foreground }]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {doctor?.name_ar || ""}
+            </Text>
+            <Text
+              style={[
+                styles.headerStatus,
+                { color: otherTyping ? colors.primary : colors.mutedForeground },
+              ]}
+              numberOfLines={1}
+            >
+              {otherTyping ? "يكتب الآن..." : doctor?.specialty_ar || "متاح للاستشارة"}
+            </Text>
+          </View>
           {doctor?.photo_url ? (
             <Image source={{ uri: doctor.photo_url }} style={styles.avatar} contentFit="cover" />
           ) : (
@@ -70,14 +88,6 @@ export default function ChatScreen() {
               <Text style={[styles.avatarInitial, { color: colors.primary }]}>{doctor?.name_ar?.charAt(0) || "د"}</Text>
             </View>
           )}
-          <View style={styles.headerTextWrap}>
-            <Text style={[styles.headerName, { color: colors.foreground }]} numberOfLines={1}>
-              {doctor?.name_ar || ""}
-            </Text>
-            {otherTyping && (
-              <Text style={[styles.headerStatus, { color: colors.primary }]}>يكتب الآن...</Text>
-            )}
-          </View>
         </View>
       </View>
 
@@ -123,30 +133,49 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
     borderBottomWidth: 1,
     zIndex: 10,
+    gap: 8,
   },
-  backBtn: { padding: 8, marginStart: -8 },
+  backBtn: { padding: 8 },
   headerInfo: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
-    marginStart: 8,
+    gap: 10,
+    minWidth: 0,
   },
-  avatar: { width: 36, height: 36, borderRadius: 18, marginEnd: 12 },
+  avatar: { width: 40, height: 40, borderRadius: 20 },
   avatarPlaceholder: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    marginEnd: 12,
   },
   avatarInitial: { fontSize: 16, fontFamily: "Tajawal_700Bold" },
-  headerTextWrap: { flex: 1 },
-  headerName: { fontSize: 16, fontFamily: "Tajawal_700Bold", textAlign: "right" },
-  headerStatus: { fontSize: 11, fontFamily: "Tajawal_500Medium", marginTop: 1, textAlign: "right" },
+  headerTextWrap: {
+    flex: 1,
+    minWidth: 0,
+    alignItems: "flex-end",
+  },
+  headerName: {
+    fontSize: 16,
+    fontFamily: "Tajawal_700Bold",
+    textAlign: "right",
+    writingDirection: "rtl",
+    lineHeight: 22,
+  },
+  headerStatus: {
+    fontSize: 11,
+    fontFamily: "Tajawal_500Medium",
+    marginTop: 2,
+    textAlign: "right",
+    writingDirection: "rtl",
+    lineHeight: 14,
+  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
