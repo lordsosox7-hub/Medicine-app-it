@@ -1,89 +1,222 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Switch } from "react-native";
-import { useColors } from "@/hooks/useColors";
+import React, { useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+} from "react-native";
+import { Stack, useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-import { getNotifications, setNotifications, NotificationPrefs } from "@/lib/preferences";
+import { useColors } from "@/hooks/useColors";
+import { useNotifications, type NotificationItem } from "@/hooks/useNotifications";
+
+function formatRelative(ts: string): string {
+  const t = new Date(ts).getTime();
+  if (!t || t <= 0) return "";
+  const diffMs = Date.now() - t;
+  const min = Math.round(diffMs / 60000);
+  if (min < 1) return "الآن";
+  if (min < 60) return `قبل ${min} دقيقة`;
+  const hr = Math.round(min / 60);
+  if (hr < 24) return `قبل ${hr} ساعة`;
+  const day = Math.round(hr / 24);
+  if (day < 7) return `قبل ${day} يوم`;
+  try {
+    return new Date(ts).toLocaleDateString("ar", {
+      day: "numeric",
+      month: "short",
+    });
+  } catch {
+    return "";
+  }
+}
 
 export default function NotificationsScreen() {
   const colors = useColors();
-  const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
+  const router = useRouter();
+  const {
+    items,
+    unreadCount,
+    markRead,
+    markAllRead,
+    clearAll,
+    refresh,
+  } = useNotifications();
 
   useEffect(() => {
-    getNotifications().then(setPrefs);
-  }, []);
+    refresh();
+  }, [refresh]);
 
-  const update = async (key: keyof NotificationPrefs, value: boolean) => {
-    if (!prefs) return;
-    const next = { ...prefs, [key]: value };
-    setPrefs(next);
-    await setNotifications(next);
+  const handlePress = async (item: NotificationItem) => {
+    if (!item.read) await markRead([item.id]);
+    if (item.kind === "appointment") {
+      router.push("/(tabs)/appointments");
+    } else if (item.kind === "message") {
+      if (item.conversationId) {
+        const did = item.doctorId ? `?doctorId=${item.doctorId}` : "";
+        router.push(`/chat/${item.conversationId}${did}` as any);
+      } else {
+        router.push("/(tabs)/chats");
+      }
+    }
   };
 
-  if (!prefs) return <View style={[styles.container, { backgroundColor: colors.background }]} />;
-
-  const items: Array<{ key: keyof NotificationPrefs; icon: keyof typeof Feather.glyphMap; label: string; description: string; iconBg: string; iconColor: string }> = [
-    { key: "appointments", icon: "calendar", label: "تذكير المواعيد", description: "تنبيهات قبل موعدك بساعة", iconBg: "#e8f0ff", iconColor: "#1e6bf0" },
-    { key: "messages", icon: "message-circle", label: "الرسائل", description: "رسائل جديدة من الأطباء", iconBg: "#e7f7ee", iconColor: "#16a34a" },
-    { key: "labResults", icon: "activity", label: "نتائج التحاليل", description: "تنبيه عند توفر نتائج جديدة", iconBg: "#f1ebff", iconColor: "#7c3aed" },
-    { key: "promotions", icon: "tag", label: "العروض والتخفيضات", description: "تخفيضات على الخدمات الطبية", iconBg: "#fef3d7", iconColor: "#f59e0b" },
-  ];
-
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={{ padding: 16, paddingBottom: 60 }}
-    >
-      <Text style={[styles.intro, { color: colors.mutedForeground }]}>
-        تحكم في الإشعارات التي تصلك من التطبيق
-      </Text>
-      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-        {items.map((item, idx) => (
-          <View
-            key={item.key}
-            style={[
-              styles.row,
-              idx < items.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border },
-            ]}
-          >
-            <View style={[styles.iconBox, { backgroundColor: item.iconBg }]}>
-              <Feather name={item.icon} size={18} color={item.iconColor} />
-            </View>
-            <View style={styles.text}>
-              <Text style={[styles.label, { color: colors.foreground }]}>{item.label}</Text>
-              <Text style={[styles.desc, { color: colors.mutedForeground }]}>{item.description}</Text>
-            </View>
-            <Switch
-              value={prefs[item.key]}
-              onValueChange={(v) => update(item.key, v)}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor="#fff"
-            />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => router.push("/notification-settings")}
+              hitSlop={8}
+              style={{ paddingHorizontal: 8 }}
+              accessibilityLabel="إعدادات الإشعارات"
+            >
+              <Feather name="settings" size={20} color={colors.foreground} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+
+      {items.length > 0 && (
+        <View style={styles.toolbar}>
+          <Text style={[styles.toolbarCount, { color: colors.mutedForeground }]}>
+            {unreadCount > 0 ? `${unreadCount} غير مقروء` : "تم قراءة الكل"}
+          </Text>
+          <View style={styles.toolbarActions}>
+            {unreadCount > 0 && (
+              <TouchableOpacity onPress={markAllRead} hitSlop={8} style={styles.toolbarBtn}>
+                <Feather name="check" size={14} color={colors.primary} />
+                <Text style={[styles.toolbarBtnText, { color: colors.primary }]}>
+                  تعليم الكل كمقروء
+                </Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity onPress={clearAll} hitSlop={8} style={styles.toolbarBtn}>
+              <Feather name="trash-2" size={14} color={colors.mutedForeground} />
+              <Text style={[styles.toolbarBtnText, { color: colors.mutedForeground }]}>
+                مسح الكل
+              </Text>
+            </TouchableOpacity>
           </View>
-        ))}
-      </View>
-    </ScrollView>
+        </View>
+      )}
+
+      <ScrollView
+        contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={refresh} tintColor={colors.primary} />
+        }
+      >
+        {items.length === 0 ? (
+          <View style={styles.empty}>
+            <View
+              style={[
+                styles.emptyIconBg,
+                { backgroundColor: colors.primarySoft },
+              ]}
+            >
+              <Feather name="bell" size={28} color={colors.primary} />
+            </View>
+            <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
+              لا توجد إشعارات
+            </Text>
+            <Text style={[styles.emptySubtitle, { color: colors.mutedForeground }]}>
+              ستظهر هنا تذكيرات مواعيدك ورسائل الأطباء.
+            </Text>
+          </View>
+        ) : (
+          items.map((it) => (
+            <TouchableOpacity
+              key={it.id}
+              activeOpacity={0.85}
+              onPress={() => handlePress(it)}
+              style={[
+                styles.row,
+                {
+                  backgroundColor: it.read ? colors.card : colors.primarySoft,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <View style={[styles.iconBox, { backgroundColor: it.iconBg }]}>
+                <Feather name={it.icon} size={18} color={it.iconColor} />
+              </View>
+              <View style={styles.content}>
+                <View style={styles.headerRow}>
+                  <Text
+                    style={[styles.title, { color: colors.foreground }]}
+                    numberOfLines={1}
+                  >
+                    {it.title}
+                  </Text>
+                  <Text style={[styles.time, { color: colors.mutedForeground }]}>
+                    {formatRelative(it.timestamp)}
+                  </Text>
+                </View>
+                <Text
+                  style={[styles.body, { color: colors.mutedForeground }]}
+                  numberOfLines={2}
+                >
+                  {it.body}
+                </Text>
+              </View>
+              {!it.read && (
+                <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />
+              )}
+            </TouchableOpacity>
+          ))
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  intro: {
-    fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
-    textAlign: "right",
-    marginBottom: 16,
-    paddingHorizontal: 4,
+  toolbar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    gap: 12,
   },
-  card: {
-    borderRadius: 20,
-    borderWidth: 1,
-    overflow: "hidden",
+  toolbarCount: {
+    fontSize: 12,
+    fontFamily: "Tajawal_500Medium",
+  },
+  toolbarActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  toolbarBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  toolbarBtnText: {
+    fontSize: 12,
+    fontFamily: "Tajawal_700Bold",
+  },
+  list: {
+    padding: 16,
+    paddingTop: 8,
+    paddingBottom: 60,
+    gap: 10,
   },
   row: {
     flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-    gap: 14,
+    alignItems: "flex-start",
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 12,
   },
   iconBox: {
     width: 40,
@@ -92,16 +225,61 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  text: { flex: 1 },
-  label: {
-    fontSize: 15,
+  content: {
+    flex: 1,
+    minWidth: 0,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+    marginBottom: 4,
+  },
+  title: {
+    flex: 1,
+    fontSize: 14,
     fontFamily: "Tajawal_700Bold",
     textAlign: "right",
-    marginBottom: 2,
+    writingDirection: "rtl",
   },
-  desc: {
+  time: {
+    fontSize: 11,
+    fontFamily: "Tajawal_500Medium",
+  },
+  body: {
     fontSize: 12,
     fontFamily: "Tajawal_500Medium",
     textAlign: "right",
+    writingDirection: "rtl",
+    lineHeight: 18,
+  },
+  unreadDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginTop: 6,
+  },
+  empty: {
+    alignItems: "center",
+    paddingTop: 80,
+    gap: 12,
+  },
+  emptyIconBg: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontFamily: "Tajawal_700Bold",
+  },
+  emptySubtitle: {
+    fontSize: 13,
+    fontFamily: "Tajawal_500Medium",
+    textAlign: "center",
+    paddingHorizontal: 40,
   },
 });

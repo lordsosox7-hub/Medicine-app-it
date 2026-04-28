@@ -14,12 +14,14 @@ import { HealthMetricCard } from "@/components/HealthMetricCard";
 import { InsightCard } from "@/components/InsightCard";
 import { getUserName } from "@/lib/userId";
 import { useUpcomingAppointment } from "@/hooks/useGkmData";
+import { useNotifications } from "@/hooks/useNotifications";
 
 export default function HomeScreen() {
   const router = useRouter();
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { data: upcomingAppointment, isLoading } = useUpcomingAppointment();
+  const { unreadCount } = useNotifications();
   const [userName, setUserName] = useState("أحمد");
 
   useEffect(() => {
@@ -118,11 +120,15 @@ export default function HomeScreen() {
             { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 },
           ]}
           activeOpacity={0.7}
+          onPress={() => router.push("/notifications")}
+          accessibilityLabel="الإشعارات"
         >
           <Feather name="bell" size={20} color={colors.foreground} />
-          <View style={[styles.badge, { backgroundColor: colors.danger, borderColor: colors.background }]}>
-            <Text style={styles.badgeText}>3</Text>
-          </View>
+          {unreadCount > 0 && (
+            <View style={[styles.badge, { backgroundColor: colors.danger, borderColor: colors.background }]}>
+              <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : String(unreadCount)}</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 

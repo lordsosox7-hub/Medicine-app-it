@@ -65,6 +65,7 @@ function RootLayoutNav() {
       <Stack.Screen name="payments" options={{ title: "المدفوعات" }} />
       <Stack.Screen name="address" options={{ title: "العنوان" }} />
       <Stack.Screen name="notifications" options={{ title: "الإشعارات" }} />
+      <Stack.Screen name="notification-settings" options={{ title: "إعدادات الإشعارات" }} />
       <Stack.Screen name="language" options={{ title: "اللغة" }} />
       <Stack.Screen name="appearance" options={{ title: "المظهر" }} />
       <Stack.Screen name="help" options={{ title: "مساعدة ودعم" }} />
