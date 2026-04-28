@@ -100,11 +100,12 @@ const styles = StyleSheet.create({
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'flex-end',
   },
   ratingText: {
     fontSize: 13,
     fontFamily: "Tajawal_700Bold",
-    marginEnd: 4,
+    marginStart: 4,
   },
   action: {
     padding: 8,

@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
-import { Platform, View, StyleSheet } from "react-native";
+import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 
@@ -13,20 +13,25 @@ export default function TabLayout() {
   // RTL flips the order visually, so we define them left-to-right in code
   // visually they will appear right-to-left: Home on the right.
   
-  const tabBarHeight = isWeb ? 84 : 70 + insets.bottom;
+  const tabBarHeight = isWeb ? 76 : 64 + insets.bottom;
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primaryForeground,
+        tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.mutedForeground,
         tabBarShowLabel: true,
         tabBarLabelStyle: {
           fontFamily: "Tajawal_500Medium",
-          fontSize: 10,
-          marginTop: -4,
-          marginBottom: 4,
+          fontSize: 11,
+          marginTop: 2,
+          marginBottom: isWeb ? 6 : 0,
+          textAlign: "center",
+          includeFontPadding: false,
+        },
+        tabBarItemStyle: {
+          paddingTop: 6,
         },
         tabBarStyle: {
           position: "absolute",
@@ -47,21 +52,17 @@ export default function TabLayout() {
         name="more"
         options={{
           title: "المزيد",
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.iconContainer, focused && { backgroundColor: colors.primary }]}>
-              <Feather name="grid" size={20} color={focused ? colors.primaryForeground : colors.mutedForeground} />
-            </View>
+          tabBarIcon: ({ focused }) => (
+            <Feather name="grid" size={22} color={focused ? colors.primary : colors.mutedForeground} />
           ),
         }}
       />
       <Tabs.Screen
         name="my-doctor"
         options={{
-          title: "الطبيب الخاص",
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.iconContainer, focused && { backgroundColor: colors.primary }]}>
-              <Feather name="user" size={20} color={focused ? colors.primaryForeground : colors.mutedForeground} />
-            </View>
+          title: "طبيبي",
+          tabBarIcon: ({ focused }) => (
+            <Feather name="user" size={22} color={focused ? colors.primary : colors.mutedForeground} />
           ),
         }}
       />
@@ -69,10 +70,8 @@ export default function TabLayout() {
         name="chats"
         options={{
           title: "المحادثات",
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.iconContainer, focused && { backgroundColor: colors.primary }]}>
-              <Feather name="message-circle" size={20} color={focused ? colors.primaryForeground : colors.mutedForeground} />
-            </View>
+          tabBarIcon: ({ focused }) => (
+            <Feather name="message-circle" size={22} color={focused ? colors.primary : colors.mutedForeground} />
           ),
         }}
       />
@@ -80,10 +79,8 @@ export default function TabLayout() {
         name="appointments"
         options={{
           title: "المواعيد",
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.iconContainer, focused && { backgroundColor: colors.primary }]}>
-              <Feather name="calendar" size={20} color={focused ? colors.primaryForeground : colors.mutedForeground} />
-            </View>
+          tabBarIcon: ({ focused }) => (
+            <Feather name="calendar" size={22} color={focused ? colors.primary : colors.mutedForeground} />
           ),
         }}
       />
@@ -91,24 +88,11 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "الرئيسية",
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.iconContainer, focused && { backgroundColor: colors.primary }]}>
-              <Feather name="home" size={20} color={focused ? colors.primaryForeground : colors.mutedForeground} />
-            </View>
+          tabBarIcon: ({ focused }) => (
+            <Feather name="home" size={22} color={focused ? colors.primary : colors.mutedForeground} />
           ),
         }}
       />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 4,
-  }
-});
