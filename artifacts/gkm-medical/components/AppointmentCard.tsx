@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
+import { Feather } from "@expo/vector-icons";
 import { Appointment } from "@/lib/supabase";
 import { useColors } from "@/hooks/useColors";
 import { StatusPill } from "./StatusPill";
@@ -17,22 +18,29 @@ export function AppointmentCard({ appointment, onPress }: AppointmentCardProps) 
   if (!doc) return null;
 
   const dateObj = new Date(appointment.appointment_date);
-  const formattedDate = dateObj.toLocaleDateString('ar', { weekday: 'long', day: 'numeric', month: 'long' });
+  const formattedDate = dateObj.toLocaleDateString("ar", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 
   return (
     <TouchableOpacity
-      activeOpacity={onPress ? 0.8 : 1}
+      activeOpacity={onPress ? 0.85 : 1}
       onPress={onPress}
-      style={[styles.container, { backgroundColor: colors.card, borderRadius: colors.radius, shadowColor: colors.foreground }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.card,
+          borderRadius: 18,
+          borderColor: colors.border,
+          borderWidth: 1,
+          shadowColor: colors.foreground,
+        },
+      ]}
     >
-      <View style={[styles.header, { borderBottomColor: colors.border, borderBottomWidth: 1 }]}>
-        <View style={styles.dateRow}>
-          <Text style={[styles.dateText, { color: colors.foreground }]}>{formattedDate} • {appointment.appointment_time}</Text>
-          <StatusPill status={appointment.status} />
-        </View>
-      </View>
-      
-      <View style={styles.doctorInfo}>
+      {/* Doctor info row */}
+      <View style={styles.doctorRow}>
         <View style={styles.imageContainer}>
           {doc.photo_url ? (
             <Image source={{ uri: doc.photo_url }} style={styles.image} contentFit="cover" />
@@ -52,6 +60,30 @@ export function AppointmentCard({ appointment, onPress }: AppointmentCardProps) 
             {doc.specialty_ar}
           </Text>
         </View>
+        <StatusPill status={appointment.status} />
+      </View>
+
+      {/* Divider */}
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+      {/* Date + time row */}
+      <View style={styles.metaRow}>
+        <View style={styles.metaItem}>
+          <View style={[styles.metaIcon, { backgroundColor: colors.primarySoft }]}>
+            <Feather name="calendar" size={14} color={colors.primary} />
+          </View>
+          <Text style={[styles.metaText, { color: colors.foreground }]} numberOfLines={1}>
+            {formattedDate}
+          </Text>
+        </View>
+        <View style={styles.metaItem}>
+          <View style={[styles.metaIcon, { backgroundColor: colors.primarySoft }]}>
+            <Feather name="clock" size={14} color={colors.primary} />
+          </View>
+          <Text style={[styles.metaText, { color: colors.foreground }]} numberOfLines={1}>
+            {appointment.appointment_time}
+          </Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -59,66 +91,81 @@ export function AppointmentCard({ appointment, onPress }: AppointmentCardProps) 
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 14,
     marginBottom: 12,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.04,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 1,
   },
-  header: {
-    paddingBottom: 12,
-    marginBottom: 12,
-  },
-  dateRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  dateText: {
-    fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
-    textAlign: 'right',
-    flexShrink: 1,
-  },
-  doctorInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  doctorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
   },
   imageContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    overflow: 'hidden',
-    marginEnd: 12,
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    overflow: "hidden",
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   placeholder: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   placeholderText: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: "Tajawal_700Bold",
   },
   info: {
     flex: 1,
-    justifyContent: 'center',
+    minWidth: 0,
+    justifyContent: "center",
+    gap: 2,
   },
   name: {
     fontSize: 15,
     fontFamily: "Tajawal_700Bold",
-    marginBottom: 2,
-    textAlign: 'right',
+    textAlign: "right",
   },
   specialty: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontFamily: "Tajawal_500Medium",
-    textAlign: 'right',
+    textAlign: "right",
+  },
+  divider: {
+    height: 1,
+    marginVertical: 12,
+    opacity: 0.7,
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    flexWrap: "wrap",
+  },
+  metaItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flexShrink: 1,
+  },
+  metaIcon: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  metaText: {
+    fontSize: 12.5,
+    fontFamily: "Tajawal_700Bold",
+    flexShrink: 1,
   },
 });
