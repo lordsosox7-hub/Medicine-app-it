@@ -28,7 +28,7 @@ export default function ChatsScreen() {
         </View>
       ) : conversations && conversations.length > 0 ? (
         <ScrollView 
-          contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 4, paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
         >
           {conversations.map((conv) => {
@@ -38,7 +38,14 @@ export default function ChatsScreen() {
             return (
               <TouchableOpacity 
                 key={conv.id} 
-                style={[styles.row, { borderBottomColor: colors.border }]}
+                activeOpacity={0.85}
+                style={[
+                  styles.row,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                  },
+                ]}
                 onPress={() => router.push(`/chat/${conv.id}?doctorId=${doc.id}`)}
               >
                 <View style={styles.imageContainer}>
@@ -53,7 +60,11 @@ export default function ChatsScreen() {
                 <View style={styles.info}>
                   <View style={styles.topRow}>
                     <Text style={[styles.name, { color: colors.foreground }]} numberOfLines={1}>{doc.name_ar}</Text>
-                    {timeStr ? <Text style={[styles.time, { color: colors.mutedForeground }]}>{timeStr}</Text> : null}
+                    {timeStr ? (
+                      <Text style={[styles.time, { color: colors.mutedForeground }]} numberOfLines={1}>
+                        {timeStr}
+                      </Text>
+                    ) : null}
                   </View>
                   <Text style={[styles.message, { color: colors.mutedForeground }]} numberOfLines={1}>
                     {conv.last_message || 'ابدأ المحادثة...'}
@@ -91,15 +102,18 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginBottom: 10,
+    gap: 12,
   },
   imageContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     overflow: 'hidden',
-    marginEnd: 12,
   },
   image: {
     width: '100%',
@@ -117,27 +131,29 @@ const styles = StyleSheet.create({
   },
   info: {
     flex: 1,
+    minWidth: 0,
+    gap: 4,
   },
   topRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    gap: 8,
   },
   name: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: "Tajawal_700Bold",
     flex: 1,
     textAlign: 'right',
   },
   time: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: "Tajawal_500Medium",
-    marginStart: 8,
+    writingDirection: 'rtl',
   },
   message: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontFamily: "Tajawal_400Regular",
     textAlign: 'right',
+    writingDirection: 'rtl',
   }
 });
