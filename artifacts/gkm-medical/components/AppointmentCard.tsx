@@ -9,9 +9,10 @@ import { StatusPill } from "./StatusPill";
 interface AppointmentCardProps {
   appointment: Appointment;
   onPress?: () => void;
+  onDelete?: () => void;
 }
 
-export function AppointmentCard({ appointment, onPress }: AppointmentCardProps) {
+export function AppointmentCard({ appointment, onPress, onDelete }: AppointmentCardProps) {
   const colors = useColors();
   const doc = appointment.doctor;
 
@@ -61,6 +62,16 @@ export function AppointmentCard({ appointment, onPress }: AppointmentCardProps) 
           </Text>
         </View>
         <StatusPill status={appointment.status} />
+        {onDelete && (
+          <TouchableOpacity
+            onPress={onDelete}
+            style={[styles.deleteBtn, { backgroundColor: colors.destructive + "1A" }]}
+            hitSlop={8}
+            accessibilityLabel="حذف الموعد"
+          >
+            <Feather name="trash-2" size={16} color={colors.destructive} />
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Divider */}
@@ -167,5 +178,12 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     fontFamily: "Tajawal_700Bold",
     flexShrink: 1,
+  },
+  deleteBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

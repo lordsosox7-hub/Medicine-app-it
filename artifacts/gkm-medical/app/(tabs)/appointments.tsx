@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Platform, Alert, ActivityIndicator 
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAppointments, useCancelAppointment } from "@/hooks/useGkmData";
+import { useAppointments, useCancelAppointment, useDeleteAppointment } from "@/hooks/useGkmData";
 import { BrandHeader } from "@/components/BrandHeader";
 import { AppointmentCard } from "@/components/AppointmentCard";
 import { EmptyState } from "@/components/EmptyState";
@@ -16,6 +16,7 @@ export default function AppointmentsScreen() {
   const insets = useSafeAreaInsets();
   const { data: appointments, isLoading } = useAppointments();
   const cancelAppointment = useCancelAppointment();
+  const deleteAppointment = useDeleteAppointment();
 
   const handlePress = (appointment: any) => {
     if (appointment.status === "upcoming") {
@@ -33,6 +34,26 @@ export default function AppointmentsScreen() {
             }
           }
         ]
+      );
+    }
+  };
+
+  const handleDelete = (appointment: any) => {
+    const doDelete = () => {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      deleteAppointment.mutate(appointment.id);
+    };
+    if (Platform.OS === "web") {
+      const ok = typeof window !== "undefined" && window.confirm("هل تريد حذف هذا الموعد نهائياً؟");
+      if (ok) doDelete();
+    } else {
+      Alert.alert(
+        "حذف الموعد",
+        "هل تريد حذف هذا الموعد نهائياً؟ لا يمكن التراجع.",
+        [
+          { text: "تراجع", style: "cancel" },
+          { text: "حذف", style: "destructive", onPress: doDelete },
+        ],
       );
     }
   };
@@ -57,7 +78,8 @@ export default function AppointmentsScreen() {
             <AppointmentCard 
               key={apt.id} 
               appointment={apt} 
-              onPress={() => handlePress(apt)} 
+              onPress={() => handlePress(apt)}
+              onDelete={() => handleDelete(apt)}
             />
           ))}
         </ScrollView>

@@ -100,6 +100,22 @@ export function useCancelAppointment() {
   });
 }
 
+export function useDeleteAppointment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("appointments")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+    },
+  });
+}
+
 // ---------- Chat ----------
 
 export function useConversations() {
