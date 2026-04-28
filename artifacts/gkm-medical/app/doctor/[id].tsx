@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Animated } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Animated, Linking } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,6 +9,7 @@ import { Image } from "expo-image";
 import { Feather } from "@expo/vector-icons";
 import { GradientButton } from "@/components/GradientButton";
 import { RTLChevron } from "@/components/RTLChevron";
+import { CLINIC } from "@/constants/clinic";
 
 export default function DoctorProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -106,6 +107,63 @@ export default function DoctorProfileScreen() {
                 <Text style={[styles.serviceText, { color: colors.primary }]}>{service}</Text>
               </View>
             ))}
+          </View>
+
+          <Text style={[styles.sectionTitle, { color: colors.foreground, marginTop: 24 }]}>عنوان العيادة</Text>
+          <View
+            style={[
+              styles.clinicCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <View style={styles.clinicRow}>
+              <View style={styles.clinicTextWrap}>
+                <Text style={[styles.clinicName, { color: colors.foreground }]} numberOfLines={2}>
+                  {CLINIC.name_ar}
+                </Text>
+                <Text style={[styles.clinicAddress, { color: colors.mutedForeground }]} numberOfLines={3}>
+                  {CLINIC.address_ar}
+                </Text>
+                <View style={styles.clinicMeta}>
+                  <Feather name="clock" size={13} color={colors.mutedForeground} />
+                  <Text style={[styles.clinicMetaText, { color: colors.mutedForeground }]} numberOfLines={1}>
+                    {CLINIC.hours_ar}
+                  </Text>
+                </View>
+              </View>
+              <View style={[styles.clinicIconWrap, { backgroundColor: colors.primarySoft }]}>
+                <Feather name="map-pin" size={22} color={colors.primary} />
+              </View>
+            </View>
+
+            <View style={[styles.clinicDivider, { backgroundColor: colors.border }]} />
+
+            <View style={styles.clinicActions}>
+              <TouchableOpacity
+                style={[styles.clinicActionBtn, { backgroundColor: colors.primary }]}
+                onPress={() => Linking.openURL(CLINIC.mapsUrl)}
+                activeOpacity={0.85}
+              >
+                <Feather name="navigation" size={15} color={colors.primaryForeground} />
+                <Text style={[styles.clinicActionText, { color: colors.primaryForeground }]}>
+                  الاتجاهات
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.clinicActionBtn,
+                  styles.clinicActionBtnGhost,
+                  { borderColor: colors.border },
+                ]}
+                onPress={() => Linking.openURL(`tel:${CLINIC.phone}`)}
+                activeOpacity={0.7}
+              >
+                <Feather name="phone" size={15} color={colors.primary} />
+                <Text style={[styles.clinicActionText, { color: colors.primary }]}>
+                  اتصل
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -248,6 +306,77 @@ const styles = StyleSheet.create({
   serviceText: {
     fontSize: 14,
     fontFamily: "Tajawal_500Medium",
+  },
+  clinicCard: {
+    borderWidth: 1,
+    borderRadius: 18,
+    padding: 16,
+  },
+  clinicRow: {
+    flexDirection: "row-reverse",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  clinicTextWrap: {
+    flex: 1,
+    minWidth: 0,
+  },
+  clinicIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  clinicName: {
+    fontSize: 15,
+    fontFamily: "Tajawal_700Bold",
+    textAlign: "right",
+    marginBottom: 4,
+    lineHeight: 22,
+  },
+  clinicAddress: {
+    fontSize: 13,
+    fontFamily: "Tajawal_400Regular",
+    textAlign: "right",
+    lineHeight: 20,
+  },
+  clinicMeta: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+  },
+  clinicMetaText: {
+    fontSize: 12,
+    fontFamily: "Tajawal_500Medium",
+    flex: 1,
+    textAlign: "right",
+  },
+  clinicDivider: {
+    height: 1,
+    marginVertical: 14,
+  },
+  clinicActions: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  clinicActionBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 11,
+    borderRadius: 12,
+  },
+  clinicActionBtnGhost: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+  },
+  clinicActionText: {
+    fontSize: 13,
+    fontFamily: "Tajawal_700Bold",
   },
   bottomBar: {
     position: 'absolute',
