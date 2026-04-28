@@ -127,7 +127,14 @@ export default function HomeScreen() {
 
       {/* Search */}
       <View style={styles.searchContainer}>
-        <SearchBar placeholder="ابحث عن طبيب، تخصص، خدمة..." />
+        <SearchBar
+          placeholder="ابحث عن طبيب، تخصص، خدمة..."
+          editable={false}
+          onPress={() => router.push("/(tabs)/my-doctor")}
+          onSubmit={(text) =>
+            router.push({ pathname: "/(tabs)/my-doctor", params: { q: text } })
+          }
+        />
       </View>
 
       {/* Hero */}

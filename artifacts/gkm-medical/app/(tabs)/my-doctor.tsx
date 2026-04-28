@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Platform, ActivityIndicator } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDoctors } from "@/hooks/useGkmData";
@@ -14,16 +14,40 @@ export default function DoctorsScreen() {
   const router = useRouter();
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const [search, setSearch] = useState("");
+  const params = useLocalSearchParams<{ q?: string }>();
+  const initialQ = typeof params.q === "string" ? params.q : "";
+  const [search, setSearch] = useState(initialQ);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const { data: doctors, isLoading } = useDoctors(selectedCategory);
+
+  useEffect(() => {
+    if (typeof params.q === "string" && params.q !== search) {
+      setSearch(params.q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.q]);
 
   const isWeb = Platform.OS === "web";
   const headerTop = isWeb ? 67 : insets.top;
 
-  const filteredDoctors = doctors?.filter(d => 
-    d.name_ar.includes(search) || d.specialty_ar.includes(search)
-  ) || [];
+  const normalize = (s: string) =>
+    s
+      .trim()
+      .toLowerCase()
+      .replace(/[\u064B-\u0652]/g, "") // strip Arabic diacritics
+      .replace(/[إأآا]/g, "ا")
+      .replace(/ى/g, "ي")
+      .replace(/ة/g, "ه");
+
+  const filteredDoctors = useMemo(() => {
+    if (!doctors) return [];
+    const q = normalize(search);
+    if (!q) return doctors;
+    return doctors.filter((d) => {
+      const hay = normalize(`${d.name_ar} ${d.specialty_ar} ${d.category}`);
+      return hay.includes(q);
+    });
+  }, [doctors, search]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background, paddingTop: headerTop }]}>
