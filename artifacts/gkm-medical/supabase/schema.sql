@@ -199,3 +199,22 @@ alter publication supabase_realtime add table messages;
 
 -- Read receipts: timestamp set when the recipient has seen the message
 alter table messages add column if not exists read_at timestamptz;
+
+-- =========================
+-- Favorites
+-- =========================
+create table if not exists favorites (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid not null,
+  doctor_id uuid not null references doctors(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  unique (user_id, doctor_id)
+);
+
+create index if not exists idx_favorites_user on favorites(user_id, created_at desc);
+
+alter table favorites enable row level security;
+
+drop policy if exists "favorites anon all" on favorites;
+create policy "favorites anon all" on favorites for all using (true) with check (true);
+

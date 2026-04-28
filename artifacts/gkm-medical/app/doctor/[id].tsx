@@ -1,9 +1,9 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Animated } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useDoctor } from "@/hooks/useGkmData";
+import { useDoctor, useIsFavorite, useToggleFavorite } from "@/hooks/useGkmData";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { Feather } from "@expo/vector-icons";
@@ -16,6 +16,21 @@ export default function DoctorProfileScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { data: doctor, isLoading } = useDoctor(id);
+  const { data: isFav = false } = useIsFavorite(id);
+  const toggleFav = useToggleFavorite();
+  const heartScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.spring(heartScale, { toValue: 1.25, useNativeDriver: true, friction: 4 }),
+      Animated.spring(heartScale, { toValue: 1, useNativeDriver: true, friction: 4 }),
+    ]).start();
+  }, [isFav, heartScale]);
+
+  const onToggleFavorite = () => {
+    if (!id) return;
+    toggleFav.mutate({ doctor_id: id, current: isFav });
+  };
 
   if (isLoading || !doctor) {
     return (
@@ -36,8 +51,20 @@ export default function DoctorProfileScreen() {
             <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
               <RTLChevron color="#ffffff" size={24} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconBtn}>
-              <Feather name="heart" size={24} color="#ffffff" />
+            <TouchableOpacity
+              style={[styles.iconBtn, isFav && styles.iconBtnActive]}
+              onPress={onToggleFavorite}
+              activeOpacity={0.7}
+              disabled={toggleFav.isPending}
+            >
+              <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+                <Feather
+                  name="heart"
+                  size={24}
+                  color={isFav ? "#ef4444" : "#ffffff"}
+                  style={isFav ? styles.heartFilled : undefined}
+                />
+              </Animated.View>
             </TouchableOpacity>
           </View>
           
@@ -120,6 +147,15 @@ const styles = StyleSheet.create({
   },
   iconBtn: {
     padding: 8,
+    borderRadius: 20,
+  },
+  iconBtnActive: {
+    backgroundColor: "rgba(255,255,255,0.95)",
+  },
+  heartFilled: {
+    textShadowColor: "#ef4444",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 1,
   },
   avatarContainer: {
     width: 100,

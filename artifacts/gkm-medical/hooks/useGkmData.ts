@@ -398,6 +398,83 @@ export function useLabResults(filter: "all" | "blood" | "urine" = "all") {
   });
 }
 
+// ---------- Favorites ----------
+
+export function useFavorites() {
+  return useQuery({
+    queryKey: ["favorites"],
+    queryFn: async (): Promise<Doctor[]> => {
+      const userId = await getUserId();
+      const { data, error } = await supabase
+        .from("favorites")
+        .select("doctor:doctors(*)")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return ((data ?? [])
+        .map((row: { doctor: Doctor | null }) => row.doctor)
+        .filter(Boolean)) as Doctor[];
+    },
+  });
+}
+
+export function useIsFavorite(doctorId?: string) {
+  return useQuery({
+    queryKey: ["favorite", doctorId],
+    enabled: !!doctorId,
+    queryFn: async (): Promise<boolean> => {
+      if (!doctorId) return false;
+      const userId = await getUserId();
+      const { data, error } = await supabase
+        .from("favorites")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("doctor_id", doctorId)
+        .maybeSingle();
+      if (error) throw error;
+      return !!data;
+    },
+  });
+}
+
+export function useToggleFavorite() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { doctor_id: string; current: boolean }) => {
+      const userId = await getUserId();
+      if (input.current) {
+        const { error } = await supabase
+          .from("favorites")
+          .delete()
+          .eq("user_id", userId)
+          .eq("doctor_id", input.doctor_id);
+        if (error) throw error;
+        return false;
+      }
+      const { error } = await supabase
+        .from("favorites")
+        .insert({ user_id: userId, doctor_id: input.doctor_id });
+      if (error && !error.message.toLowerCase().includes("duplicate")) throw error;
+      return true;
+    },
+    onMutate: async (vars) => {
+      await qc.cancelQueries({ queryKey: ["favorite", vars.doctor_id] });
+      const previous = qc.getQueryData<boolean>(["favorite", vars.doctor_id]);
+      qc.setQueryData(["favorite", vars.doctor_id], !vars.current);
+      return { previous };
+    },
+    onError: (_err, vars, ctx) => {
+      if (ctx?.previous !== undefined) {
+        qc.setQueryData(["favorite", vars.doctor_id], ctx.previous);
+      }
+    },
+    onSettled: (_data, _err, vars) => {
+      qc.invalidateQueries({ queryKey: ["favorite", vars.doctor_id] });
+      qc.invalidateQueries({ queryKey: ["favorites"] });
+    },
+  });
+}
+
 // ---------- Bootstrap demo data for the local user ----------
 
 export async function ensureDemoData(): Promise<void> {
