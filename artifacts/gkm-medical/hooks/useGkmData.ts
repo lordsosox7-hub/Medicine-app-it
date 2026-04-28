@@ -162,6 +162,69 @@ export function useMessages(conversationId?: string) {
   });
 }
 
+export function useDoctorConversations(doctorId?: string) {
+  const qc = useQueryClient();
+  const query = useQuery({
+    queryKey: ["doctor_conversations", doctorId],
+    enabled: !!doctorId,
+    queryFn: async (): Promise<Conversation[]> => {
+      if (!doctorId) return [];
+      const { data, error } = await supabase
+        .from("conversations")
+        .select("*, doctor:doctors(*)")
+        .eq("doctor_id", doctorId)
+        .order("last_message_at", { ascending: false, nullsFirst: false });
+      if (error) throw error;
+      return (data ?? []) as Conversation[];
+    },
+  });
+  useEffect(() => {
+    if (!doctorId) return;
+    const ch = supabase
+      .channel(`doctor_convs:${doctorId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "conversations", filter: `doctor_id=eq.${doctorId}` },
+        () => qc.invalidateQueries({ queryKey: ["doctor_conversations", doctorId] }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [doctorId, qc]);
+  return query;
+}
+
+export function useSendMessageAsDoctor() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { conversation_id: string; doctor_id: string; user_id: string; text: string }) => {
+      const { data, error } = await supabase
+        .from("messages")
+        .insert({
+          conversation_id: input.conversation_id,
+          doctor_id: input.doctor_id,
+          user_id: input.user_id,
+          sender: "doctor",
+          text: input.text,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      await supabase
+        .from("conversations")
+        .update({ last_message: input.text, last_message_at: new Date().toISOString() })
+        .eq("id", input.conversation_id);
+      return data as Message;
+    },
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ["messages", vars.conversation_id] });
+      qc.invalidateQueries({ queryKey: ["doctor_conversations", vars.doctor_id] });
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+    },
+  });
+}
+
 export function useRealtimeMessages(conversationId?: string) {
   const qc = useQueryClient();
   useEffect(() => {

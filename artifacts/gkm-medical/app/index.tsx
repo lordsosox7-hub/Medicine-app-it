@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { isOnboarded, isAuthenticated } from "@/lib/userId";
@@ -13,6 +13,14 @@ export default function GateScreen() {
     let timeout: ReturnType<typeof setTimeout>;
     const route = async () => {
       try {
+        if (
+          Platform.OS === "web" &&
+          typeof window !== "undefined" &&
+          window.location.hash === "#admin"
+        ) {
+          router.replace("/admin");
+          return;
+        }
         const [authed, onboarded] = await Promise.all([
           isAuthenticated(),
           isOnboarded(),
