@@ -41,6 +41,7 @@ function RootLayoutNav() {
       <Stack.Screen name="chat/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="medical-file" options={{ title: "الملف الطبي" }} />
       <Stack.Screen name="lab-results" options={{ title: "نتائج التحاليل" }} />
+      <Stack.Screen name="favorites" options={{ title: "المفضلة" }} />
     </Stack>
   );
 }

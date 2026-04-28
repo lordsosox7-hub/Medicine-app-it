@@ -50,7 +50,7 @@ export default function MoreScreen() {
 
         <View style={styles.menuSection}>
           <MenuRow icon="bell" label="الإشعارات" onPress={() => {}} />
-          <MenuRow icon="heart" label="المفضلة" onPress={() => {}} />
+          <MenuRow icon="heart" label="المفضلة" onPress={() => router.push("/favorites")} />
           <MenuRow icon="credit-card" label="المدفوعات" onPress={() => {}} />
           <MenuRow icon="map-pin" label="العنوان" onPress={() => {}} />
           <MenuRow icon="help-circle" label="مساعدة ودعم" onPress={() => {}} />
