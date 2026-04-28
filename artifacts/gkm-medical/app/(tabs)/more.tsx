@@ -6,7 +6,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BrandHeader } from "@/components/BrandHeader";
 import { MenuRow } from "@/components/MenuRow";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getUserName } from "@/lib/userId";
+import { getUserName, getUserEmail } from "@/lib/userId";
+import { supabase } from "@/lib/supabase";
 import { Image } from "expo-image";
 
 export default function MoreScreen() {
@@ -14,15 +15,17 @@ export default function MoreScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const [userName, setUserName] = useState("أحمد");
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
     getUserName().then(setUserName);
+    getUserEmail().then(setUserEmail);
   }, []);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("gkm_onboarded");
-    await AsyncStorage.removeItem("gkm_user_id");
-    router.replace("/onboarding");
+    await supabase.auth.signOut();
+    await AsyncStorage.removeItem("gkm_user_name");
+    router.replace("/sign-in");
   };
 
   const isWeb = Platform.OS === "web";
@@ -39,7 +42,9 @@ export default function MoreScreen() {
           </View>
           <View style={styles.profileInfo}>
             <Text style={[styles.name, { color: colors.foreground }]}>{userName}</Text>
-            <Text style={[styles.viewProfile, { color: colors.primary }]}>عرض الملف الشخصي</Text>
+            <Text style={[styles.viewProfile, { color: colors.primary }]} numberOfLines={1}>
+              {userEmail ?? "عرض الملف الشخصي"}
+            </Text>
           </View>
         </View>
 

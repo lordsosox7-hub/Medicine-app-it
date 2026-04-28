@@ -31,6 +31,7 @@ function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerBackTitle: "رجوع", headerTitleAlign: 'center', headerTitleStyle: { fontFamily: 'Inter_700Bold' } }}>
       <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="sign-in" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="doctor/[id]" options={{ headerShown: false }} />
