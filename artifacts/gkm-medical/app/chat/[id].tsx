@@ -159,21 +159,21 @@ const styles = StyleSheet.create({
   headerTextWrap: {
     flex: 1,
     minWidth: 0,
-    alignItems: "flex-end",
+    alignItems: "flex-start",
   },
   headerName: {
     fontSize: 16,
     fontFamily: "Tajawal_700Bold",
-    textAlign: "right",
-    writingDirection: "rtl",
+    textAlign: "left",
+    writingDirection: "ltr",
     lineHeight: 22,
   },
   headerStatus: {
     fontSize: 11,
     fontFamily: "Tajawal_500Medium",
     marginTop: 2,
-    textAlign: "right",
-    writingDirection: "rtl",
+    textAlign: "left",
+    writingDirection: "ltr",
     lineHeight: 14,
   },
   inputContainer: {
