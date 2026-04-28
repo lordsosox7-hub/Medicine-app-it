@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Platform } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { BrandHeader } from "@/components/BrandHeader";
+import { Feather } from "@expo/vector-icons";
 import { MenuRow } from "@/components/MenuRow";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserName, getUserEmail } from "@/lib/userId";
 import { supabase } from "@/lib/supabase";
-import { Image } from "expo-image";
 
 export default function MoreScreen() {
   const router = useRouter();
@@ -33,30 +32,112 @@ export default function MoreScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background, paddingTop: headerTop }]}>
-      <BrandHeader title="المزيد" />
-      
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        <View style={styles.profileCard}>
+      <View style={styles.headerRow}>
+        <Text style={[styles.pageTitle, { color: colors.foreground }]}>المزيد</Text>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 110 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Profile card */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={[
+            styles.profileCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+              borderRadius: 20,
+            },
+          ]}
+        >
           <View style={[styles.avatar, { backgroundColor: colors.primarySoft }]}>
-            <Text style={[styles.avatarText, { color: colors.primary }]}>{userName.charAt(0)}</Text>
+            <Text style={[styles.avatarText, { color: colors.primary }]}>
+              {userName.charAt(0)}
+            </Text>
           </View>
           <View style={styles.profileInfo}>
-            <Text style={[styles.name, { color: colors.foreground }]}>{userName}</Text>
-            <Text style={[styles.viewProfile, { color: colors.primary }]} numberOfLines={1}>
+            <Text style={[styles.name, { color: colors.foreground }]} numberOfLines={1}>
+              {userName}
+            </Text>
+            <Text
+              style={[styles.profileEmail, { color: colors.mutedForeground }]}
+              numberOfLines={1}
+            >
               {userEmail ?? "عرض الملف الشخصي"}
             </Text>
           </View>
-        </View>
+          <View style={styles.editBtn}>
+            <Feather name="edit-2" size={16} color={colors.primary} />
+          </View>
+        </TouchableOpacity>
 
-        <View style={styles.menuSection}>
-          <MenuRow icon="bell" label="الإشعارات" onPress={() => {}} />
+        {/* Account section */}
+        <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>الحساب</Text>
+        <View
+          style={[
+            styles.menuGroup,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+              borderRadius: 20,
+            },
+          ]}
+        >
+          <MenuRow icon="user" label="الملف الشخصي" onPress={() => {}} />
           <MenuRow icon="heart" label="المفضلة" onPress={() => router.push("/favorites")} />
           <MenuRow icon="credit-card" label="المدفوعات" onPress={() => {}} />
           <MenuRow icon="map-pin" label="العنوان" onPress={() => {}} />
-          <MenuRow icon="help-circle" label="مساعدة ودعم" onPress={() => {}} />
-          <MenuRow icon="settings" label="الإعدادات" onPress={() => {}} />
-          <MenuRow icon="log-out" label="تسجيل الخروج" onPress={handleLogout} destructive />
         </View>
+
+        {/* Preferences section */}
+        <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>التفضيلات</Text>
+        <View
+          style={[
+            styles.menuGroup,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+              borderRadius: 20,
+            },
+          ]}
+        >
+          <MenuRow icon="bell" label="الإشعارات" onPress={() => {}} />
+          <MenuRow icon="globe" label="اللغة" onPress={() => {}} />
+          <MenuRow icon="moon" label="المظهر" onPress={() => {}} />
+        </View>
+
+        {/* Support section */}
+        <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>الدعم</Text>
+        <View
+          style={[
+            styles.menuGroup,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+              borderRadius: 20,
+            },
+          ]}
+        >
+          <MenuRow icon="help-circle" label="مساعدة ودعم" onPress={() => {}} />
+          <MenuRow icon="shield" label="سياسة الخصوصية" onPress={() => {}} />
+          <MenuRow icon="info" label="حول التطبيق" onPress={() => {}} />
+          <MenuRow
+            icon="log-out"
+            label="تسجيل الخروج"
+            onPress={handleLogout}
+            destructive
+          />
+        </View>
+
+        <Text style={[styles.versionText, { color: colors.mutedForeground }]}>
+          الإصدار 1.0.0
+        </Text>
       </ScrollView>
     </View>
   );
@@ -66,19 +147,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  headerRow: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 16,
+    alignItems: "flex-start",
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontFamily: "Tajawal_700Bold",
+    textAlign: "right",
+  },
   profileCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 24,
+    gap: 14,
   },
   avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginEnd: 16,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
   },
   avatarText: {
     fontSize: 24,
@@ -88,17 +181,41 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   name: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: "Tajawal_700Bold",
-    marginBottom: 4,
-    textAlign: 'right',
+    marginBottom: 2,
+    textAlign: "right",
   },
-  viewProfile: {
-    fontSize: 14,
+  profileEmail: {
+    fontSize: 13,
     fontFamily: "Tajawal_500Medium",
-    textAlign: 'right',
+    textAlign: "right",
   },
-  menuSection: {
+  editBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionLabel: {
+    fontSize: 12,
+    fontFamily: "Tajawal_700Bold",
+    textAlign: "right",
+    marginHorizontal: 24,
+    marginBottom: 8,
+    marginTop: 4,
+    letterSpacing: 0.3,
+  },
+  menuGroup: {
+    marginHorizontal: 16,
+    marginBottom: 20,
+    overflow: "hidden",
+  },
+  versionText: {
+    fontSize: 12,
+    fontFamily: "Tajawal_500Medium",
+    textAlign: "center",
     marginTop: 8,
-  }
+  },
 });

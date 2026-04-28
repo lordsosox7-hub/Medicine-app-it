@@ -26,7 +26,7 @@ export function MenuRow({ icon, label, onPress, destructive }: MenuRowProps) {
         <View style={[styles.iconContainer, { backgroundColor: destructive ? `${colors.destructive}15` : colors.primarySoft }]}>
           <Feather name={icon} size={20} color={iconColor} />
         </View>
-        <Text style={[styles.label, { color: textColor }]}>{label}</Text>
+        <Text style={[styles.label, { color: textColor }]} numberOfLines={1}>{label}</Text>
       </View>
       <RTLChevron color={colors.mutedForeground} />
     </TouchableOpacity>
@@ -38,24 +38,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
+    gap: 12,
   },
   left: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    gap: 12,
   },
   iconContainer: {
     width: 40,
     height: 40,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginEnd: 12,
   },
   label: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: "Tajawal_700Bold",
+    textAlign: 'right',
+    flex: 1,
   },
 });
