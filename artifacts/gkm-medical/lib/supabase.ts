@@ -32,6 +32,10 @@ export type Doctor = {
   about_ar: string;
   services_ar: string[];
   price: number;
+  clinic_name_ar?: string | null;
+  clinic_address_ar?: string | null;
+  clinic_phone?: string | null;
+  clinic_maps_url?: string | null;
 };
 
 export type Appointment = {

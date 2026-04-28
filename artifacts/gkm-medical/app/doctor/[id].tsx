@@ -110,61 +110,71 @@ export default function DoctorProfileScreen() {
           </View>
 
           <Text style={[styles.sectionTitle, { color: colors.foreground, marginTop: 24 }]}>عنوان العيادة</Text>
-          <View
-            style={[
-              styles.clinicCard,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
-          >
-            <View style={styles.clinicRow}>
-              <View style={styles.clinicTextWrap}>
-                <Text style={[styles.clinicName, { color: colors.foreground }]} numberOfLines={2}>
-                  {CLINIC.name_ar}
-                </Text>
-                <Text style={[styles.clinicAddress, { color: colors.mutedForeground }]} numberOfLines={3}>
-                  {CLINIC.address_ar}
-                </Text>
-                <View style={styles.clinicMeta}>
-                  <Feather name="clock" size={13} color={colors.mutedForeground} />
-                  <Text style={[styles.clinicMetaText, { color: colors.mutedForeground }]} numberOfLines={1}>
-                    {CLINIC.hours_ar}
-                  </Text>
+          {(() => {
+            const clinicName = doctor.clinic_name_ar ?? CLINIC.name_ar;
+            const clinicAddress = doctor.clinic_address_ar ?? CLINIC.address_ar;
+            const clinicPhone = doctor.clinic_phone ?? CLINIC.phone;
+            const clinicMapsUrl =
+              doctor.clinic_maps_url ??
+              `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinicAddress)}`;
+            return (
+              <View
+                style={[
+                  styles.clinicCard,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
+                <View style={styles.clinicRow}>
+                  <View style={styles.clinicTextWrap}>
+                    <Text style={[styles.clinicName, { color: colors.foreground }]} numberOfLines={2}>
+                      {clinicName}
+                    </Text>
+                    <Text style={[styles.clinicAddress, { color: colors.mutedForeground }]} numberOfLines={3}>
+                      {clinicAddress}
+                    </Text>
+                    <View style={styles.clinicMeta}>
+                      <Feather name="clock" size={13} color={colors.mutedForeground} />
+                      <Text style={[styles.clinicMetaText, { color: colors.mutedForeground }]} numberOfLines={1}>
+                        {CLINIC.hours_ar}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={[styles.clinicIconWrap, { backgroundColor: colors.primarySoft }]}>
+                    <Feather name="map-pin" size={22} color={colors.primary} />
+                  </View>
+                </View>
+
+                <View style={[styles.clinicDivider, { backgroundColor: colors.border }]} />
+
+                <View style={styles.clinicActions}>
+                  <TouchableOpacity
+                    style={[styles.clinicActionBtn, { backgroundColor: colors.primary }]}
+                    onPress={() => Linking.openURL(clinicMapsUrl)}
+                    activeOpacity={0.85}
+                  >
+                    <Feather name="navigation" size={15} color={colors.primaryForeground} />
+                    <Text style={[styles.clinicActionText, { color: colors.primaryForeground }]}>
+                      الاتجاهات
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.clinicActionBtn,
+                      styles.clinicActionBtnGhost,
+                      { borderColor: colors.border },
+                    ]}
+                    onPress={() => Linking.openURL(`tel:${clinicPhone}`)}
+                    activeOpacity={0.7}
+                  >
+                    <Feather name="phone" size={15} color={colors.primary} />
+                    <Text style={[styles.clinicActionText, { color: colors.primary }]}>
+                      اتصل
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </View>
-              <View style={[styles.clinicIconWrap, { backgroundColor: colors.primarySoft }]}>
-                <Feather name="map-pin" size={22} color={colors.primary} />
-              </View>
-            </View>
-
-            <View style={[styles.clinicDivider, { backgroundColor: colors.border }]} />
-
-            <View style={styles.clinicActions}>
-              <TouchableOpacity
-                style={[styles.clinicActionBtn, { backgroundColor: colors.primary }]}
-                onPress={() => Linking.openURL(CLINIC.mapsUrl)}
-                activeOpacity={0.85}
-              >
-                <Feather name="navigation" size={15} color={colors.primaryForeground} />
-                <Text style={[styles.clinicActionText, { color: colors.primaryForeground }]}>
-                  الاتجاهات
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.clinicActionBtn,
-                  styles.clinicActionBtnGhost,
-                  { borderColor: colors.border },
-                ]}
-                onPress={() => Linking.openURL(`tel:${CLINIC.phone}`)}
-                activeOpacity={0.7}
-              >
-                <Feather name="phone" size={15} color={colors.primary} />
-                <Text style={[styles.clinicActionText, { color: colors.primary }]}>
-                  اتصل
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+            );
+          })()}
         </View>
       </ScrollView>
 

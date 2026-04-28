@@ -21,8 +21,18 @@ create table if not exists doctors (
   about_ar text not null default '',
   services_ar text[] not null default '{}',
   price numeric(10,2) not null default 150,
+  clinic_name_ar text,
+  clinic_address_ar text,
+  clinic_phone text,
+  clinic_maps_url text,
   created_at timestamptz not null default now()
 );
+
+-- Backfill columns for existing databases
+alter table doctors add column if not exists clinic_name_ar text;
+alter table doctors add column if not exists clinic_address_ar text;
+alter table doctors add column if not exists clinic_phone text;
+alter table doctors add column if not exists clinic_maps_url text;
 
 create table if not exists appointments (
   id uuid primary key default uuid_generate_v4(),
@@ -122,14 +132,22 @@ create policy "lab_results anon all" on lab_results for all using (true) with ch
 -- =========================
 -- Seed: doctors
 -- =========================
-insert into doctors (name_ar, specialty_ar, category, photo_url, rating, years_experience, about_ar, services_ar, price) values
-  ('د. محمد السعيد', 'استشاري أمراض القلب والأوعية الدموية', 'heart', 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&q=80', 4.9, 15, 'استشاري في أمراض القلب والأوعية الدموية، متخصص في تشخيص وعلاج أمراض القلب وارتفاع ضغط الدم. حاصل على البورد العربي والزمالة الأوروبية في طب القلب.', ARRAY['متابعة الضغط','تخطيط القلب','علاج ارتفاع الكوليسترول','استشارات طبية'], 150),
-  ('د. سارة أحمد', 'استشارية طب الأطفال وحديثي الولادة', 'kids', 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&q=80', 4.8, 12, 'استشارية في طب الأطفال وحديثي الولادة، متخصصة في تطعيمات ومتابعة نمو الأطفال وعلاج أمراض الطفولة الشائعة.', ARRAY['الكشف العام','التطعيمات','متابعة النمو','استشارات أمهات'], 130),
-  ('د. علي إبراهيم', 'استشاري الجهاز الهضمي والمناظير', 'general', 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&q=80', 4.7, 18, 'استشاري الجهاز الهضمي والكبد، متخصص في المناظير التشخيصية والعلاجية وعلاج أمراض القولون.', ARRAY['مناظير الجهاز الهضمي','علاج القولون العصبي','استشارات الكبد'], 180),
-  ('د. ندى حسن', 'استشارية الجلدية والتجميل', 'women', 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&q=80', 4.9, 10, 'استشارية الأمراض الجلدية وعلاجات التجميل غير الجراحية، خبرة واسعة في علاج حب الشباب والبشرة.', ARRAY['علاج حب الشباب','تنظيف البشرة','حقن البلازما','استشارات تجميل'], 200),
-  ('د. خالد المطيري', 'أخصائي طب الأسنان وتقويم', 'dental', 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=400&q=80', 4.6, 8, 'أخصائي طب الأسنان وتقويم الأسنان، متخصص في الزراعة وتجميل الأسنان.', ARRAY['تقويم الأسنان','زراعة الأسنان','تبييض','حشوات تجميلية'], 170),
-  ('د. منى الرشيد', 'استشارية أمراض النساء والولادة', 'women', 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&q=80', 4.8, 14, 'استشارية أمراض النساء والولادة، متابعة الحمل والرعاية النسائية الشاملة.', ARRAY['متابعة الحمل','الفحص الدوري','استشارات الخصوبة'], 160)
+insert into doctors (name_ar, specialty_ar, category, photo_url, rating, years_experience, about_ar, services_ar, price, clinic_name_ar, clinic_address_ar, clinic_phone, clinic_maps_url) values
+  ('د. محمد السعيد', 'استشاري أمراض القلب والأوعية الدموية', 'heart', 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&q=80', 4.9, 15, 'استشاري في أمراض القلب والأوعية الدموية، متخصص في تشخيص وعلاج أمراض القلب وارتفاع ضغط الدم. حاصل على البورد العربي والزمالة الأوروبية في طب القلب.', ARRAY['متابعة الضغط','تخطيط القلب','علاج ارتفاع الكوليسترول','استشارات طبية'], 150, 'مركز القلب التخصصي', 'برج العليا الطبي، الدور 5، شارع الملك فهد، حي العليا، الرياض', '+966112345671', 'https://www.google.com/maps/search/?api=1&query=Olaya+Medical+Tower+Riyadh'),
+  ('د. سارة أحمد', 'استشارية طب الأطفال وحديثي الولادة', 'kids', 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&q=80', 4.8, 12, 'استشارية في طب الأطفال وحديثي الولادة، متخصصة في تطعيمات ومتابعة نمو الأطفال وعلاج أمراض الطفولة الشائعة.', ARRAY['الكشف العام','التطعيمات','متابعة النمو','استشارات أمهات'], 130, 'عيادات الأطفال السعيدة', 'مجمع الياسمين الطبي، طريق الأمير محمد بن عبدالعزيز، حي الياسمين، الرياض', '+966112345672', 'https://www.google.com/maps/search/?api=1&query=Yasmin+Medical+Complex+Riyadh'),
+  ('د. علي إبراهيم', 'استشاري الجهاز الهضمي والمناظير', 'general', 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&q=80', 4.7, 18, 'استشاري الجهاز الهضمي والكبد، متخصص في المناظير التشخيصية والعلاجية وعلاج أمراض القولون.', ARRAY['مناظير الجهاز الهضمي','علاج القولون العصبي','استشارات الكبد'], 180, 'مركز المناظير المتقدم', 'مجمع التخصصي الطبي، شارع التحلية، حي السليمانية، الرياض', '+966112345673', 'https://www.google.com/maps/search/?api=1&query=Tahlia+Street+Riyadh'),
+  ('د. ندى حسن', 'استشارية الجلدية والتجميل', 'women', 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&q=80', 4.9, 10, 'استشارية الأمراض الجلدية وعلاجات التجميل غير الجراحية، خبرة واسعة في علاج حب الشباب والبشرة.', ARRAY['علاج حب الشباب','تنظيف البشرة','حقن البلازما','استشارات تجميل'], 200, 'عيادة ندى للجلدية والتجميل', 'برج المملكة، الدور 12، طريق العروبة، حي العليا، الرياض', '+966112345674', 'https://www.google.com/maps/search/?api=1&query=Kingdom+Tower+Riyadh'),
+  ('د. خالد المطيري', 'أخصائي طب الأسنان وتقويم', 'dental', 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=400&q=80', 4.6, 8, 'أخصائي طب الأسنان وتقويم الأسنان، متخصص في الزراعة وتجميل الأسنان.', ARRAY['تقويم الأسنان','زراعة الأسنان','تبييض','حشوات تجميلية'], 170, 'عيادات الابتسامة الذهبية للأسنان', 'مجمع النخيل الطبي، شارع الأمير سلطان، حي النخيل، الرياض', '+966112345675', 'https://www.google.com/maps/search/?api=1&query=Al+Nakheel+Riyadh'),
+  ('د. منى الرشيد', 'استشارية أمراض النساء والولادة', 'women', 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&q=80', 4.8, 14, 'استشارية أمراض النساء والولادة، متابعة الحمل والرعاية النسائية الشاملة.', ARRAY['متابعة الحمل','الفحص الدوري','استشارات الخصوبة'], 160, 'مركز الرشيد للنساء والولادة', 'مجمع الورود الطبي، طريق الملك عبدالله، حي الورود، الرياض', '+966112345676', 'https://www.google.com/maps/search/?api=1&query=Al+Wurud+Riyadh')
 on conflict do nothing;
+
+-- Backfill clinic info for existing doctor rows (matched by name)
+update doctors set clinic_name_ar = 'مركز القلب التخصصي', clinic_address_ar = 'برج العليا الطبي، الدور 5، شارع الملك فهد، حي العليا، الرياض', clinic_phone = '+966112345671', clinic_maps_url = 'https://www.google.com/maps/search/?api=1&query=Olaya+Medical+Tower+Riyadh' where name_ar = 'د. محمد السعيد' and clinic_address_ar is null;
+update doctors set clinic_name_ar = 'عيادات الأطفال السعيدة', clinic_address_ar = 'مجمع الياسمين الطبي، طريق الأمير محمد بن عبدالعزيز، حي الياسمين، الرياض', clinic_phone = '+966112345672', clinic_maps_url = 'https://www.google.com/maps/search/?api=1&query=Yasmin+Medical+Complex+Riyadh' where name_ar = 'د. سارة أحمد' and clinic_address_ar is null;
+update doctors set clinic_name_ar = 'مركز المناظير المتقدم', clinic_address_ar = 'مجمع التخصصي الطبي، شارع التحلية، حي السليمانية، الرياض', clinic_phone = '+966112345673', clinic_maps_url = 'https://www.google.com/maps/search/?api=1&query=Tahlia+Street+Riyadh' where name_ar = 'د. علي إبراهيم' and clinic_address_ar is null;
+update doctors set clinic_name_ar = 'عيادة ندى للجلدية والتجميل', clinic_address_ar = 'برج المملكة، الدور 12، طريق العروبة، حي العليا، الرياض', clinic_phone = '+966112345674', clinic_maps_url = 'https://www.google.com/maps/search/?api=1&query=Kingdom+Tower+Riyadh' where name_ar = 'د. ندى حسن' and clinic_address_ar is null;
+update doctors set clinic_name_ar = 'عيادات الابتسامة الذهبية للأسنان', clinic_address_ar = 'مجمع النخيل الطبي، شارع الأمير سلطان، حي النخيل، الرياض', clinic_phone = '+966112345675', clinic_maps_url = 'https://www.google.com/maps/search/?api=1&query=Al+Nakheel+Riyadh' where name_ar = 'د. خالد المطيري' and clinic_address_ar is null;
+update doctors set clinic_name_ar = 'مركز الرشيد للنساء والولادة', clinic_address_ar = 'مجمع الورود الطبي، طريق الملك عبدالله، حي الورود، الرياض', clinic_phone = '+966112345676', clinic_maps_url = 'https://www.google.com/maps/search/?api=1&query=Al+Wurud+Riyadh' where name_ar = 'د. منى الرشيد' and clinic_address_ar is null;
 
 -- =========================
 -- Helper: create demo data for a given user_id
