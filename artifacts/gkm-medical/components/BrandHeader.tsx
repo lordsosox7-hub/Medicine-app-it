@@ -21,12 +21,14 @@ export function BrandHeader({ title }: BrandHeaderProps) {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-    paddingBottom: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: 8,
+    paddingBottom: 14,
+    alignItems: 'flex-start',
   },
   title: {
-    fontSize: 18,
+    fontSize: 22,
     fontFamily: "Tajawal_700Bold",
+    textAlign: 'right',
+    width: '100%',
   },
 });

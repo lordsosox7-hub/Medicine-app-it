@@ -15,9 +15,18 @@ export function DoctorCard({ doctor, onPress }: DoctorCardProps) {
 
   return (
     <TouchableOpacity
-      activeOpacity={0.8}
+      activeOpacity={0.85}
       onPress={onPress}
-      style={[styles.container, { backgroundColor: colors.card, borderRadius: colors.radius, shadowColor: colors.foreground }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.card,
+          borderRadius: 18,
+          borderColor: colors.border,
+          borderWidth: 1,
+          shadowColor: colors.foreground,
+        },
+      ]}
     >
       <View style={styles.imageContainer}>
         {doctor.photo_url ? (
@@ -30,20 +39,39 @@ export function DoctorCard({ doctor, onPress }: DoctorCardProps) {
           </View>
         )}
       </View>
+
       <View style={styles.info}>
-        <Text style={[styles.name, { color: colors.foreground }]} numberOfLines={1}>
-          {doctor.name_ar}
-        </Text>
-        <Text style={[styles.specialty, { color: colors.mutedForeground }]} numberOfLines={1}>
+        <View style={styles.titleRow}>
+          <Text style={[styles.name, { color: colors.foreground }]} numberOfLines={1}>
+            {doctor.name_ar}
+          </Text>
+          <TouchableOpacity
+            style={[styles.heart, { backgroundColor: colors.muted }]}
+            activeOpacity={0.7}
+            hitSlop={6}
+          >
+            <Feather name="heart" size={16} color={colors.mutedForeground} />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={[styles.specialty, { color: colors.mutedForeground }]} numberOfLines={2}>
           {doctor.specialty_ar}
         </Text>
-        <View style={styles.ratingRow}>
-          <Feather name="star" size={14} color={colors.warning} style={{ fill: colors.warning }} />
-          <Text style={[styles.ratingText, { color: colors.foreground }]}>{doctor.rating.toFixed(1)}</Text>
+
+        <View style={styles.metaRow}>
+          <View style={[styles.ratingPill, { backgroundColor: "#fff7e0" }]}>
+            <Feather name="star" size={12} color={colors.warning} />
+            <Text style={[styles.ratingText, { color: "#a35a00" }]}>
+              {doctor.rating.toFixed(1)}
+            </Text>
+          </View>
+          <View style={styles.metaItem}>
+            <Feather name="briefcase" size={12} color={colors.mutedForeground} />
+            <Text style={[styles.metaText, { color: colors.mutedForeground }]} numberOfLines={1}>
+              متاح اليوم
+            </Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.action}>
-        <Feather name="heart" size={20} color={colors.mutedForeground} />
       </View>
     </TouchableOpacity>
   );
@@ -51,31 +79,31 @@ export function DoctorCard({ doctor, onPress }: DoctorCardProps) {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 12,
     marginBottom: 12,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.04,
     shadowRadius: 8,
-    elevation: 2,
-    alignItems: 'center',
+    elevation: 1,
+    alignItems: "center",
+    gap: 12,
   },
   imageContainer: {
     width: 72,
     height: 72,
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginEnd: 12, // RTL
+    borderRadius: 14,
+    overflow: "hidden",
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   placeholder: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   placeholderText: {
     fontSize: 24,
@@ -83,31 +111,61 @@ const styles = StyleSheet.create({
   },
   info: {
     flex: 1,
-    justifyContent: 'center',
+    minWidth: 0,
+    justifyContent: "center",
+    gap: 6,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
   },
   name: {
-    fontSize: 16,
+    flex: 1,
+    fontSize: 15,
     fontFamily: "Tajawal_700Bold",
-    marginBottom: 4,
-    textAlign: 'right',
+    textAlign: "right",
+  },
+  heart: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
   },
   specialty: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontFamily: "Tajawal_500Medium",
-    marginBottom: 6,
-    textAlign: 'right',
+    textAlign: "right",
+    lineHeight: 18,
   },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 2,
+  },
+  ratingPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
   },
   ratingText: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: "Tajawal_700Bold",
-    marginStart: 4,
   },
-  action: {
-    padding: 8,
-    alignSelf: 'center',
-  }
+  metaItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    flexShrink: 1,
+  },
+  metaText: {
+    fontSize: 12,
+    fontFamily: "Tajawal_500Medium",
+  },
 });
