@@ -13,7 +13,18 @@ export function DoctorCardMini({ doctor }: DoctorCardMiniProps) {
   const colors = useColors();
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.card, borderRadius: colors.radius, shadowColor: colors.foreground }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.card,
+          borderRadius: 18,
+          borderColor: colors.border,
+          borderWidth: 1,
+          shadowColor: colors.foreground,
+        },
+      ]}
+    >
       <View style={styles.imageContainer}>
         {doctor.photo_url ? (
           <Image source={{ uri: doctor.photo_url }} style={styles.image} contentFit="cover" />
@@ -25,16 +36,25 @@ export function DoctorCardMini({ doctor }: DoctorCardMiniProps) {
           </View>
         )}
       </View>
+
       <View style={styles.info}>
         <Text style={[styles.name, { color: colors.foreground }]} numberOfLines={1}>
           {doctor.name_ar}
         </Text>
-        <Text style={[styles.specialty, { color: colors.mutedForeground }]} numberOfLines={1}>
+        <Text style={[styles.specialty, { color: colors.mutedForeground }]} numberOfLines={2}>
           {doctor.specialty_ar}
         </Text>
-        <View style={styles.ratingRow}>
-          <Feather name="star" size={12} color={colors.warning} style={{ fill: colors.warning }} />
-          <Text style={[styles.ratingText, { color: colors.foreground }]}>{doctor.rating.toFixed(1)}</Text>
+        <View style={styles.metaRow}>
+          <View style={[styles.ratingPill, { backgroundColor: "#fff7e0" }]}>
+            <Feather name="star" size={11} color={colors.warning} />
+            <Text style={[styles.ratingText, { color: "#a35a00" }]}>
+              {doctor.rating.toFixed(1)}
+            </Text>
+          </View>
+          <View style={styles.metaItem}>
+            <Feather name="check-circle" size={11} color={colors.success} />
+            <Text style={[styles.metaText, { color: colors.success }]}>موثّق</Text>
+          </View>
         </View>
       </View>
     </View>
@@ -43,58 +63,77 @@ export function DoctorCardMini({ doctor }: DoctorCardMiniProps) {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 12,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.04,
     shadowRadius: 8,
-    elevation: 2,
-    alignItems: 'center',
+    elevation: 1,
+    alignItems: "center",
+    gap: 12,
   },
   imageContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginEnd: 12,
+    width: 64,
+    height: 64,
+    borderRadius: 14,
+    overflow: "hidden",
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   placeholder: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   placeholderText: {
-    fontSize: 20,
+    fontSize: 22,
     fontFamily: "Tajawal_700Bold",
   },
   info: {
     flex: 1,
-    justifyContent: 'center',
+    minWidth: 0,
+    justifyContent: "center",
+    gap: 5,
   },
   name: {
     fontSize: 15,
     fontFamily: "Tajawal_700Bold",
-    marginBottom: 4,
-    textAlign: 'right',
+    textAlign: "right",
   },
   specialty: {
-    fontSize: 12,
+    fontSize: 12.5,
     fontFamily: "Tajawal_500Medium",
-    marginBottom: 6,
-    textAlign: 'right',
+    textAlign: "right",
+    lineHeight: 18,
   },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 2,
+  },
+  ratingPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
   },
   ratingText: {
     fontSize: 12,
     fontFamily: "Tajawal_700Bold",
-    marginStart: 4,
+  },
+  metaItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  metaText: {
+    fontSize: 11.5,
+    fontFamily: "Tajawal_700Bold",
   },
 });

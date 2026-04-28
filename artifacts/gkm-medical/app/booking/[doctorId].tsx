@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDoctor, useCreateAppointment } from "@/hooks/useGkmData";
 import { DoctorCardMini } from "@/components/DoctorCardMini";
 import { GradientButton } from "@/components/GradientButton";
+import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 
 const TIME_SLOTS = ['10:30 صباحاً','11:30 صباحاً','12:30 ظهراً','02:30 ظهراً','04:30 مساءً','06:30 مساءً'];
@@ -128,12 +129,26 @@ export default function BookingScreen() {
 
       <View style={[styles.footer, { backgroundColor: colors.card, borderTopColor: colors.border, paddingBottom: insets.bottom || 16 }]}>
         <View style={styles.recapContainer}>
-          <Text style={[styles.recapLabel, { color: colors.mutedForeground }]}>الوقت المختار</Text>
-          <Text style={[styles.recapValue, { color: colors.foreground }]}>{formattedDateSelected}</Text>
-          <Text style={[styles.recapValue, { color: colors.primary }]}>{selectedTime}</Text>
+          <Text style={[styles.recapLabel, { color: colors.mutedForeground }]}>ملخص الحجز</Text>
+          <View style={styles.recapRow}>
+            <View style={[styles.recapIcon, { backgroundColor: colors.primarySoft }]}>
+              <Feather name="calendar" size={16} color={colors.primary} />
+            </View>
+            <Text style={[styles.recapValue, { color: colors.foreground }]} numberOfLines={1}>
+              {formattedDateSelected}
+            </Text>
+          </View>
+          <View style={styles.recapRow}>
+            <View style={[styles.recapIcon, { backgroundColor: colors.primarySoft }]}>
+              <Feather name="clock" size={16} color={colors.primary} />
+            </View>
+            <Text style={[styles.recapValue, { color: colors.foreground }]} numberOfLines={1}>
+              {selectedTime}
+            </Text>
+          </View>
         </View>
-        <GradientButton 
-          title="تأكيد الحجز" 
+        <GradientButton
+          title="تأكيد الحجز"
           onPress={handleBook}
         />
       </View>
@@ -221,18 +236,31 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   recapContainer: {
-    marginBottom: 16,
+    marginBottom: 14,
+    gap: 8,
   },
   recapLabel: {
-    fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
-    marginBottom: 4,
+    fontSize: 12,
+    fontFamily: "Tajawal_700Bold",
     textAlign: 'right',
+    marginBottom: 2,
+  },
+  recapRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  recapIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   recapValue: {
-    fontSize: 15,
+    flex: 1,
+    fontSize: 14,
     fontFamily: "Tajawal_700Bold",
-    marginBottom: 2,
     textAlign: 'right',
   }
 });
