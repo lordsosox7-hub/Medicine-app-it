@@ -1,9 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { Doctor } from "@/lib/supabase";
 import { useColors } from "@/hooks/useColors";
+import { useIsFavorite, useToggleFavorite } from "@/hooks/useGkmData";
 
 interface DoctorCardProps {
   doctor: Doctor;
@@ -12,6 +13,12 @@ interface DoctorCardProps {
 
 export function DoctorCard({ doctor, onPress }: DoctorCardProps) {
   const colors = useColors();
+  const { data: isFav = false } = useIsFavorite(doctor.id);
+  const toggleFav = useToggleFavorite();
+
+  const onToggleFavorite = () => {
+    toggleFav.mutate({ doctor_id: doctor.id, current: isFav });
+  };
 
   return (
     <TouchableOpacity
@@ -46,11 +53,20 @@ export function DoctorCard({ doctor, onPress }: DoctorCardProps) {
             {doctor.name_ar}
           </Text>
           <TouchableOpacity
-            style={[styles.heart, { backgroundColor: colors.muted }]}
+            style={[
+              styles.heart,
+              { backgroundColor: isFav ? "#fee2e2" : colors.muted },
+            ]}
             activeOpacity={0.7}
             hitSlop={6}
+            onPress={onToggleFavorite}
+            disabled={toggleFav.isPending}
           >
-            <Feather name="heart" size={16} color={colors.mutedForeground} />
+            <Ionicons
+              name={isFav ? "heart" : "heart-outline"}
+              size={16}
+              color={isFav ? "#ef4444" : colors.mutedForeground}
+            />
           </TouchableOpacity>
         </View>
 

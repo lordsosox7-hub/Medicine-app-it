@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDoctor, useIsFavorite, useToggleFavorite } from "@/hooks/useGkmData";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { GradientButton } from "@/components/GradientButton";
 import { RTLChevron } from "@/components/RTLChevron";
 import { CLINIC } from "@/constants/clinic";
@@ -59,11 +59,10 @@ export default function DoctorProfileScreen() {
               disabled={toggleFav.isPending}
             >
               <Animated.View style={{ transform: [{ scale: heartScale }] }}>
-                <Feather
-                  name="heart"
+                <Ionicons
+                  name={isFav ? "heart" : "heart-outline"}
                   size={24}
                   color={isFav ? "#ef4444" : "#ffffff"}
-                  style={isFav ? styles.heartFilled : undefined}
                 />
               </Animated.View>
             </TouchableOpacity>
