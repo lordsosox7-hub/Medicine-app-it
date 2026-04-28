@@ -53,7 +53,7 @@ export default function DoctorProfileScreen() {
               <RTLChevron color="#ffffff" size={24} />
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.iconBtn, isFav && styles.iconBtnActive]}
+              style={styles.iconBtn}
               onPress={onToggleFavorite}
               activeOpacity={0.7}
               disabled={toggleFav.isPending}
@@ -62,7 +62,7 @@ export default function DoctorProfileScreen() {
                 <Ionicons
                   name={isFav ? "heart" : "heart-outline"}
                   size={24}
-                  color={isFav ? "#ef4444" : "#ffffff"}
+                  color="#ffffff"
                 />
               </Animated.View>
             </TouchableOpacity>
