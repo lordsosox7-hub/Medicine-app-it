@@ -23,8 +23,8 @@ export function MessageBubble({ message, viewerRole = "user" }: MessageBubblePro
           styles.bubble,
           {
             backgroundColor: mine ? colors.primary : colors.muted,
-            borderBottomRightRadius: mine ? 4 : 16,
-            borderBottomLeftRadius: !mine ? 4 : 16,
+            borderBottomLeftRadius: mine ? 4 : 16,
+            borderBottomRightRadius: mine ? 16 : 4,
           },
         ]}
       >
@@ -37,8 +37,7 @@ export function MessageBubble({ message, viewerRole = "user" }: MessageBubblePro
           {message.text}
         </Text>
       </View>
-      <View style={[styles.metaRow, { flexDirection: mine ? "row-reverse" : "row" }]}>
-        <Text style={[styles.time, { color: colors.mutedForeground }]}>{timeStr}</Text>
+      <View style={styles.metaRow}>
         {mine && (
           <View style={styles.ticks}>
             <Feather
@@ -54,6 +53,7 @@ export function MessageBubble({ message, viewerRole = "user" }: MessageBubblePro
             />
           </View>
         )}
+        <Text style={[styles.time, { color: colors.mutedForeground }]}>{timeStr}</Text>
       </View>
     </View>
   );

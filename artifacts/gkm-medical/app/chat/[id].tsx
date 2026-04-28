@@ -70,14 +70,15 @@ export default function ChatScreen() {
               <Text style={[styles.avatarInitial, { color: colors.primary }]}>{doctor?.name_ar?.charAt(0) || "د"}</Text>
             </View>
           )}
-          <View>
-            <Text style={[styles.headerName, { color: colors.foreground }]}>{doctor?.name_ar}</Text>
+          <View style={styles.headerTextWrap}>
+            <Text style={[styles.headerName, { color: colors.foreground }]} numberOfLines={1}>
+              {doctor?.name_ar || ""}
+            </Text>
             {otherTyping && (
               <Text style={[styles.headerStatus, { color: colors.primary }]}>يكتب الآن...</Text>
             )}
           </View>
         </View>
-        <View style={{ width: 40 }} />
       </View>
 
       <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" keyboardVerticalOffset={0}>
@@ -122,13 +123,17 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     zIndex: 10,
   },
   backBtn: { padding: 8, marginStart: -8 },
-  headerInfo: { flexDirection: "row", alignItems: "center" },
+  headerInfo: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    marginStart: 8,
+  },
   avatar: { width: 36, height: 36, borderRadius: 18, marginEnd: 12 },
   avatarPlaceholder: {
     width: 36,
@@ -139,14 +144,16 @@ const styles = StyleSheet.create({
     marginEnd: 12,
   },
   avatarInitial: { fontSize: 16, fontFamily: "Tajawal_700Bold" },
-  headerName: { fontSize: 16, fontFamily: "Tajawal_700Bold" },
-  headerStatus: { fontSize: 11, fontFamily: "Tajawal_500Medium", marginTop: 1 },
+  headerTextWrap: { flex: 1 },
+  headerName: { fontSize: 16, fontFamily: "Tajawal_700Bold", textAlign: "right" },
+  headerStatus: { fontSize: 11, fontFamily: "Tajawal_500Medium", marginTop: 1, textAlign: "right" },
   inputContainer: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     paddingHorizontal: 16,
     paddingTop: 12,
     borderTopWidth: 1,
+    gap: 12,
   },
   input: {
     flex: 1,
@@ -158,7 +165,7 @@ const styles = StyleSheet.create({
     fontFamily: "Tajawal_500Medium",
     fontSize: 15,
     textAlign: "right",
-    marginEnd: 12,
+    writingDirection: "rtl",
   },
   sendButton: {
     width: 44,
