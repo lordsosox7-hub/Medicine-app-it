@@ -95,21 +95,13 @@ export default function HomeScreen() {
     >
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerLeft}>
+        <View style={styles.userBlock}>
           <TouchableOpacity
-            style={[
-              styles.iconButton,
-              { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 },
-            ]}
-            activeOpacity={0.7}
+            style={[styles.avatar, { backgroundColor: colors.primarySoft }]}
+            activeOpacity={0.8}
           >
-            <Feather name="bell" size={20} color={colors.foreground} />
-            <View style={[styles.badge, { backgroundColor: colors.danger, borderColor: colors.background }]}>
-              <Text style={styles.badgeText}>3</Text>
-            </View>
+            <Text style={[styles.avatarText, { color: colors.primary }]}>{userName.charAt(0)}</Text>
           </TouchableOpacity>
-        </View>
-        <View style={styles.headerRight}>
           <View style={styles.greetingBlock}>
             <Text style={[styles.greeting, { color: colors.foreground }]} numberOfLines={1}>
               مرحباً، {userName} 👋
@@ -118,10 +110,19 @@ export default function HomeScreen() {
               نتمنى لك يوماً صحياً
             </Text>
           </View>
-          <View style={[styles.avatar, { backgroundColor: colors.primarySoft }]}>
-            <Text style={[styles.avatarText, { color: colors.primary }]}>{userName.charAt(0)}</Text>
-          </View>
         </View>
+        <TouchableOpacity
+          style={[
+            styles.iconButton,
+            { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 },
+          ]}
+          activeOpacity={0.7}
+        >
+          <Feather name="bell" size={20} color={colors.foreground} />
+          <View style={[styles.badge, { backgroundColor: colors.danger, borderColor: colors.background }]}>
+            <Text style={styles.badgeText}>3</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       {/* Search */}
@@ -293,20 +294,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     marginBottom: 20,
-  },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "flex-start",
     gap: 12,
   },
+  userBlock: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flex: 1,
+    minWidth: 0,
+  },
   greetingBlock: {
-    flexShrink: 1,
+    flex: 1,
+    minWidth: 0,
   },
   iconButton: {
     width: 44,
