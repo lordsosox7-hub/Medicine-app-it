@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   type Appointment,
@@ -159,6 +160,37 @@ export function useMessages(conversationId?: string) {
       return (data ?? []) as Message[];
     },
   });
+}
+
+export function useRealtimeMessages(conversationId?: string) {
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!conversationId) return;
+    const channel = supabase
+      .channel(`messages:${conversationId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as Message;
+          qc.setQueryData<Message[]>(["messages", conversationId], (prev) => {
+            const list = prev ?? [];
+            if (list.some((m) => m.id === newMsg.id)) return list;
+            return [...list, newMsg];
+          });
+          qc.invalidateQueries({ queryKey: ["conversations"] });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [conversationId, qc]);
 }
 
 export function useSendMessage() {

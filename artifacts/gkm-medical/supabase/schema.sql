@@ -193,3 +193,6 @@ begin
   end if;
 end;
 $$;
+
+-- Enable realtime on messages so doctor replies stream into the chat instantly
+alter publication supabase_realtime add table messages;

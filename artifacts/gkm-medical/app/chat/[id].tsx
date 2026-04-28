@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, Platform, TouchableOpacity } from "r
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useDoctor, useMessages, useSendMessage, useOrCreateConversation } from "@/hooks/useGkmData";
+import { useDoctor, useMessages, useSendMessage, useOrCreateConversation, useRealtimeMessages } from "@/hooks/useGkmData";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { FlatList } from "react-native";
 import { MessageBubble } from "@/components/MessageBubble";
@@ -21,6 +21,7 @@ export default function ChatScreen() {
   const { data: doctor } = useDoctor(doctorId);
   const { data: messages } = useMessages(conversationId);
   const sendMessage = useSendMessage();
+  useRealtimeMessages(conversationId);
 
   const [text, setText] = useState("");
 
