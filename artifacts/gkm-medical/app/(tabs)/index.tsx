@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from "
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { SearchBar } from "@/components/SearchBar";
@@ -130,17 +130,23 @@ export default function HomeScreen() {
         <TouchableOpacity
           style={[
             styles.iconButton,
-            { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 },
+            {
+              backgroundColor: colors.primarySoft,
+              shadowColor: colors.primary,
+            },
           ]}
           activeOpacity={0.7}
           onPress={() => router.push("/notifications")}
           accessibilityLabel="الإشعارات"
         >
-          <Feather name="bell" size={20} color={colors.foreground} />
+          <Ionicons name="notifications-outline" size={22} color={colors.primary} />
           {unreadCount > 0 && (
-            <View style={[styles.badge, { backgroundColor: colors.danger, borderColor: colors.background }]}>
-              <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : String(unreadCount)}</Text>
-            </View>
+            <View
+              style={[
+                styles.badge,
+                { backgroundColor: colors.danger, borderColor: colors.background },
+              ]}
+            />
           )}
         </TouchableOpacity>
       </View>
@@ -335,30 +341,25 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 2,
   },
   badge: {
     position: "absolute",
-    top: 4,
-    insetInlineEnd: 4,
-    minWidth: 16,
-    height: 16,
-    borderRadius: 8,
-    paddingHorizontal: 4,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1.5,
-  },
-  badgeText: {
-    color: "#ffffff",
-    fontSize: 9,
-    fontFamily: "Tajawal_700Bold",
-    lineHeight: 11,
+    top: 10,
+    insetInlineEnd: 10,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 2,
   },
   greeting: {
     fontSize: 15,
