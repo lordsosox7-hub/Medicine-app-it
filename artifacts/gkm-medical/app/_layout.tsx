@@ -14,6 +14,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { I18nManager, Platform } from "react-native";
 import { ensureDemoData } from "@/hooks/useGkmData";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ThemeProvider } from "@/hooks/useTheme";
+import { useColors } from "@/hooks/useColors";
 
 // Force RTL BEFORE any rendering
 if (!I18nManager.isRTL) {
@@ -33,8 +35,19 @@ SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 
 function RootLayoutNav() {
+  const colors = useColors();
   return (
-    <Stack screenOptions={{ headerBackTitle: "رجوع", headerTitleAlign: 'center', headerTitleStyle: { fontFamily: 'Tajawal_700Bold' } }}>
+    <Stack
+      screenOptions={{
+        headerBackTitle: "رجوع",
+        headerTitleAlign: 'center',
+        headerTitleStyle: { fontFamily: 'Tajawal_700Bold', color: colors.foreground },
+        headerStyle: { backgroundColor: colors.background },
+        headerTintColor: colors.foreground,
+        headerShadowVisible: false,
+        contentStyle: { backgroundColor: colors.background },
+      }}
+    >
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="welcome" options={{ headerShown: false }} />
       <Stack.Screen name="sign-in" options={{ headerShown: false }} />
@@ -91,13 +104,15 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <GestureHandlerRootView>
-            <KeyboardProvider>
-              <RootLayoutNav />
-            </KeyboardProvider>
-          </GestureHandlerRootView>
-        </QueryClientProvider>
+        <ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <GestureHandlerRootView>
+              <KeyboardProvider>
+                <RootLayoutNav />
+              </KeyboardProvider>
+            </GestureHandlerRootView>
+          </QueryClientProvider>
+        </ThemeProvider>
       </ErrorBoundary>
     </SafeAreaProvider>
   );

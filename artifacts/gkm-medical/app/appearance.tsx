@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { useTheme } from "@/hooks/useTheme";
 import { Feather } from "@expo/vector-icons";
-import { getTheme, setTheme, Theme } from "@/lib/preferences";
+import { Theme } from "@/lib/preferences";
 
 const OPTIONS: Array<{ value: Theme; label: string; description: string; icon: keyof typeof Feather.glyphMap }> = [
   { value: "light", label: "فاتح", description: "مظهر فاتح طوال الوقت", icon: "sun" },
@@ -12,14 +13,9 @@ const OPTIONS: Array<{ value: Theme; label: string; description: string; icon: k
 
 export default function AppearanceScreen() {
   const colors = useColors();
-  const [current, setCurrent] = useState<Theme>("system");
-
-  useEffect(() => {
-    getTheme().then(setCurrent);
-  }, []);
+  const { theme: current, setTheme } = useTheme();
 
   const onSelect = async (t: Theme) => {
-    setCurrent(t);
     await setTheme(t);
   };
 
@@ -63,7 +59,7 @@ export default function AppearanceScreen() {
         })}
       </View>
       <Text style={[styles.note, { color: colors.mutedForeground }]}>
-        ملاحظة: يتم تطبيق المظهر الداكن بشكل تلقائي حسب إعدادات نظامك حالياً.
+        يتم تطبيق المظهر فوراً على جميع شاشات التطبيق.
       </Text>
     </ScrollView>
   );
