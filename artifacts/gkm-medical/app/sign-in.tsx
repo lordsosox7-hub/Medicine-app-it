@@ -18,13 +18,11 @@ import { supabase } from "@/lib/supabase";
 import { isOnboarded } from "@/lib/userId";
 import { RTLChevron } from "@/components/RTLChevron";
 
-type Step = "email" | "sent";
-
 export default function SignInScreen() {
   const router = useRouter();
   const colors = useColors();
-  const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -39,29 +37,30 @@ export default function SignInScreen() {
     };
   }, [router]);
 
-  const sendMagicLink = async () => {
+  const signIn = async () => {
     const trimmed = email.trim().toLowerCase();
     if (!trimmed || !trimmed.includes("@")) {
       Alert.alert("خطأ", "يرجى إدخال بريد إلكتروني صحيح");
       return;
     }
+    if (!password || password.length < 6) {
+      Alert.alert("خطأ", "كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+      return;
+    }
     setLoading(true);
     try {
-      const redirectTo =
-        Platform.OS === "web" && typeof window !== "undefined"
-          ? window.location.origin
-          : undefined;
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await supabase.auth.signInWithPassword({
         email: trimmed,
-        options: {
-          shouldCreateUser: true,
-          ...(redirectTo ? { emailRedirectTo: redirectTo } : {}),
-        },
+        password,
       });
       if (error) throw error;
-      setStep("sent");
     } catch (e: any) {
-      Alert.alert("تعذّر الإرسال", e?.message ?? "حدث خطأ");
+      const msg =
+        e?.message?.toLowerCase().includes("invalid") ||
+        e?.message?.toLowerCase().includes("credentials")
+          ? "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+          : e?.message ?? "حدث خطأ";
+      Alert.alert("تعذّر تسجيل الدخول", msg);
     } finally {
       setLoading(false);
     }
@@ -86,76 +85,82 @@ export default function SignInScreen() {
           </View>
 
           <View style={[styles.card, { backgroundColor: colors.background }]}>
-            {step === "email" ? (
-              <>
-                <Text style={[styles.title, { color: colors.foreground }]}>
-                  تسجيل الدخول
+            <Text style={[styles.title, { color: colors.foreground }]}>
+              تسجيل الدخول
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.muted }]}>
+              أدخل بريدك الإلكتروني وكلمة المرور للمتابعة
+            </Text>
+
+            <Text style={[styles.label, { color: colors.muted }]}>
+              البريد الإلكتروني
+            </Text>
+            <View
+              style={[
+                styles.inputWrap,
+                { backgroundColor: colors.primarySoft },
+              ]}
+            >
+              <TextInput
+                style={[styles.input, { color: colors.foreground }]}
+                placeholder="example@email.com"
+                placeholderTextColor={colors.muted}
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                autoComplete="email"
+                keyboardType="email-address"
+                textAlign="left"
+                editable={!loading}
+              />
+            </View>
+
+            <Text style={[styles.label, { color: colors.muted }]}>
+              كلمة المرور
+            </Text>
+            <View
+              style={[
+                styles.inputWrap,
+                { backgroundColor: colors.primarySoft },
+              ]}
+            >
+              <TextInput
+                style={[styles.input, { color: colors.foreground }]}
+                placeholder="••••••••"
+                placeholderTextColor={colors.muted}
+                value={password}
+                onChangeText={setPassword}
+                autoCapitalize="none"
+                autoComplete="password"
+                secureTextEntry
+                textAlign="left"
+                editable={!loading}
+                onSubmitEditing={signIn}
+              />
+            </View>
+
+            <GradientButton
+              title={loading ? "جارٍ الدخول..." : "تسجيل الدخول"}
+              onPress={signIn}
+            />
+
+            <Pressable
+              onPress={() => router.replace("/register")}
+              style={styles.altLink}
+            >
+              <Text style={[styles.altText, { color: colors.muted }]}>
+                ليس لديك حساب؟{" "}
+                <Text style={{ color: colors.primary, fontFamily: "Tajawal_700Bold" }}>
+                  أنشئ حساباً جديداً
                 </Text>
-                <Text style={[styles.subtitle, { color: colors.muted }]}>
-                  أدخل بريدك الإلكتروني وسنرسل لك رابط دخول سحري
-                </Text>
-                <View
-                  style={[
-                    styles.inputWrap,
-                    { backgroundColor: colors.primarySoft },
-                  ]}
-                >
-                  <TextInput
-                    style={[styles.input, { color: colors.foreground }]}
-                    placeholder="example@email.com"
-                    placeholderTextColor={colors.muted}
-                    value={email}
-                    onChangeText={setEmail}
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    keyboardType="email-address"
-                    textAlign="left"
-                    editable={!loading}
-                  />
-                </View>
-                <GradientButton
-                  title={loading ? "جارٍ الإرسال..." : "إرسال رابط الدخول"}
-                  onPress={sendMagicLink}
-                />
-                <Pressable
-                  onPress={() => router.replace("/register")}
-                  style={styles.altLink}
-                >
-                  <Text style={[styles.altText, { color: colors.muted }]}>
-                    ليس لديك حساب؟{" "}
-                    <Text style={{ color: colors.primary, fontFamily: "Tajawal_700Bold" }}>
-                      أنشئ حساباً جديداً
-                    </Text>
-                  </Text>
-                </Pressable>
-                {loading && (
-                  <ActivityIndicator
-                    color={colors.primary}
-                    style={{ marginTop: 12 }}
-                  />
-                )}
-              </>
-            ) : (
-              <>
-                <Text style={[styles.title, { color: colors.foreground }]}>
-                  تحقّق من بريدك
-                </Text>
-                <Text style={[styles.subtitle, { color: colors.muted }]}>
-                  أرسلنا رابط الدخول إلى{"\n"}
-                  <Text style={{ fontFamily: "Tajawal_700Bold" }}>
-                    {email}
-                  </Text>
-                  {"\n"}اضغط على الرابط في البريد لإكمال تسجيل الدخول.
-                </Text>
-                <Pressable
-                  onPress={() => setStep("email")}
-                  style={styles.backBtn}
-                >
-                  <Text style={[styles.backText, { color: colors.primary }]}>
-                    استخدم بريداً مختلفاً
-                  </Text>
-                </Pressable>
-              </>
+              </Text>
+            </Pressable>
+
+            {loading && (
+              <ActivityIndicator
+                color={colors.primary}
+                style={{ marginTop: 12 }}
+              />
             )}
           </View>
         </View>
@@ -174,19 +179,19 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    marginBottom: 32,
+    marginBottom: 24,
   },
   brand: {
     color: "#ffffff",
-    fontSize: 32,
+    fontSize: 28,
     fontFamily: "Tajawal_700Bold",
   },
   brandSub: {
     color: "#ffffff",
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "Tajawal_500Medium",
     opacity: 0.85,
-    marginTop: 4,
+    marginTop: 2,
   },
   card: {
     borderRadius: 24,
@@ -210,25 +215,22 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     lineHeight: 20,
   },
+  label: {
+    fontSize: 13,
+    fontFamily: "Tajawal_500Medium",
+    marginBottom: 6,
+    textAlign: "right",
+  },
   inputWrap: {
     borderRadius: 14,
     paddingHorizontal: 16,
-    height: 54,
+    height: 52,
     justifyContent: "center",
-    marginBottom: 16,
+    marginBottom: 14,
   },
   input: {
     fontSize: 16,
     fontFamily: "Tajawal_500Medium",
-  },
-  backBtn: {
-    alignItems: "center",
-    paddingVertical: 12,
-    marginTop: 8,
-  },
-  backText: {
-    fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
   },
   backChip: {
     position: "absolute",

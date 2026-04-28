@@ -9,6 +9,7 @@ import {
   Platform,
   ActivityIndicator,
   Pressable,
+  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,15 +19,15 @@ import { supabase } from "@/lib/supabase";
 import { setUserName } from "@/lib/userId";
 import { RTLChevron } from "@/components/RTLChevron";
 
-type Step = "form" | "sent";
-
 export default function RegisterScreen() {
   const router = useRouter();
   const colors = useColors();
-  const [step, setStep] = useState<Step>("form");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confirmSent, setConfirmSent] = useState(false);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -48,25 +49,44 @@ export default function RegisterScreen() {
       Alert.alert("خطأ", "يرجى إدخال بريد إلكتروني صحيح");
       return;
     }
+    if (!password || password.length < 6) {
+      Alert.alert("خطأ", "كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("خطأ", "كلمتا المرور غير متطابقتين");
+      return;
+    }
     setLoading(true);
     try {
       await setUserName(trimmedName);
-      const redirectTo =
-        Platform.OS === "web" && typeof window !== "undefined"
-          ? window.location.origin
-          : undefined;
-      const { error } = await supabase.auth.signInWithOtp({
+      const { data, error } = await supabase.auth.signUp({
         email: trimmedEmail,
+        password,
         options: {
-          shouldCreateUser: true,
           data: { full_name: trimmedName },
-          ...(redirectTo ? { emailRedirectTo: redirectTo } : {}),
         },
       });
       if (error) throw error;
-      setStep("sent");
+      if (data.session) {
+        return;
+      }
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password,
+      });
+      if (signInErr) {
+        setConfirmSent(true);
+      }
     } catch (e: any) {
-      Alert.alert("تعذّر إنشاء الحساب", e?.message ?? "حدث خطأ");
+      const lower = (e?.message ?? "").toLowerCase();
+      let msg = e?.message ?? "حدث خطأ";
+      if (lower.includes("already") || lower.includes("registered")) {
+        msg = "هذا البريد مسجّل بالفعل. سجّل الدخول بدلاً من ذلك.";
+      } else if (lower.includes("password")) {
+        msg = "كلمة المرور ضعيفة جداً. اختر كلمة أقوى.";
+      }
+      Alert.alert("تعذّر إنشاء الحساب", msg);
     } finally {
       setLoading(false);
     }
@@ -85,20 +105,38 @@ export default function RegisterScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.flex}
       >
-        <View style={styles.inner}>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.header}>
             <Text style={styles.brand}>GKM&apos;s Unit</Text>
             <Text style={styles.brandSub}>Medical Care</Text>
           </View>
 
           <View style={[styles.card, { backgroundColor: colors.background }]}>
-            {step === "form" ? (
+            {confirmSent ? (
+              <>
+                <Text style={[styles.title, { color: colors.foreground }]}>
+                  تحقّق من بريدك
+                </Text>
+                <Text style={[styles.subtitle, { color: colors.muted }]}>
+                  أرسلنا رسالة تفعيل إلى{"\n"}
+                  <Text style={{ fontFamily: "Tajawal_700Bold" }}>{email}</Text>
+                  {"\n"}اضغط على رابط التفعيل ثم سجّل الدخول.
+                </Text>
+                <GradientButton
+                  title="الذهاب لتسجيل الدخول"
+                  onPress={() => router.replace("/sign-in")}
+                />
+              </>
+            ) : (
               <>
                 <Text style={[styles.title, { color: colors.foreground }]}>
                   إنشاء حساب جديد
                 </Text>
                 <Text style={[styles.subtitle, { color: colors.muted }]}>
-                  أدخل بياناتك وسنرسل لك رابط تفعيل عبر البريد
+                  أنشئ حسابك للوصول إلى خدمات الرعاية الطبية
                 </Text>
 
                 <Text style={[styles.label, { color: colors.muted }]}>
@@ -144,6 +182,51 @@ export default function RegisterScreen() {
                   />
                 </View>
 
+                <Text style={[styles.label, { color: colors.muted }]}>
+                  كلمة المرور
+                </Text>
+                <View
+                  style={[
+                    styles.inputWrap,
+                    { backgroundColor: colors.primarySoft },
+                  ]}
+                >
+                  <TextInput
+                    style={[styles.input, { color: colors.foreground }]}
+                    placeholder="6 أحرف على الأقل"
+                    placeholderTextColor={colors.muted}
+                    value={password}
+                    onChangeText={setPassword}
+                    autoCapitalize="none"
+                    secureTextEntry
+                    textAlign="left"
+                    editable={!loading}
+                  />
+                </View>
+
+                <Text style={[styles.label, { color: colors.muted }]}>
+                  تأكيد كلمة المرور
+                </Text>
+                <View
+                  style={[
+                    styles.inputWrap,
+                    { backgroundColor: colors.primarySoft },
+                  ]}
+                >
+                  <TextInput
+                    style={[styles.input, { color: colors.foreground }]}
+                    placeholder="••••••••"
+                    placeholderTextColor={colors.muted}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    autoCapitalize="none"
+                    secureTextEntry
+                    textAlign="left"
+                    editable={!loading}
+                    onSubmitEditing={submit}
+                  />
+                </View>
+
                 <GradientButton
                   title={loading ? "جارٍ الإنشاء..." : "إنشاء الحساب"}
                   onPress={submit}
@@ -168,28 +251,9 @@ export default function RegisterScreen() {
                   />
                 )}
               </>
-            ) : (
-              <>
-                <Text style={[styles.title, { color: colors.foreground }]}>
-                  تحقّق من بريدك
-                </Text>
-                <Text style={[styles.subtitle, { color: colors.muted }]}>
-                  أرسلنا رابط التفعيل إلى{"\n"}
-                  <Text style={{ fontFamily: "Tajawal_700Bold" }}>{email}</Text>
-                  {"\n"}اضغط على الرابط لتفعيل حسابك.
-                </Text>
-                <Pressable
-                  onPress={() => setStep("form")}
-                  style={styles.altLink}
-                >
-                  <Text style={[styles.altText, { color: colors.primary, fontFamily: "Tajawal_700Bold" }]}>
-                    تعديل البيانات
-                  </Text>
-                </Pressable>
-              </>
             )}
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
@@ -210,30 +274,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  inner: {
-    flex: 1,
+  scroll: {
+    flexGrow: 1,
     justifyContent: "center",
     paddingHorizontal: 24,
+    paddingVertical: 60,
   },
   header: {
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 20,
   },
   brand: {
     color: "#ffffff",
-    fontSize: 28,
+    fontSize: 26,
     fontFamily: "Tajawal_700Bold",
   },
   brandSub: {
     color: "#ffffff",
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: "Tajawal_500Medium",
     opacity: 0.85,
     marginTop: 2,
   },
   card: {
     borderRadius: 24,
-    padding: 24,
+    padding: 22,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 20,
@@ -250,7 +315,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Tajawal_400Regular",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 18,
     lineHeight: 22,
   },
   label: {
@@ -262,9 +327,9 @@ const styles = StyleSheet.create({
   inputWrap: {
     borderRadius: 14,
     paddingHorizontal: 16,
-    height: 52,
+    height: 50,
     justifyContent: "center",
-    marginBottom: 14,
+    marginBottom: 12,
   },
   input: {
     fontSize: 16,
