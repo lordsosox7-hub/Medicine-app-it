@@ -48,9 +48,7 @@ export default function ProfileScreen() {
     >
       <View style={[styles.avatarBlock]}>
         <View style={[styles.avatar, { backgroundColor: colors.primarySoft }]}>
-          <Text style={[styles.avatarText, { color: colors.primary }]}>
-            {(name || "؟").charAt(0)}
-          </Text>
+          <Feather name="user" size={36} color={colors.primary} />
         </View>
         <TouchableOpacity style={[styles.avatarEdit, { backgroundColor: colors.primary }]}>
           <Feather name="camera" size={14} color={colors.primaryForeground} />

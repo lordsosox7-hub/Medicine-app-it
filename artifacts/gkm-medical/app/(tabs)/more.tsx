@@ -55,9 +55,7 @@ export default function MoreScreen() {
           ]}
         >
           <View style={[styles.avatar, { backgroundColor: colors.primarySoft }]}>
-            <Text style={[styles.avatarText, { color: colors.primary }]}>
-              {userName.charAt(0)}
-            </Text>
+            <Feather name="user" size={26} color={colors.primary} />
           </View>
           <View style={styles.profileInfo}>
             <Text style={[styles.name, { color: colors.foreground }]} numberOfLines={1}>

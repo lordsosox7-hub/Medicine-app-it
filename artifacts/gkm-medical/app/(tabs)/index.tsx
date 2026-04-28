@@ -99,8 +99,9 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={[styles.avatar, { backgroundColor: colors.primarySoft }]}
             activeOpacity={0.8}
+            onPress={() => router.push("/profile")}
           >
-            <Text style={[styles.avatarText, { color: colors.primary }]}>{userName.charAt(0)}</Text>
+            <Feather name="user" size={22} color={colors.primary} />
           </TouchableOpacity>
           <View style={styles.greetingBlock}>
             <Text style={[styles.greeting, { color: colors.foreground }]} numberOfLines={1}>
