@@ -6,13 +6,14 @@ import { useColors } from "@/hooks/useColors";
 interface QuickActionCardProps {
   label: string;
   subtitle?: string;
-  icon: keyof typeof Feather.glyphMap;
+  icon?: keyof typeof Feather.glyphMap;
+  iconNode?: React.ReactNode;
   iconColor: string;
   iconBg: string;
   onPress: () => void;
 }
 
-export function QuickActionCard({ label, subtitle, icon, iconColor, iconBg, onPress }: QuickActionCardProps) {
+export function QuickActionCard({ label, subtitle, icon, iconNode, iconColor, iconBg, onPress }: QuickActionCardProps) {
   const colors = useColors();
 
   return (
@@ -31,7 +32,7 @@ export function QuickActionCard({ label, subtitle, icon, iconColor, iconBg, onPr
       ]}
     >
       <View style={[styles.iconContainer, { backgroundColor: iconBg }]}>
-        <Feather name={icon} size={22} color={iconColor} />
+        {iconNode ?? (icon ? <Feather name={icon} size={22} color={iconColor} /> : null)}
       </View>
       <Text style={[styles.label, { color: colors.foreground }]} numberOfLines={1}>
         {label}

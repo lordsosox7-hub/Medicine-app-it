@@ -4,7 +4,8 @@ import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 
 interface HealthMetricCardProps {
-  icon: keyof typeof Feather.glyphMap;
+  icon?: keyof typeof Feather.glyphMap;
+  iconNode?: React.ReactNode;
   iconColor: string;
   iconBg: string;
   label: string;
@@ -13,7 +14,7 @@ interface HealthMetricCardProps {
   status: "normal" | "warning" | "alert";
 }
 
-export function HealthMetricCard({ icon, iconColor, iconBg, label, value, unit, status }: HealthMetricCardProps) {
+export function HealthMetricCard({ icon, iconNode, iconColor, iconBg, label, value, unit, status }: HealthMetricCardProps) {
   const colors = useColors();
 
   const statusColor =
@@ -35,7 +36,7 @@ export function HealthMetricCard({ icon, iconColor, iconBg, label, value, unit, 
     >
       <View style={styles.topRow}>
         <View style={[styles.iconContainer, { backgroundColor: iconBg }]}>
-          <Feather name={icon} size={18} color={iconColor} />
+          {iconNode ?? (icon ? <Feather name={icon} size={18} color={iconColor} /> : null)}
         </View>
         <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
       </View>

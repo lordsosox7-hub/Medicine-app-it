@@ -8,5 +8,6 @@ import { useTheme } from "./useTheme";
 export function useColors() {
   const { scheme } = useTheme();
   const palette = scheme === "dark" ? colors.dark : colors.light;
-  return { ...palette, radius: colors.radius };
+  const accents = scheme === "dark" ? colors.accents.dark : colors.accents.light;
+  return { ...palette, accents, radius: colors.radius };
 }

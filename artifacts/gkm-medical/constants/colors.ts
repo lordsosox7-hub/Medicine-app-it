@@ -83,6 +83,39 @@ const colors = {
   },
 
   radius: 16,
+
+  accents: {
+    light: {
+      blue:   { color: "#1e6bf0", bg: "#e8f0ff" },
+      green:  { color: "#16a34a", bg: "#e7f7ee" },
+      purple: { color: "#7c3aed", bg: "#f1ebff" },
+      teal:   { color: "#0891b2", bg: "#e0f5fa" },
+      amber:  { color: "#d97706", bg: "#fef3d7" },
+      red:    { color: "#ef4444", bg: "#fde8e8" },
+      indigo: { color: "#0b3fb5", bg: "#e8f0ff" },
+      rose:   { color: "#e11d48", bg: "#ffe4ec" },
+    },
+    dark: {
+      blue:   { color: "#60a5fa", bg: "#16263f" },
+      green:  { color: "#34d399", bg: "#10281d" },
+      purple: { color: "#a78bfa", bg: "#221a3a" },
+      teal:   { color: "#22d3ee", bg: "#0e2a32" },
+      amber:  { color: "#fbbf24", bg: "#332410" },
+      red:    { color: "#fca5a5", bg: "#3a1818" },
+      indigo: { color: "#818cf8", bg: "#1a1f3a" },
+      rose:   { color: "#fb7185", bg: "#3a1820" },
+    },
+  },
 };
+
+export type AccentName =
+  | "blue"
+  | "green"
+  | "purple"
+  | "teal"
+  | "amber"
+  | "red"
+  | "indigo"
+  | "rose";
 
 export default colors;

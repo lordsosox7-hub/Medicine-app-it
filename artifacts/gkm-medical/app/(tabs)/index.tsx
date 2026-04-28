@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from "
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { SearchBar } from "@/components/SearchBar";
@@ -31,10 +31,13 @@ export default function HomeScreen() {
   const isWeb = Platform.OS === "web";
   const headerTop = isWeb ? 67 : insets.top;
 
+  const a = colors.accents;
+
   const quickActions: Array<{
     label: string;
     subtitle: string;
-    icon: keyof typeof Feather.glyphMap;
+    icon?: keyof typeof Feather.glyphMap;
+    iconNode?: React.ReactNode;
     iconColor: string;
     iconBg: string;
     onPress: () => void;
@@ -43,48 +46,58 @@ export default function HomeScreen() {
       label: "احجز موعد",
       subtitle: "مع أفضل الأطباء",
       icon: "calendar",
-      iconColor: "#1e6bf0",
-      iconBg: "#e8f0ff",
+      iconColor: a.blue.color,
+      iconBg: a.blue.bg,
       onPress: () => router.push("/(tabs)/my-doctor"),
     },
     {
       label: "استشارة طبية",
       subtitle: "تواصل فوري",
-      icon: "message-circle",
-      iconColor: "#16a34a",
-      iconBg: "#e7f7ee",
+      iconNode: (
+        <MaterialCommunityIcons name="stethoscope" size={22} color={a.green.color} />
+      ),
+      iconColor: a.green.color,
+      iconBg: a.green.bg,
       onPress: () => router.push("/(tabs)/chats"),
     },
     {
       label: "نتائج التحاليل",
       subtitle: "تابع نتائجك",
-      icon: "activity",
-      iconColor: "#7c3aed",
-      iconBg: "#f1ebff",
+      iconNode: (
+        <MaterialCommunityIcons name="test-tube" size={22} color={a.purple.color} />
+      ),
+      iconColor: a.purple.color,
+      iconBg: a.purple.bg,
       onPress: () => router.push("/lab-results"),
     },
     {
       label: "الأدوية",
       subtitle: "وصفاتك الطبية",
-      icon: "thermometer",
-      iconColor: "#0891b2",
-      iconBg: "#e0f5fa",
+      iconNode: (
+        <MaterialCommunityIcons name="pill" size={22} color={a.teal.color} />
+      ),
+      iconColor: a.teal.color,
+      iconBg: a.teal.bg,
       onPress: () => {},
     },
     {
       label: "الملف الطبي",
       subtitle: "سجلك الكامل",
-      icon: "file-text",
-      iconColor: "#0b3fb5",
-      iconBg: "#e8f0ff",
+      iconNode: (
+        <MaterialCommunityIcons name="clipboard-pulse" size={22} color={a.indigo.color} />
+      ),
+      iconColor: a.indigo.color,
+      iconBg: a.indigo.bg,
       onPress: () => router.push("/medical-file"),
     },
     {
       label: "الطوارئ",
       subtitle: "اتصل الآن",
-      icon: "alert-circle",
-      iconColor: "#ef4444",
-      iconBg: "#fde8e8",
+      iconNode: (
+        <MaterialCommunityIcons name="ambulance" size={22} color={a.red.color} />
+      ),
+      iconColor: a.red.color,
+      iconBg: a.red.bg,
       onPress: () => {},
     },
   ];
@@ -220,35 +233,35 @@ export default function HomeScreen() {
           contentContainerStyle={styles.metricsScroll}
         >
           <HealthMetricCard
-            icon="heart"
-            iconColor="#ef4444"
-            iconBg="#fde8e8"
+            iconNode={<MaterialCommunityIcons name="heart-pulse" size={20} color={a.rose.color} />}
+            iconColor={a.rose.color}
+            iconBg={a.rose.bg}
             label="معدل ضربات القلب"
             value="72"
             unit="bpm"
             status="normal"
           />
           <HealthMetricCard
-            icon="activity"
-            iconColor="#1e6bf0"
-            iconBg="#e8f0ff"
+            iconNode={<MaterialCommunityIcons name="gauge" size={20} color={a.blue.color} />}
+            iconColor={a.blue.color}
+            iconBg={a.blue.bg}
             label="ضغط الدم"
             value="120/80"
             status="normal"
           />
           <HealthMetricCard
-            icon="droplet"
-            iconColor="#7c3aed"
-            iconBg="#f1ebff"
+            iconNode={<MaterialCommunityIcons name="water" size={20} color={a.purple.color} />}
+            iconColor={a.purple.color}
+            iconBg={a.purple.bg}
             label="سكر الدم"
             value="98"
             unit="mg/dL"
             status="normal"
           />
           <HealthMetricCard
-            icon="bar-chart-2"
-            iconColor="#f59e0b"
-            iconBg="#fef3d7"
+            iconNode={<MaterialCommunityIcons name="scale-bathroom" size={20} color={a.amber.color} />}
+            iconColor={a.amber.color}
+            iconBg={a.amber.bg}
             label="الوزن"
             value="70"
             unit="kg"
@@ -273,23 +286,23 @@ export default function HomeScreen() {
         <View style={styles.quickServicesRow}>
           <QuickActionCard
             label="تواصل مع طبيب"
-            icon="phone-call"
-            iconColor="#16a34a"
-            iconBg="#e7f7ee"
+            iconNode={<MaterialCommunityIcons name="phone-in-talk" size={22} color={a.green.color} />}
+            iconColor={a.green.color}
+            iconBg={a.green.bg}
             onPress={() => router.push("/(tabs)/chats")}
           />
           <QuickActionCard
             label="إعادة وصفة"
-            icon="refresh-cw"
-            iconColor="#0891b2"
-            iconBg="#e0f5fa"
+            iconNode={<MaterialCommunityIcons name="prescription" size={22} color={a.teal.color} />}
+            iconColor={a.teal.color}
+            iconBg={a.teal.bg}
             onPress={() => {}}
           />
           <QuickActionCard
             label="زيارة منزلية"
-            icon="home"
-            iconColor="#1e6bf0"
-            iconBg="#e8f0ff"
+            iconNode={<MaterialCommunityIcons name="home-heart" size={22} color={a.blue.color} />}
+            iconColor={a.blue.color}
+            iconBg={a.blue.bg}
             onPress={() => {}}
           />
         </View>
