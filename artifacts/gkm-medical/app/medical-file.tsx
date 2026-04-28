@@ -77,15 +77,15 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontSize: 32,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
   },
   name: {
     fontSize: 20,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     marginBottom: 8,
   },
   subInfo: {
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
   }
 });

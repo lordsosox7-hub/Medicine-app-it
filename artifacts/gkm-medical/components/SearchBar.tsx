@@ -16,7 +16,7 @@ export function SearchBar({ placeholder, value, onChangeText }: SearchBarProps) 
     <View style={[styles.container, { backgroundColor: colors.input, borderRadius: colors.radius }]}>
       <Feather name="search" size={20} color={colors.mutedForeground} style={styles.icon} />
       <TextInput
-        style={[styles.input, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}
+        style={[styles.input, { color: colors.foreground, fontFamily: "Tajawal_500Medium" }]}
         placeholder={placeholder}
         placeholderTextColor={colors.mutedForeground}
         value={value}

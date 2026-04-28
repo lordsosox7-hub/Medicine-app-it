@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Tajawal_700Bold",
   },
   doctorInfo: {
     flexDirection: 'row',
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 16,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
   },
   info: {
     flex: 1,
@@ -110,13 +110,13 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 15,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     marginBottom: 2,
     textAlign: 'left',
   },
   specialty: {
     fontSize: 13,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     textAlign: 'left',
   },
 });

@@ -90,7 +90,7 @@ export default function AdminScreen() {
                     <Text
                       style={{
                         color: active ? colors.primaryForeground : colors.primary,
-                        fontFamily: "Inter_600SemiBold",
+                        fontFamily: "Tajawal_700Bold",
                         fontSize: 13,
                       }}
                     >
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
   },
-  toolbarLabel: { fontSize: 13, fontFamily: "Inter_500Medium" },
+  toolbarLabel: { fontSize: 13, fontFamily: "Tajawal_500Medium" },
   doctorChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   },
   sidebarHeader: {
     fontSize: 14,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     padding: 16,
     paddingBottom: 8,
   },
@@ -277,20 +277,20 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderBottomWidth: 1,
   },
-  convName: { fontSize: 14, fontFamily: "Inter_600SemiBold", marginBottom: 2 },
-  convPreview: { fontSize: 12, fontFamily: "Inter_400Regular" },
+  convName: { fontSize: 14, fontFamily: "Tajawal_700Bold", marginBottom: 2 },
+  convPreview: { fontSize: 12, fontFamily: "Tajawal_400Regular" },
   chatPane: { flex: 1 },
   chatHeader: {
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
   },
-  chatHeaderTitle: { fontSize: 14, fontFamily: "Inter_700Bold" },
-  chatHeaderStatus: { fontSize: 11, fontFamily: "Inter_500Medium", marginTop: 2 },
+  chatHeaderTitle: { fontSize: 14, fontFamily: "Tajawal_700Bold" },
+  chatHeaderStatus: { fontSize: 11, fontFamily: "Tajawal_500Medium", marginTop: 2 },
   empty: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 12 },
   emptyText: {
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     textAlign: "center",
     maxWidth: 320,
   },
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     textAlign: "left",
   },
   sendBtn: {

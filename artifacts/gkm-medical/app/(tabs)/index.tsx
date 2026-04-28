@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 16,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     marginRight: 12,
   },
   avatar: {
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontSize: 18,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
   },
   searchContainer: {
     paddingHorizontal: 16,
@@ -184,14 +184,14 @@ const styles = StyleSheet.create({
   heroTitle: {
     color: '#ffffff',
     fontSize: 22,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     marginBottom: 8,
     textAlign: 'left',
   },
   heroSubtitle: {
     color: 'rgba(255,255,255,0.8)',
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     marginBottom: 24,
     textAlign: 'left',
   },
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   },
   heroButtonText: {
     fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Tajawal_700Bold",
   },
   heroImage: {
     position: 'absolute',
@@ -230,6 +230,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
   }
 });

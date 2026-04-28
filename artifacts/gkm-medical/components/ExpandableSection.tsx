@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Tajawal_700Bold",
   },
   content: {
     padding: 16,
@@ -92,13 +92,13 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     flex: 1,
     textAlign: 'left',
   },
   emptyText: {
     fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontStyle: 'italic',
   },
 });

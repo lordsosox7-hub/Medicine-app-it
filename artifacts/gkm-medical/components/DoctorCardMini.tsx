@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 20,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
   },
   info: {
     flex: 1,
@@ -78,13 +78,13 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 15,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     marginBottom: 4,
     textAlign: 'left',
   },
   specialty: {
     fontSize: 12,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     marginBottom: 6,
     textAlign: 'left',
   },
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontSize: 12,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Tajawal_700Bold",
     marginLeft: 4,
   },
 });

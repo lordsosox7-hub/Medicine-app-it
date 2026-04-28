@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 15,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     lineHeight: 22,
     textAlign: "left",
   },
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   },
   time: {
     fontSize: 11,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
   },
   ticks: {
     flexDirection: "row",

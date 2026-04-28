@@ -27,6 +27,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
   },
 });

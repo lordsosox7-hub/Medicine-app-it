@@ -25,7 +25,7 @@ export default function MoreScreen() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     await AsyncStorage.removeItem("gkm_user_name");
-    router.replace("/sign-in");
+    router.replace("/welcome");
   };
 
   const isWeb = Platform.OS === "web";
@@ -82,20 +82,20 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontSize: 24,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
   },
   profileInfo: {
     flex: 1,
   },
   name: {
     fontSize: 20,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     marginBottom: 4,
     textAlign: 'left',
   },
   viewProfile: {
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     textAlign: 'left',
   },
   menuSection: {

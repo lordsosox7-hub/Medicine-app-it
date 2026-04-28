@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 20,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
   },
   info: {
     flex: 1,
@@ -126,18 +126,18 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 16,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     flex: 1,
     textAlign: 'left',
   },
   time: {
     fontSize: 12,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     marginLeft: 8,
   },
   message: {
     fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
     textAlign: 'left',
   }
 });

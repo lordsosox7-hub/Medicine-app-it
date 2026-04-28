@@ -142,17 +142,17 @@ const styles = StyleSheet.create({
   },
   avatarInitial: {
     fontSize: 36,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
   },
   name: {
     fontSize: 22,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     color: '#ffffff',
     marginBottom: 4,
   },
   specialty: {
     fontSize: 15,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     color: 'rgba(255,255,255,0.8)',
     marginBottom: 24,
   },
@@ -175,13 +175,13 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 16,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     color: '#ffffff',
     marginBottom: 2,
   },
   statLabel: {
     fontSize: 12,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     color: 'rgba(255,255,255,0.8)',
   },
   content: {
@@ -189,13 +189,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     marginBottom: 12,
     textAlign: 'left',
   },
   about: {
     fontSize: 15,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
     lineHeight: 24,
     textAlign: 'left',
   },
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   serviceText: {
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
   },
   bottomBar: {
     position: 'absolute',
@@ -234,13 +234,13 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 12,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     marginBottom: 2,
     textAlign: 'left',
   },
   priceValue: {
     fontSize: 18,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     textAlign: 'left',
   },
   bookButton: {

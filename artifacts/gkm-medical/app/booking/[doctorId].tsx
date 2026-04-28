@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     paddingHorizontal: 16,
     marginBottom: 16,
     textAlign: 'left',
@@ -177,17 +177,17 @@ const styles = StyleSheet.create({
   },
   dayName: {
     fontSize: 12,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     marginBottom: 2,
   },
   dayNum: {
     fontSize: 18,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     marginBottom: 2,
   },
   monthName: {
     fontSize: 11,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
   },
   timeGrid: {
     flexDirection: 'row',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Tajawal_700Bold",
   },
   footer: {
     position: 'absolute',
@@ -225,13 +225,13 @@ const styles = StyleSheet.create({
   },
   recapLabel: {
     fontSize: 13,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     marginBottom: 4,
     textAlign: 'left',
   },
   recapValue: {
     fontSize: 15,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     marginBottom: 2,
     textAlign: 'left',
   }

@@ -37,7 +37,7 @@ export default function LabResultsScreen() {
                   isSelected && { backgroundColor: colors.card, borderRadius: colors.radius - 2, shadowColor: colors.foreground, shadowOffset: {width: 0, height: 1}, shadowOpacity: 0.1, shadowRadius: 2, elevation: 1 }
                 ]}
               >
-                <Text style={[styles.segmentText, { color: isSelected ? colors.foreground : colors.mutedForeground, fontFamily: isSelected ? "Inter_600SemiBold" : "Inter_500Medium" }]}>
+                <Text style={[styles.segmentText, { color: isSelected ? colors.foreground : colors.mutedForeground, fontFamily: isSelected ? "Tajawal_700Bold" : "Tajawal_500Medium" }]}>
                   {labels[f]}
                 </Text>
               </TouchableOpacity>
@@ -161,13 +161,13 @@ const styles = StyleSheet.create({
   },
   testName: {
     fontSize: 15,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     marginBottom: 4,
     textAlign: 'left',
   },
   testDate: {
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
     textAlign: 'left',
   },
   cardBody: {
@@ -180,23 +180,23 @@ const styles = StyleSheet.create({
   },
   valueLabel: {
     fontSize: 12,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     marginBottom: 4,
     textAlign: 'left',
   },
   valueText: {
     fontSize: 16,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Tajawal_700Bold",
     textAlign: 'left',
   },
   unitText: {
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
   },
   emptyText: {
     textAlign: 'center',
     marginTop: 40,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
   },
   loadMoreBtn: {
     paddingVertical: 16,
@@ -204,6 +204,6 @@ const styles = StyleSheet.create({
   },
   loadMoreText: {
     fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Tajawal_700Bold",
   }
 });

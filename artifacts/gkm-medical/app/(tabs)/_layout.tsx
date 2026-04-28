@@ -23,7 +23,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.mutedForeground,
         tabBarShowLabel: true,
         tabBarLabelStyle: {
-          fontFamily: "Inter_500Medium",
+          fontFamily: "Tajawal_500Medium",
           fontSize: 10,
           marginTop: -4,
           marginBottom: 4,

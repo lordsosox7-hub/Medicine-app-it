@@ -62,6 +62,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Tajawal_700Bold",
   },
 });

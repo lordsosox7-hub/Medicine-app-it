@@ -27,7 +27,7 @@ export default function GateScreen() {
         ]);
         timeout = setTimeout(() => {
           if (!authed) {
-            router.replace("/sign-in");
+            router.replace("/welcome");
           } else if (onboarded) {
             router.replace("/(tabs)");
           } else {
@@ -35,7 +35,7 @@ export default function GateScreen() {
           }
         }, 500);
       } catch {
-        router.replace("/sign-in");
+        router.replace("/welcome");
       }
     };
     route();
@@ -55,11 +55,11 @@ export default function GateScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: "center", justifyContent: "center" },
-  title: { color: "#ffffff", fontSize: 32, fontFamily: "Inter_700Bold" },
+  title: { color: "#ffffff", fontSize: 32, fontFamily: "Tajawal_700Bold" },
   subtitle: {
     color: "#ffffff",
     fontSize: 20,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     opacity: 0.8,
     marginTop: 8,
   },
