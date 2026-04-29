@@ -51,8 +51,18 @@ export default function BookingScreen() {
       appointment_date: selectedDate,
       appointment_time: selectedTime,
     }, {
-      onSuccess: () => {
-        router.replace('/(tabs)/appointments');
+      onSuccess: (appointment) => {
+        router.replace({
+          pathname: '/payment/[appointmentId]',
+          params: {
+            appointmentId: appointment.id,
+            doctorName: doctor.name_ar,
+            doctorSpecialty: doctor.specialty_ar,
+            date: selectedDate,
+            time: selectedTime,
+            price: String(doctor.price),
+          },
+        });
       }
     });
   };
