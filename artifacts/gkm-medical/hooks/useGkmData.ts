@@ -65,6 +65,20 @@ export function useUpcomingAppointment() {
   return { data: upcoming, ...rest };
 }
 
+export function useAllAppointments() {
+  return useQuery({
+    queryKey: ["appointments", "all"],
+    queryFn: async (): Promise<Appointment[]> => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("*, doctor:doctors(*)")
+        .order("appointment_date", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Appointment[];
+    },
+  });
+}
+
 export function useCreateAppointment() {
   const qc = useQueryClient();
   return useMutation({
