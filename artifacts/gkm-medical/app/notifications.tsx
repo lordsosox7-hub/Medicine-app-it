@@ -178,7 +178,7 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   toolbar: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
@@ -189,20 +189,23 @@ const styles = StyleSheet.create({
   toolbarCount: {
     fontSize: 12,
     fontFamily: "Tajawal_500Medium",
+    textAlign: "right",
+    writingDirection: "rtl",
   },
   toolbarActions: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
     gap: 14,
   },
   toolbarBtn: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 4,
+    gap: 6,
   },
   toolbarBtnText: {
     fontSize: 12,
     fontFamily: "Tajawal_700Bold",
+    writingDirection: "rtl",
   },
   list: {
     padding: 16,
@@ -211,7 +214,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   row: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "flex-start",
     padding: 14,
     borderRadius: 16,
@@ -230,7 +233,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   headerRow: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-between",
     gap: 8,
@@ -246,6 +249,7 @@ const styles = StyleSheet.create({
   time: {
     fontSize: 11,
     fontFamily: "Tajawal_500Medium",
+    writingDirection: "rtl",
   },
   body: {
     fontSize: 12,
