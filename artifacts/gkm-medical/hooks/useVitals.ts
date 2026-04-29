@@ -221,6 +221,26 @@ export function useVitals() {
   const getHistory = (type: VitalType): VitalReading[] =>
     readings.filter((r) => r.type === type);
 
+  // Returns the last `n` readings for `type` as numeric points,
+  // ordered oldest -> newest, ready to plot in a sparkline.
+  // For blood_pressure (e.g. "120/80"), uses the systolic number.
+  const getTrend = (type: VitalType, n: number = 7): number[] => {
+    const list = readings.filter((r) => r.type === type).slice(0, n);
+    if (list.length === 0) return [];
+    const nums: number[] = [];
+    for (let i = list.length - 1; i >= 0; i--) {
+      const r = list[i];
+      if (type === "blood_pressure") {
+        const m = r.value.match(/^\s*(\d{2,3})\s*\/\s*\d{2,3}\s*$/);
+        if (m) nums.push(Number(m[1]));
+      } else {
+        const v = Number(r.value);
+        if (isFinite(v)) nums.push(v);
+      }
+    }
+    return nums;
+  };
+
   return {
     loading,
     readings,
@@ -230,5 +250,6 @@ export function useVitals() {
     getDisplayValue,
     getStatus,
     getHistory,
+    getTrend,
   };
 }

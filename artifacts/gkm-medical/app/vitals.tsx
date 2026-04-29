@@ -21,6 +21,7 @@ import {
   VitalReading,
   evaluateVitalStatus,
 } from "@/hooks/useVitals";
+import { Sparkline } from "@/components/Sparkline";
 import * as Haptics from "expo-haptics";
 
 export default function VitalsScreen() {
@@ -34,6 +35,7 @@ export default function VitalsScreen() {
     getDisplayValue,
     getStatus,
     getLatest,
+    getTrend,
   } = useVitals();
 
   const [editing, setEditing] = useState<VitalType | null>(null);
@@ -112,6 +114,7 @@ export default function VitalsScreen() {
             const value = getDisplayValue(meta.type);
             const status = getStatus(meta.type);
             const latest = getLatest(meta.type);
+            const trend = getTrend(meta.type, 7);
             const accent = a[meta.accentKey];
             const statusColor =
               status === "normal"
@@ -173,6 +176,16 @@ export default function VitalsScreen() {
                     {meta.unit}
                   </Text>
                 </View>
+                {trend.length > 1 ? (
+                  <View style={styles.sparkRow}>
+                    <Sparkline
+                      points={trend}
+                      color={accent.color}
+                      width={140}
+                      height={32}
+                    />
+                  </View>
+                ) : null}
                 <Text style={[styles.vitalStatus, { color: statusColor }]}>
                   {latest ? statusLabel : "اضغط للتسجيل"}
                 </Text>
@@ -507,6 +520,10 @@ const styles = StyleSheet.create({
     textAlign: "right",
     writingDirection: "rtl",
     marginTop: 4,
+  },
+  sparkRow: {
+    marginTop: 8,
+    alignItems: "flex-start",
   },
   sectionTitle: {
     fontSize: 17,

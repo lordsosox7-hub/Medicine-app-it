@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
+import { Sparkline } from "@/components/Sparkline";
 
 interface HealthMetricCardProps {
   icon?: keyof typeof Feather.glyphMap;
@@ -13,9 +14,10 @@ interface HealthMetricCardProps {
   unit?: string;
   status: "normal" | "warning" | "alert";
   onPress?: () => void;
+  trend?: number[];
 }
 
-export function HealthMetricCard({ icon, iconNode, iconColor, iconBg, label, value, unit, status, onPress }: HealthMetricCardProps) {
+export function HealthMetricCard({ icon, iconNode, iconColor, iconBg, label, value, unit, status, onPress, trend }: HealthMetricCardProps) {
   const colors = useColors();
 
   const statusColor =
@@ -52,6 +54,11 @@ export function HealthMetricCard({ icon, iconNode, iconColor, iconBg, label, val
         <Text style={[styles.value, { color: colors.foreground }]}>{value}</Text>
         {unit && <Text style={[styles.unit, { color: colors.mutedForeground }]}> {unit}</Text>}
       </View>
+      {trend && trend.length > 1 ? (
+        <View style={styles.sparkRow}>
+          <Sparkline points={trend} color={iconColor} width={120} height={26} />
+        </View>
+      ) : null}
       <Text style={[styles.status, { color: statusColor }]}>{statusLabel}</Text>
     </Wrapper>
   );
@@ -109,5 +116,9 @@ const styles = StyleSheet.create({
     fontFamily: "Tajawal_700Bold",
     marginTop: 4,
     textAlign: "right",
+  },
+  sparkRow: {
+    marginTop: 6,
+    alignItems: "flex-start",
   },
 });

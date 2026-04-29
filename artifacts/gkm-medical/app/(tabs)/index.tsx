@@ -23,7 +23,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { data: upcomingAppointment, isLoading } = useUpcomingAppointment();
   const { unreadCount } = useNotifications();
-  const { getDisplayValue, getStatus } = useVitals();
+  const { getDisplayValue, getStatus, getTrend } = useVitals();
   const [userName, setUserName] = useState("أحمد");
 
   useEffect(() => {
@@ -252,6 +252,7 @@ export default function HomeScreen() {
             value={getDisplayValue("heart_rate")}
             unit="bpm"
             status={getStatus("heart_rate")}
+            trend={getTrend("heart_rate", 7)}
             onPress={() => router.push("/vitals")}
           />
           <HealthMetricCard
@@ -261,6 +262,7 @@ export default function HomeScreen() {
             label="ضغط الدم"
             value={getDisplayValue("blood_pressure")}
             status={getStatus("blood_pressure")}
+            trend={getTrend("blood_pressure", 7)}
             onPress={() => router.push("/vitals")}
           />
           <HealthMetricCard
@@ -271,6 +273,7 @@ export default function HomeScreen() {
             value={getDisplayValue("blood_sugar")}
             unit="mg/dL"
             status={getStatus("blood_sugar")}
+            trend={getTrend("blood_sugar", 7)}
             onPress={() => router.push("/vitals")}
           />
           <HealthMetricCard
@@ -281,6 +284,7 @@ export default function HomeScreen() {
             value={getDisplayValue("weight")}
             unit="kg"
             status={getStatus("weight")}
+            trend={getTrend("weight", 7)}
             onPress={() => router.push("/vitals")}
           />
         </ScrollView>
