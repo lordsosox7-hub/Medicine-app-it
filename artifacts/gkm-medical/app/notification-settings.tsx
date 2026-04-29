@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Tajawal_500Medium",
     textAlign: "right",
+    writingDirection: "rtl",
     marginBottom: 16,
     paddingHorizontal: 4,
   },
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   row: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
     padding: 16,
     gap: 14,
@@ -99,16 +100,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  text: { flex: 1 },
+  text: { flex: 1, minWidth: 0 },
   label: {
     fontSize: 15,
     fontFamily: "Tajawal_700Bold",
     textAlign: "right",
+    writingDirection: "rtl",
     marginBottom: 2,
   },
   desc: {
     fontSize: 12,
     fontFamily: "Tajawal_500Medium",
     textAlign: "right",
+    writingDirection: "rtl",
   },
 });
