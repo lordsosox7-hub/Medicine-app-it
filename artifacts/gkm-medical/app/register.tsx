@@ -120,7 +120,7 @@ export default function RegisterScreen() {
                 <Text style={[styles.title, { color: colors.foreground }]}>
                   تحقّق من بريدك
                 </Text>
-                <Text style={[styles.subtitle, { color: colors.muted }]}>
+                <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
                   أرسلنا رسالة تفعيل إلى{"\n"}
                   <Text style={{ fontFamily: "Tajawal_700Bold" }}>{email}</Text>
                   {"\n"}اضغط على رابط التفعيل ثم سجّل الدخول.
@@ -135,11 +135,11 @@ export default function RegisterScreen() {
                 <Text style={[styles.title, { color: colors.foreground }]}>
                   إنشاء حساب جديد
                 </Text>
-                <Text style={[styles.subtitle, { color: colors.muted }]}>
+                <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
                   أنشئ حسابك للوصول إلى خدمات الرعاية الطبية
                 </Text>
 
-                <Text style={[styles.label, { color: colors.muted }]}>
+                <Text style={[styles.label, { color: colors.mutedForeground }]}>
                   الاسم الكامل
                 </Text>
                 <View
@@ -151,7 +151,7 @@ export default function RegisterScreen() {
                   <TextInput
                     style={[styles.input, { color: colors.foreground }]}
                     placeholder="مثال: أحمد محمد"
-                    placeholderTextColor={colors.muted}
+                    placeholderTextColor={colors.mutedForeground}
                     value={name}
                     onChangeText={setName}
                     textAlign="right"
@@ -159,7 +159,7 @@ export default function RegisterScreen() {
                   />
                 </View>
 
-                <Text style={[styles.label, { color: colors.muted }]}>
+                <Text style={[styles.label, { color: colors.mutedForeground }]}>
                   البريد الإلكتروني
                 </Text>
                 <View
@@ -171,7 +171,7 @@ export default function RegisterScreen() {
                   <TextInput
                     style={[styles.input, { color: colors.foreground }]}
                     placeholder="example@email.com"
-                    placeholderTextColor={colors.muted}
+                    placeholderTextColor={colors.mutedForeground}
                     value={email}
                     onChangeText={setEmail}
                     autoCapitalize="none"
@@ -182,7 +182,7 @@ export default function RegisterScreen() {
                   />
                 </View>
 
-                <Text style={[styles.label, { color: colors.muted }]}>
+                <Text style={[styles.label, { color: colors.mutedForeground }]}>
                   كلمة المرور
                 </Text>
                 <View
@@ -194,7 +194,7 @@ export default function RegisterScreen() {
                   <TextInput
                     style={[styles.input, { color: colors.foreground }]}
                     placeholder="6 أحرف على الأقل"
-                    placeholderTextColor={colors.muted}
+                    placeholderTextColor={colors.mutedForeground}
                     value={password}
                     onChangeText={setPassword}
                     autoCapitalize="none"
@@ -204,7 +204,7 @@ export default function RegisterScreen() {
                   />
                 </View>
 
-                <Text style={[styles.label, { color: colors.muted }]}>
+                <Text style={[styles.label, { color: colors.mutedForeground }]}>
                   تأكيد كلمة المرور
                 </Text>
                 <View
@@ -216,7 +216,7 @@ export default function RegisterScreen() {
                   <TextInput
                     style={[styles.input, { color: colors.foreground }]}
                     placeholder="••••••••"
-                    placeholderTextColor={colors.muted}
+                    placeholderTextColor={colors.mutedForeground}
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     autoCapitalize="none"
@@ -236,7 +236,7 @@ export default function RegisterScreen() {
                   onPress={() => router.replace("/sign-in")}
                   style={styles.altLink}
                 >
-                  <Text style={[styles.altText, { color: colors.muted }]}>
+                  <Text style={[styles.altText, { color: colors.mutedForeground }]}>
                     لديك حساب بالفعل؟{" "}
                     <Text style={{ color: colors.primary, fontFamily: "Tajawal_700Bold" }}>
                       سجّل الدخول

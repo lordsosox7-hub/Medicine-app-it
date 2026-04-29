@@ -88,11 +88,11 @@ export default function SignInScreen() {
             <Text style={[styles.title, { color: colors.foreground }]}>
               تسجيل الدخول
             </Text>
-            <Text style={[styles.subtitle, { color: colors.muted }]}>
+            <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
               أدخل بريدك الإلكتروني وكلمة المرور للمتابعة
             </Text>
 
-            <Text style={[styles.label, { color: colors.muted }]}>
+            <Text style={[styles.label, { color: colors.mutedForeground }]}>
               البريد الإلكتروني
             </Text>
             <View
@@ -104,7 +104,7 @@ export default function SignInScreen() {
               <TextInput
                 style={[styles.input, { color: colors.foreground }]}
                 placeholder="example@email.com"
-                placeholderTextColor={colors.muted}
+                placeholderTextColor={colors.mutedForeground}
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -115,7 +115,7 @@ export default function SignInScreen() {
               />
             </View>
 
-            <Text style={[styles.label, { color: colors.muted }]}>
+            <Text style={[styles.label, { color: colors.mutedForeground }]}>
               كلمة المرور
             </Text>
             <View
@@ -127,7 +127,7 @@ export default function SignInScreen() {
               <TextInput
                 style={[styles.input, { color: colors.foreground }]}
                 placeholder="••••••••"
-                placeholderTextColor={colors.muted}
+                placeholderTextColor={colors.mutedForeground}
                 value={password}
                 onChangeText={setPassword}
                 autoCapitalize="none"
@@ -148,7 +148,7 @@ export default function SignInScreen() {
               onPress={() => router.replace("/register")}
               style={styles.altLink}
             >
-              <Text style={[styles.altText, { color: colors.muted }]}>
+              <Text style={[styles.altText, { color: colors.mutedForeground }]}>
                 ليس لديك حساب؟{" "}
                 <Text style={{ color: colors.primary, fontFamily: "Tajawal_700Bold" }}>
                   أنشئ حساباً جديداً
