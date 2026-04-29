@@ -20,7 +20,7 @@ export function GradientButton({ title, onPress, style }: GradientButtonProps) {
         end={{ x: 1, y: 0 }}
         style={[styles.container, { borderRadius: colors.radius }]}
       >
-        <Text style={[styles.title, { color: colors.primaryForeground }]}>{title}</Text>
+        <Text style={[styles.title, { color: "#ffffff" }]}>{title}</Text>
       </LinearGradient>
     </TouchableOpacity>
   );
