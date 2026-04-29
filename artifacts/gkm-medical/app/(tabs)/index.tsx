@@ -15,6 +15,7 @@ import { InsightCard } from "@/components/InsightCard";
 import { getUserName } from "@/lib/userId";
 import { useUpcomingAppointment } from "@/hooks/useGkmData";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useVitals } from "@/hooks/useVitals";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { data: upcomingAppointment, isLoading } = useUpcomingAppointment();
   const { unreadCount } = useNotifications();
+  const { getDisplayValue, getStatus } = useVitals();
   const [userName, setUserName] = useState("أحمد");
 
   useEffect(() => {
@@ -231,7 +233,11 @@ export default function HomeScreen() {
       {/* Health Indicators */}
       <View style={[styles.section, { paddingHorizontal: 0 }]}>
         <View style={{ paddingHorizontal: 16 }}>
-          <SectionHeader title="المؤشرات الصحية" actionLabel="التفاصيل" onAction={() => {}} />
+          <SectionHeader
+            title="المؤشرات الصحية"
+            actionLabel="التفاصيل"
+            onAction={() => router.push("/vitals")}
+          />
         </View>
         <ScrollView
           horizontal
@@ -243,35 +249,39 @@ export default function HomeScreen() {
             iconColor={a.rose.color}
             iconBg={a.rose.bg}
             label="معدل ضربات القلب"
-            value="72"
+            value={getDisplayValue("heart_rate")}
             unit="bpm"
-            status="normal"
+            status={getStatus("heart_rate")}
+            onPress={() => router.push("/vitals")}
           />
           <HealthMetricCard
             iconNode={<MaterialCommunityIcons name="gauge" size={20} color={a.blue.color} />}
             iconColor={a.blue.color}
             iconBg={a.blue.bg}
             label="ضغط الدم"
-            value="120/80"
-            status="normal"
+            value={getDisplayValue("blood_pressure")}
+            status={getStatus("blood_pressure")}
+            onPress={() => router.push("/vitals")}
           />
           <HealthMetricCard
             iconNode={<MaterialCommunityIcons name="water" size={20} color={a.purple.color} />}
             iconColor={a.purple.color}
             iconBg={a.purple.bg}
             label="سكر الدم"
-            value="98"
+            value={getDisplayValue("blood_sugar")}
             unit="mg/dL"
-            status="normal"
+            status={getStatus("blood_sugar")}
+            onPress={() => router.push("/vitals")}
           />
           <HealthMetricCard
             iconNode={<MaterialCommunityIcons name="scale-bathroom" size={20} color={a.amber.color} />}
             iconColor={a.amber.color}
             iconBg={a.amber.bg}
             label="الوزن"
-            value="70"
+            value={getDisplayValue("weight")}
             unit="kg"
-            status="normal"
+            status={getStatus("weight")}
+            onPress={() => router.push("/vitals")}
           />
         </ScrollView>
       </View>

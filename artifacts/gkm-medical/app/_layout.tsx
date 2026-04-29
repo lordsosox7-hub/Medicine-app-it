@@ -63,6 +63,7 @@ function RootLayoutNav() {
       <Stack.Screen name="medical-file" options={{ title: "الملف الطبي" }} />
       <Stack.Screen name="medical-file-edit" options={{ title: "تعديل الملف الطبي" }} />
       <Stack.Screen name="lab-results" options={{ title: "نتائج التحاليل" }} />
+      <Stack.Screen name="vitals" options={{ title: "المؤشرات الصحية" }} />
       <Stack.Screen name="favorites" options={{ title: "المفضلة" }} />
       <Stack.Screen name="profile" options={{ title: "الملف الشخصي" }} />
       <Stack.Screen name="payments" options={{ title: "المدفوعات" }} />

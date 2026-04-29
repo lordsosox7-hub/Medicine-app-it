@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 
@@ -12,17 +12,22 @@ interface HealthMetricCardProps {
   value: string;
   unit?: string;
   status: "normal" | "warning" | "alert";
+  onPress?: () => void;
 }
 
-export function HealthMetricCard({ icon, iconNode, iconColor, iconBg, label, value, unit, status }: HealthMetricCardProps) {
+export function HealthMetricCard({ icon, iconNode, iconColor, iconBg, label, value, unit, status, onPress }: HealthMetricCardProps) {
   const colors = useColors();
 
   const statusColor =
     status === "normal" ? colors.success : status === "warning" ? colors.warning : colors.danger;
   const statusLabel = status === "normal" ? "طبيعي" : status === "warning" ? "تنبيه" : "مرتفع";
 
+  const Wrapper: any = onPress ? TouchableOpacity : View;
+  const wrapperProps = onPress ? { onPress, activeOpacity: 0.85 } : {};
+
   return (
-    <View
+    <Wrapper
+      {...wrapperProps}
       style={[
         styles.container,
         {
@@ -48,7 +53,7 @@ export function HealthMetricCard({ icon, iconNode, iconColor, iconBg, label, val
         {unit && <Text style={[styles.unit, { color: colors.mutedForeground }]}> {unit}</Text>}
       </View>
       <Text style={[styles.status, { color: statusColor }]}>{statusLabel}</Text>
-    </View>
+    </Wrapper>
   );
 }
 
