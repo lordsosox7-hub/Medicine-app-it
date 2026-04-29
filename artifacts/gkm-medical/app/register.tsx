@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { GradientButton } from "@/components/GradientButton";
 import { supabase } from "@/lib/supabase";
@@ -28,6 +29,8 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [confirmSent, setConfirmSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -188,20 +191,33 @@ export default function RegisterScreen() {
                 <View
                   style={[
                     styles.inputWrap,
+                    styles.inputWrapRow,
                     { backgroundColor: colors.primarySoft },
                   ]}
                 >
                   <TextInput
-                    style={[styles.input, { color: colors.foreground }]}
+                    style={[styles.input, styles.inputFlex, { color: colors.foreground }]}
                     placeholder="6 أحرف على الأقل"
                     placeholderTextColor={colors.mutedForeground}
                     value={password}
                     onChangeText={setPassword}
                     autoCapitalize="none"
-                    secureTextEntry
+                    secureTextEntry={!showPassword}
                     textAlign="left"
                     editable={!loading}
                   />
+                  <Pressable
+                    onPress={() => setShowPassword((v) => !v)}
+                    hitSlop={10}
+                    style={styles.eyeBtn}
+                    accessibilityLabel={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-off-outline" : "eye-outline"}
+                      size={20}
+                      color={colors.mutedForeground}
+                    />
+                  </Pressable>
                 </View>
 
                 <Text style={[styles.label, { color: colors.mutedForeground }]}>
@@ -210,21 +226,34 @@ export default function RegisterScreen() {
                 <View
                   style={[
                     styles.inputWrap,
+                    styles.inputWrapRow,
                     { backgroundColor: colors.primarySoft },
                   ]}
                 >
                   <TextInput
-                    style={[styles.input, { color: colors.foreground }]}
+                    style={[styles.input, styles.inputFlex, { color: colors.foreground }]}
                     placeholder="••••••••"
                     placeholderTextColor={colors.mutedForeground}
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     autoCapitalize="none"
-                    secureTextEntry
+                    secureTextEntry={!showConfirmPassword}
                     textAlign="left"
                     editable={!loading}
                     onSubmitEditing={submit}
                   />
+                  <Pressable
+                    onPress={() => setShowConfirmPassword((v) => !v)}
+                    hitSlop={10}
+                    style={styles.eyeBtn}
+                    accessibilityLabel={showConfirmPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                  >
+                    <Ionicons
+                      name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
+                      size={20}
+                      color={colors.mutedForeground}
+                    />
+                  </Pressable>
                 </View>
 
                 <GradientButton
@@ -331,9 +360,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 12,
   },
+  inputWrapRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+  },
   input: {
     fontSize: 16,
     fontFamily: "Tajawal_500Medium",
+  },
+  inputFlex: {
+    flex: 1,
+  },
+  eyeBtn: {
+    paddingStart: 10,
+    paddingEnd: 4,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   altLink: {
     alignItems: "center",

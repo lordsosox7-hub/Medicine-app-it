@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { GradientButton } from "@/components/GradientButton";
 import { supabase } from "@/lib/supabase";
@@ -24,6 +25,7 @@ export default function SignInScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -121,22 +123,35 @@ export default function SignInScreen() {
             <View
               style={[
                 styles.inputWrap,
+                styles.inputWrapRow,
                 { backgroundColor: colors.primarySoft },
               ]}
             >
               <TextInput
-                style={[styles.input, { color: colors.foreground }]}
+                style={[styles.input, styles.inputFlex, { color: colors.foreground }]}
                 placeholder="••••••••"
                 placeholderTextColor={colors.mutedForeground}
                 value={password}
                 onChangeText={setPassword}
                 autoCapitalize="none"
                 autoComplete="password"
-                secureTextEntry
+                secureTextEntry={!showPassword}
                 textAlign="left"
                 editable={!loading}
                 onSubmitEditing={signIn}
               />
+              <Pressable
+                onPress={() => setShowPassword((v) => !v)}
+                hitSlop={10}
+                style={styles.eyeBtn}
+                accessibilityLabel={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off-outline" : "eye-outline"}
+                  size={20}
+                  color={colors.mutedForeground}
+                />
+              </Pressable>
             </View>
 
             <GradientButton
@@ -228,9 +243,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 14,
   },
+  inputWrapRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+  },
   input: {
     fontSize: 16,
     fontFamily: "Tajawal_500Medium",
+  },
+  inputFlex: {
+    flex: 1,
+  },
+  eyeBtn: {
+    paddingStart: 10,
+    paddingEnd: 4,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   backChip: {
     position: "absolute",
