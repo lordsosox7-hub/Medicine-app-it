@@ -71,7 +71,7 @@ export default function NotificationsScreen() {
             <TouchableOpacity
               onPress={() => router.push("/notification-settings")}
               hitSlop={8}
-              style={{ paddingHorizontal: 8 }}
+              style={{ paddingHorizontal: 16 }}
               accessibilityLabel="إعدادات الإشعارات"
             >
               <Feather name="settings" size={20} color={colors.foreground} />
