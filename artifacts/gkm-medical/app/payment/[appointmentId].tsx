@@ -80,6 +80,54 @@ export default function PaymentScreen() {
       hint_ar: "محفظة رقمية",
     },
     {
+      id: "bankak",
+      label_ar: "بنكك",
+      icon: (
+        <MaterialCommunityIcons
+          name="bank-outline"
+          size={22}
+          color={colors.primary}
+        />
+      ),
+      hint_ar: "تطبيق بنكك للدفع الإلكتروني",
+    },
+    {
+      id: "fawry",
+      label_ar: "فوري",
+      icon: (
+        <MaterialCommunityIcons
+          name="storefront-outline"
+          size={22}
+          color={colors.primary}
+        />
+      ),
+      hint_ar: "ادفع نقداً من أقرب منفذ فوري",
+    },
+    {
+      id: "ocash",
+      label_ar: "اوكاش",
+      icon: (
+        <MaterialCommunityIcons
+          name="wallet-outline"
+          size={22}
+          color={colors.primary}
+        />
+      ),
+      hint_ar: "محفظة اوكاش الإلكترونية",
+    },
+    {
+      id: "my_cashy",
+      label_ar: "ماي كاشي",
+      icon: (
+        <MaterialCommunityIcons
+          name="cellphone-nfc"
+          size={22}
+          color={colors.primary}
+        />
+      ),
+      hint_ar: "ادفع من محفظة ماي كاشي",
+    },
+    {
       id: "cash",
       label_ar: "الدفع في العيادة",
       icon: <Feather name="dollar-sign" size={22} color={colors.primary} />,
