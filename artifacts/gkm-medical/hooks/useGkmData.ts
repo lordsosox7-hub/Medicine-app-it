@@ -671,6 +671,203 @@ export function useUpdatePaymentStatus() {
   });
 }
 
+// ---------- Admin: Doctor management ----------
+
+export type NewDoctorInput = Omit<Doctor, "id"> & { id?: string };
+
+export function useCreateDoctor() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: NewDoctorInput): Promise<Doctor> => {
+      const { id: _id, ...rest } = input;
+      const { data, error } = await supabase
+        .from("doctors")
+        .insert(rest)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Doctor;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["doctors"] });
+    },
+  });
+}
+
+export function useUpdateDoctor() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: Partial<Doctor> & { id: string }): Promise<Doctor> => {
+      const { id, ...rest } = input;
+      const { data, error } = await supabase
+        .from("doctors")
+        .update(rest)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Doctor;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["doctors"] });
+      qc.invalidateQueries({ queryKey: ["doctor", vars.id] });
+    },
+  });
+}
+
+export function useDeleteDoctor() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("doctors").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["doctors"] });
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+    },
+  });
+}
+
+// ---------- Admin: User (patient) directory ----------
+
+export type AdminUser = {
+  user_id: string;
+  full_name_ar: string | null;
+  age: number | null;
+  gender: string | null;
+  blood_type: string | null;
+  appointments_count: number;
+  conversations_count: number;
+  last_seen_at: string | null;
+  has_medical_file: boolean;
+};
+
+export function useAdminUsers() {
+  return useQuery({
+    queryKey: ["admin", "users"],
+    queryFn: async (): Promise<AdminUser[]> => {
+      const [filesRes, apptRes, convRes] = await Promise.all([
+        supabase.from("medical_files").select("user_id, full_name_ar, age, gender, blood_type, created_at"),
+        supabase.from("appointments").select("user_id, created_at"),
+        supabase.from("conversations").select("user_id, last_message_at, created_at"),
+      ]);
+      if (filesRes.error) throw filesRes.error;
+      if (apptRes.error) throw apptRes.error;
+      if (convRes.error) throw convRes.error;
+
+      const map = new Map<string, AdminUser>();
+      const ensure = (id: string): AdminUser => {
+        let u = map.get(id);
+        if (!u) {
+          u = {
+            user_id: id,
+            full_name_ar: null,
+            age: null,
+            gender: null,
+            blood_type: null,
+            appointments_count: 0,
+            conversations_count: 0,
+            last_seen_at: null,
+            has_medical_file: false,
+          };
+          map.set(id, u);
+        }
+        return u;
+      };
+      const bumpSeen = (u: AdminUser, ts: string | null | undefined) => {
+        if (!ts) return;
+        if (!u.last_seen_at || ts > u.last_seen_at) u.last_seen_at = ts;
+      };
+
+      for (const r of filesRes.data ?? []) {
+        const u = ensure(r.user_id as string);
+        u.full_name_ar = (r as any).full_name_ar ?? null;
+        u.age = (r as any).age ?? null;
+        u.gender = (r as any).gender ?? null;
+        u.blood_type = (r as any).blood_type ?? null;
+        u.has_medical_file = true;
+        bumpSeen(u, (r as any).created_at);
+      }
+      for (const r of apptRes.data ?? []) {
+        const u = ensure(r.user_id as string);
+        u.appointments_count += 1;
+        bumpSeen(u, (r as any).created_at);
+      }
+      for (const r of convRes.data ?? []) {
+        const u = ensure(r.user_id as string);
+        u.conversations_count += 1;
+        bumpSeen(u, (r as any).last_message_at ?? (r as any).created_at);
+      }
+      return Array.from(map.values()).sort((a, b) => {
+        const ta = a.last_seen_at ?? "";
+        const tb = b.last_seen_at ?? "";
+        return tb.localeCompare(ta);
+      });
+    },
+  });
+}
+
+export function useDeleteUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      // Cascade-delete the user's data across all tables (no auth account).
+      const tables = [
+        "messages",
+        "conversations",
+        "payments",
+        "appointments",
+        "lab_results",
+        "vital_readings",
+        "medical_files",
+      ] as const;
+      for (const t of tables) {
+        const { error } = await supabase.from(t).delete().eq("user_id", userId);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "users"] });
+      qc.invalidateQueries({ queryKey: ["admin", "conversations"] });
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+    },
+  });
+}
+
+// ---------- Admin: All conversations & message monitor ----------
+
+export function useAllConversations() {
+  const qc = useQueryClient();
+  const query = useQuery({
+    queryKey: ["admin", "conversations"],
+    queryFn: async (): Promise<Conversation[]> => {
+      const { data, error } = await supabase
+        .from("conversations")
+        .select("*, doctor:doctors(*)")
+        .order("last_message_at", { ascending: false, nullsFirst: false });
+      if (error) throw error;
+      return (data ?? []) as Conversation[];
+    },
+  });
+  useEffect(() => {
+    const ch = supabase
+      .channel("admin_all_convs")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "conversations" },
+        () => qc.invalidateQueries({ queryKey: ["admin", "conversations"] }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [qc]);
+  return query;
+}
+
 // ---------- Bootstrap demo data for the local user ----------
 
 export async function ensureDemoData(): Promise<void> {
