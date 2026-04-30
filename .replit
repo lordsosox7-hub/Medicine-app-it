@@ -9,6 +9,28 @@ args = ["pnpm", "store", "prune"]
 env = { "CI" = "true" }
 
 [workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=20803 pnpm --filter @workspace/gkm-medical run dev"
+waitForPort = 20803
 
 [agent]
 stack = "PNPM_WORKSPACE"
@@ -54,3 +76,4 @@ externalPort = 3002
 
 [userenv.shared]
 EXPO_PUBLIC_SUPABASE_URL = "https://ntoxhcaennvobivxqawv.supabase.co"
+EXPO_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50b3hoY2Flbm52b2JpdnhxYXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyOTU2MTgsImV4cCI6MjA5Mjg3MTYxOH0.9kmWEIbzh8afLQo_4CFsc6sYpFfEy5ZSLe6PfYjz_Y0"
