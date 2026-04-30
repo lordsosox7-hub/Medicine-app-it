@@ -15,7 +15,7 @@ export function InsightCard({ title, body, icon = "droplet" }: InsightCardProps)
 
   return (
     <LinearGradient
-      colors={[colors.primarySoft, "#f7fbff"]}
+      colors={[colors.primarySoft, colors.card]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={[styles.container, { borderRadius: 20, borderColor: colors.border, borderWidth: 1 }]}
