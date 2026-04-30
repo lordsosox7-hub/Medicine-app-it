@@ -678,15 +678,10 @@ export type NewDoctorInput = Omit<Doctor, "id"> & { id?: string };
 export function useCreateDoctor() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: NewDoctorInput): Promise<Doctor> => {
+    mutationFn: async (input: NewDoctorInput): Promise<void> => {
       const { id: _id, ...rest } = input;
-      const { data, error } = await supabase
-        .from("doctors")
-        .insert(rest)
-        .select()
-        .single();
+      const { error } = await supabase.from("doctors").insert(rest);
       if (error) throw error;
-      return data as Doctor;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["doctors"] });
@@ -697,16 +692,13 @@ export function useCreateDoctor() {
 export function useUpdateDoctor() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: Partial<Doctor> & { id: string }): Promise<Doctor> => {
+    mutationFn: async (input: Partial<Doctor> & { id: string }): Promise<void> => {
       const { id, ...rest } = input;
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("doctors")
         .update(rest)
-        .eq("id", id)
-        .select()
-        .single();
+        .eq("id", id);
       if (error) throw error;
-      return data as Doctor;
     },
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: ["doctors"] });
