@@ -56,6 +56,7 @@ export default function BookingScreen() {
           pathname: '/payment/[appointmentId]',
           params: {
             appointmentId: appointment.id,
+            doctorId: doctor.id,
             doctorName: doctor.name_ar,
             doctorSpecialty: doctor.specialty_ar,
             date: selectedDate,

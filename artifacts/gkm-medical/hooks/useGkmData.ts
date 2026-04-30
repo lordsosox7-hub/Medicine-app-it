@@ -7,6 +7,7 @@ import {
   type LabResult,
   type MedicalFile,
   type Message,
+  type Payment,
   supabase,
 } from "@/lib/supabase";
 import { getUserId } from "@/lib/userId";
@@ -537,6 +538,135 @@ export function useToggleFavorite() {
     onSettled: (_data, _err, vars) => {
       qc.invalidateQueries({ queryKey: ["favorite", vars.doctor_id] });
       qc.invalidateQueries({ queryKey: ["favorites"] });
+    },
+  });
+}
+
+// ---------- Payments (manual transfer verification) ----------
+
+export function useCreatePayment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      appointment_id: string;
+      doctor_id: string;
+      amount: number;
+      method: string;
+      txn_ref: string;
+    }): Promise<Payment> => {
+      const userId = await getUserId();
+      const { data, error } = await supabase
+        .from("payments")
+        .insert({
+          appointment_id: input.appointment_id,
+          user_id: userId,
+          doctor_id: input.doctor_id,
+          amount: input.amount,
+          method: input.method,
+          txn_ref: input.txn_ref,
+          status: "pending",
+        })
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data as Payment;
+    },
+    onSuccess: (p) => {
+      qc.invalidateQueries({ queryKey: ["payment", p.appointment_id] });
+      qc.invalidateQueries({ queryKey: ["pending_payments"] });
+    },
+  });
+}
+
+export function usePaymentByAppointment(appointmentId?: string) {
+  return useQuery({
+    queryKey: ["payment", appointmentId ?? ""],
+    enabled: !!appointmentId,
+    queryFn: async (): Promise<Payment | null> => {
+      if (!appointmentId) return null;
+      const { data, error } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("appointment_id", appointmentId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as Payment | null) ?? null;
+    },
+    refetchInterval: (q) => {
+      const p = q.state.data as Payment | null | undefined;
+      return p && p.status === "pending" ? 4000 : false;
+    },
+  });
+}
+
+export function useRealtimePayment(appointmentId?: string) {
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!appointmentId) return;
+    const channel = supabase
+      .channel(`payment:${appointmentId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "payments",
+          filter: `appointment_id=eq.${appointmentId}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["payment", appointmentId] });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [appointmentId, qc]);
+}
+
+export function usePendingPayments() {
+  return useQuery({
+    queryKey: ["pending_payments"],
+    queryFn: async (): Promise<Array<Payment & { doctor?: Doctor }>> => {
+      const { data, error } = await supabase
+        .from("payments")
+        .select("*, doctor:doctors(*)")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Array<Payment & { doctor?: Doctor }>;
+    },
+    refetchInterval: 8000,
+  });
+}
+
+export function useUpdatePaymentStatus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      id: string;
+      appointment_id: string;
+      status: "confirmed" | "rejected";
+      reason?: string;
+    }) => {
+      const patch: Record<string, unknown> = { status: input.status };
+      if (input.status === "confirmed") {
+        patch.confirmed_at = new Date().toISOString();
+      } else {
+        patch.rejected_at = new Date().toISOString();
+        patch.rejection_reason = input.reason ?? null;
+      }
+      const { error } = await supabase
+        .from("payments")
+        .update(patch)
+        .eq("id", input.id);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["payment", vars.appointment_id] });
+      qc.invalidateQueries({ queryKey: ["pending_payments"] });
     },
   });
 }

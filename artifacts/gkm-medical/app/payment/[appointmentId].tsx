@@ -17,6 +17,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { GradientButton } from "@/components/GradientButton";
 import * as Haptics from "expo-haptics";
+import {
+  useCreatePayment,
+  usePaymentByAppointment,
+  useRealtimePayment,
+} from "@/hooks/useGkmData";
 
 const ACCOUNT_NAME = "اسامة ادم موسى ادم";
 
@@ -61,9 +66,10 @@ export default function PaymentScreen() {
   const router = useRouter();
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { appointmentId, doctorName, doctorSpecialty, date, time, price } =
+  const { appointmentId, doctorId, doctorName, doctorSpecialty, date, time, price } =
     useLocalSearchParams<{
       appointmentId: string;
+      doctorId?: string;
       doctorName?: string;
       doctorSpecialty?: string;
       date?: string;
@@ -144,10 +150,48 @@ export default function PaymentScreen() {
   const [selectedMethod, setSelectedMethod] = useState<string>("bankak");
   const [processing, setProcessing] = useState(false);
   const [txnLast4, setTxnLast4] = useState<string>("");
+  const [submittedReason, setSubmittedReason] = useState<string | null>(null);
 
   const manualInfo = MANUAL_PAYMENT_INSTRUCTIONS[selectedMethod];
   const requiresTxnRef = !!manualInfo;
   const txnRefValid = !requiresTxnRef || /^\d{4}$/.test(txnLast4);
+
+  const createPayment = useCreatePayment();
+  const { data: payment, refetch: refetchPayment } = usePaymentByAppointment(
+    appointmentId ? String(appointmentId) : undefined,
+  );
+  useRealtimePayment(appointmentId ? String(appointmentId) : undefined);
+
+  // When the admin confirms, route to the success screen.
+  React.useEffect(() => {
+    if (!payment) return;
+    if (payment.status === "confirmed") {
+      router.replace({
+        pathname: "/booking-confirmed/[appointmentId]",
+        params: {
+          appointmentId: String(appointmentId),
+          doctorName: doctorName ?? "",
+          doctorSpecialty: doctorSpecialty ?? "",
+          date: date ?? "",
+          time: time ?? "",
+          total: String(total),
+          method: payment.method,
+          txnRef: payment.txn_ref ?? "",
+        },
+      });
+    } else if (payment.status === "rejected") {
+      setSubmittedReason(payment.rejection_reason ?? null);
+    }
+  }, [
+    payment,
+    appointmentId,
+    doctorName,
+    doctorSpecialty,
+    date,
+    time,
+    total,
+    router,
+  ]);
 
   const handleCopyAccount = async () => {
     if (!manualInfo) return;
@@ -164,6 +208,31 @@ export default function PaymentScreen() {
     }
   };
 
+  const submitForVerification = async (doctorIdParam?: string) => {
+    if (!appointmentId) return;
+    setProcessing(true);
+    try {
+      await createPayment.mutateAsync({
+        appointment_id: String(appointmentId),
+        doctor_id: doctorIdParam ?? "",
+        amount: total,
+        method: selectedMethod,
+        txn_ref: txnLast4,
+      });
+      setSubmittedReason(null);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      await refetchPayment();
+    } catch (e) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(
+        "تعذّر إرسال البيانات",
+        "تأكد من اتصالك بالإنترنت ثم حاول مرة أخرى.",
+      );
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const handlePay = async () => {
     if (requiresTxnRef && !txnRefValid) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -173,9 +242,14 @@ export default function PaymentScreen() {
       );
       return;
     }
+    if (requiresTxnRef) {
+      // Manual transfer: persist the attempt and wait for admin confirmation.
+      await submitForVerification(doctorId);
+      return;
+    }
+    // Cash on arrival or any non-manual method: confirm immediately.
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setProcessing(true);
-    // Simulate payment processing
     setTimeout(() => {
       setProcessing(false);
       router.replace({
@@ -188,11 +262,273 @@ export default function PaymentScreen() {
           time: time ?? "",
           total: String(total),
           method: selectedMethod,
-          txnRef: requiresTxnRef ? txnLast4 : "",
+          txnRef: "",
         },
       });
-    }, 1400);
+    }, 1000);
   };
+
+  const isPending = !!payment && payment.status === "pending";
+  const isRejected = !!payment && payment.status === "rejected";
+
+  // ----- Pending / rejected verification screen -----
+  if (isPending || isRejected) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <ScrollView
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: 60 }]}
+          showsVerticalScrollIndicator={false}
+        >
+          <View
+            style={[
+              styles.statusCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: isRejected
+                  ? colors.destructive + "55"
+                  : colors.primary + "55",
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.statusIconWrap,
+                {
+                  backgroundColor: isRejected
+                    ? colors.destructive + "15"
+                    : colors.primarySoft,
+                },
+              ]}
+            >
+              {isRejected ? (
+                <Feather name="x-circle" size={42} color={colors.destructive} />
+              ) : (
+                <ActivityIndicator size="large" color={colors.primary} />
+              )}
+            </View>
+            <Text style={[styles.statusTitle, { color: colors.foreground }]}>
+              {isRejected
+                ? "تم رفض عملية الدفع"
+                : "بانتظار تأكيد الإدارة"}
+            </Text>
+            <Text
+              style={[
+                styles.statusSubtitle,
+                { color: colors.mutedForeground },
+              ]}
+            >
+              {isRejected
+                ? "يبدو أن هناك مشكلة في رقم العملية. يمكنك إعادة المحاولة بإدخال الأرقام الصحيحة."
+                : "تم استلام بيانات تحويلك. سيتم تأكيد الموعد فور التحقق من العملية في حسابنا."}
+            </Text>
+
+            {!!submittedReason && isRejected && (
+              <View
+                style={[
+                  styles.reasonBox,
+                  {
+                    backgroundColor: colors.destructive + "10",
+                    borderColor: colors.destructive + "33",
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.reasonText,
+                    { color: colors.destructive },
+                  ]}
+                >
+                  {submittedReason}
+                </Text>
+              </View>
+            )}
+
+            <View
+              style={[
+                styles.statusDetailRow,
+                {
+                  backgroundColor: colors.background,
+                  borderColor: colors.border,
+                  marginTop: 18,
+                },
+              ]}
+            >
+              <Text
+                style={[styles.statusDetailLabel, { color: colors.mutedForeground }]}
+              >
+                طريقة الدفع
+              </Text>
+              <Text
+                style={[styles.statusDetailValue, { color: colors.foreground }]}
+              >
+                {MANUAL_PAYMENT_INSTRUCTIONS[payment!.method]?.label_ar ??
+                  payment!.method}
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.statusDetailRow,
+                {
+                  backgroundColor: colors.background,
+                  borderColor: colors.border,
+                  marginTop: 8,
+                },
+              ]}
+            >
+              <Text
+                style={[styles.statusDetailLabel, { color: colors.mutedForeground }]}
+              >
+                آخر 4 أرقام
+              </Text>
+              <Text
+                style={[
+                  styles.statusDetailValue,
+                  { color: colors.primary, letterSpacing: 4 },
+                ]}
+              >
+                {payment!.txn_ref}
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.statusDetailRow,
+                {
+                  backgroundColor: colors.background,
+                  borderColor: colors.border,
+                  marginTop: 8,
+                },
+              ]}
+            >
+              <Text
+                style={[styles.statusDetailLabel, { color: colors.mutedForeground }]}
+              >
+                المبلغ
+              </Text>
+              <Text
+                style={[styles.statusDetailValue, { color: colors.foreground }]}
+              >
+                {Math.round(payment!.amount)} ج.س
+              </Text>
+            </View>
+
+            {isPending && (
+              <View
+                style={[
+                  styles.hintBox,
+                  {
+                    backgroundColor: colors.primarySoft,
+                    borderColor: colors.primary + "33",
+                  },
+                ]}
+              >
+                <Feather name="clock" size={16} color={colors.primary} />
+                <Text
+                  style={[styles.hintText, { color: colors.foreground }]}
+                >
+                  عادةً ما تتم المراجعة خلال دقائق. يمكنك إغلاق التطبيق وسيصلك
+                  إشعار عند التأكيد.
+                </Text>
+              </View>
+            )}
+
+            {isRejected && (
+              <View style={{ marginTop: 18, gap: 10 }}>
+                <Text
+                  style={[styles.txnLabel, { color: colors.foreground }]}
+                >
+                  أعد إدخال آخر 4 أرقام من رقم العملية
+                </Text>
+                <TextInput
+                  value={txnLast4}
+                  onChangeText={(t) =>
+                    setTxnLast4(t.replace(/\D/g, "").slice(0, 4))
+                  }
+                  keyboardType="number-pad"
+                  maxLength={4}
+                  placeholder="0000"
+                  placeholderTextColor={colors.mutedForeground}
+                  style={[
+                    styles.txnInput,
+                    {
+                      backgroundColor: colors.background,
+                      borderColor:
+                        txnLast4.length === 0
+                          ? colors.border
+                          : txnRefValid
+                            ? colors.primary
+                            : colors.destructive,
+                      color: colors.foreground,
+                    },
+                  ]}
+                />
+              </View>
+            )}
+          </View>
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => router.replace("/(tabs)/appointments")}
+            style={[
+              styles.secondaryBtn,
+              { borderColor: colors.border, backgroundColor: colors.card },
+            ]}
+          >
+            <Feather name="calendar" size={16} color={colors.foreground} />
+            <Text style={[styles.secondaryBtnText, { color: colors.foreground }]}>
+              متابعة المواعيد لاحقاً
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+
+        <View
+          style={[
+            styles.footer,
+            {
+              backgroundColor: colors.card,
+              borderTopColor: colors.border,
+              paddingBottom: insets.bottom || 16,
+            },
+          ]}
+        >
+          {isRejected ? (
+            processing ? (
+              <View
+                style={[
+                  styles.processingBtn,
+                  { backgroundColor: colors.primary },
+                ]}
+              >
+                <ActivityIndicator color="#ffffff" />
+                <Text style={styles.processingText}>جارٍ الإرسال...</Text>
+              </View>
+            ) : (
+              <GradientButton
+                title="إعادة المحاولة"
+                onPress={() => submitForVerification(payment!.doctor_id)}
+              />
+            )
+          ) : (
+            <View
+              style={[
+                styles.pendingBanner,
+                {
+                  backgroundColor: colors.primarySoft,
+                  borderColor: colors.primary + "33",
+                },
+              ]}
+            >
+              <ActivityIndicator color={colors.primary} />
+              <Text
+                style={[styles.pendingBannerText, { color: colors.foreground }]}
+              >
+                بانتظار تأكيد الإدارة...
+              </Text>
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -832,5 +1168,107 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontSize: 15,
     fontFamily: "IBMPlexSansArabic_700Bold",
+  },
+  statusCard: {
+    borderRadius: 22,
+    borderWidth: 1,
+    padding: 22,
+    alignItems: "center",
+  },
+  statusIconWrap: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 14,
+  },
+  statusTitle: {
+    fontSize: 20,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    textAlign: "center",
+    marginBottom: 6,
+  },
+  statusSubtitle: {
+    fontSize: 14,
+    fontFamily: "IBMPlexSansArabic_400Regular",
+    textAlign: "center",
+    lineHeight: 22,
+    paddingHorizontal: 4,
+  },
+  statusDetailRow: {
+    width: "100%",
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  statusDetailLabel: {
+    fontSize: 13,
+    fontFamily: "IBMPlexSansArabic_400Regular",
+  },
+  statusDetailValue: {
+    fontSize: 15,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+  },
+  hintBox: {
+    marginTop: 18,
+    flexDirection: "row-reverse",
+    alignItems: "flex-start",
+    gap: 10,
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    width: "100%",
+  },
+  hintText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 22,
+    fontFamily: "IBMPlexSansArabic_400Regular",
+  },
+  reasonBox: {
+    marginTop: 14,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    width: "100%",
+  },
+  reasonText: {
+    fontSize: 13,
+    lineHeight: 22,
+    fontFamily: "IBMPlexSansArabic_500Medium",
+    textAlign: "center",
+  },
+  pendingBanner: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  pendingBannerText: {
+    fontSize: 14,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+  },
+  secondaryBtn: {
+    marginTop: 14,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  secondaryBtnText: {
+    fontSize: 14,
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
 });

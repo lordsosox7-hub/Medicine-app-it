@@ -95,6 +95,21 @@ export type LabResult = {
   reference_range: string | null;
 };
 
+export type Payment = {
+  id: string;
+  appointment_id: string;
+  user_id: string;
+  doctor_id: string;
+  amount: number;
+  method: string;
+  txn_ref: string | null;
+  status: "pending" | "confirmed" | "rejected";
+  rejection_reason: string | null;
+  created_at: string;
+  confirmed_at: string | null;
+  rejected_at: string | null;
+};
+
 export type VitalReadingRow = {
   id: string;
   user_id: string;

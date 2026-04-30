@@ -21,18 +21,29 @@ import {
   useSendMessageAsDoctor,
   useTypingIndicator,
   useMarkMessagesRead,
+  usePendingPayments,
+  useUpdatePaymentStatus,
 } from "@/hooks/useGkmData";
 import { MessageBubble, TypingBubble } from "@/components/MessageBubble";
 import { Feather } from "@expo/vector-icons";
-import type { Appointment } from "@/lib/supabase";
+import type { Appointment, Payment, Doctor } from "@/lib/supabase";
 
-type AdminTab = "appointments" | "revenue" | "chat";
+type AdminTab = "appointments" | "payments" | "revenue" | "chat";
 
 const TABS: Array<{ id: AdminTab; label: string; icon: keyof typeof Feather.glyphMap }> = [
   { id: "appointments", label: "Appointments", icon: "calendar" },
+  { id: "payments", label: "Payments", icon: "credit-card" },
   { id: "revenue", label: "Revenue", icon: "trending-up" },
   { id: "chat", label: "Doctor Console", icon: "message-square" },
 ];
+
+const PAYMENT_METHOD_LABEL: Record<string, string> = {
+  bankak: "بنكك",
+  fawry: "فوري",
+  ocash: "اوكاش",
+  my_cashy: "ماي كاشي",
+  cash: "نقداً",
+};
 
 export default function AdminScreen() {
   const colors = useColors();
@@ -82,6 +93,7 @@ export default function AdminScreen() {
         </View>
 
         {tab === "appointments" && <AppointmentsView />}
+        {tab === "payments" && <PaymentsView />}
         {tab === "revenue" && <RevenueView />}
         {tab === "chat" && <DoctorConsoleView />}
       </View>
@@ -290,6 +302,228 @@ function AppointmentRow({ appointment }: { appointment: Appointment }) {
         </View>
       </View>
     </View>
+  );
+}
+
+// =============== Payments View ===============
+
+function PaymentsView() {
+  const colors = useColors();
+  const { data: payments, isLoading } = usePendingPayments();
+  const updateStatus = useUpdatePaymentStatus();
+  const [actingId, setActingId] = useState<string>("");
+
+  if (isLoading) {
+    return (
+      <View style={styles.empty}>
+        <ActivityIndicator color={colors.primary} />
+      </View>
+    );
+  }
+
+  const list = payments ?? [];
+
+  if (list.length === 0) {
+    return (
+      <View style={styles.empty}>
+        <Feather name="check-circle" size={42} color={colors.mutedForeground} />
+        <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
+          No pending payments to review.
+        </Text>
+      </View>
+    );
+  }
+
+  const handle = (
+    p: Payment,
+    status: "confirmed" | "rejected",
+    reason?: string,
+  ) => {
+    setActingId(p.id);
+    updateStatus.mutate(
+      {
+        id: p.id,
+        appointment_id: p.appointment_id,
+        status,
+        reason,
+      },
+      { onSettled: () => setActingId("") },
+    );
+  };
+
+  return (
+    <FlatList
+      data={list}
+      keyExtractor={(p) => p.id}
+      contentContainerStyle={{ padding: 16, gap: 12 }}
+      renderItem={({ item }) => {
+        const doctor = (item as Payment & { doctor?: Doctor }).doctor;
+        const busy = actingId === item.id && updateStatus.isPending;
+        return (
+          <View
+            style={[
+              styles.apptCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <View style={styles.apptHeader}>
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={[styles.apptDoctor, { color: colors.foreground }]}
+                  numberOfLines={1}
+                >
+                  {doctor?.name_ar ?? "—"}
+                </Text>
+                <Text
+                  style={[styles.apptSpecialty, { color: colors.mutedForeground }]}
+                  numberOfLines={1}
+                >
+                  {doctor?.specialty_ar ?? ""}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.statusPill,
+                  { backgroundColor: colors.primarySoft },
+                ]}
+              >
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontFamily: "IBMPlexSansArabic_700Bold",
+                    fontSize: 11,
+                  }}
+                >
+                  pending
+                </Text>
+              </View>
+            </View>
+
+            <View style={[styles.apptDivider, { backgroundColor: colors.border }]} />
+
+            <View style={styles.apptMeta}>
+              <View style={styles.apptMetaItem}>
+                <Feather
+                  name="credit-card"
+                  size={13}
+                  color={colors.mutedForeground}
+                />
+                <Text style={[styles.apptMetaText, { color: colors.foreground }]}>
+                  {PAYMENT_METHOD_LABEL[item.method] ?? item.method}
+                </Text>
+              </View>
+              <View style={styles.apptMetaItem}>
+                <Feather name="hash" size={13} color={colors.mutedForeground} />
+                <Text
+                  style={[
+                    styles.apptMetaText,
+                    {
+                      color: colors.primary,
+                      fontFamily: "IBMPlexSansArabic_700Bold",
+                      letterSpacing: 3,
+                    },
+                  ]}
+                >
+                  {item.txn_ref ?? "----"}
+                </Text>
+              </View>
+              <View style={styles.apptMetaItem}>
+                <Feather
+                  name="dollar-sign"
+                  size={13}
+                  color={colors.primary}
+                />
+                <Text
+                  style={[
+                    styles.apptMetaText,
+                    {
+                      color: colors.primary,
+                      fontFamily: "IBMPlexSansArabic_700Bold",
+                    },
+                  ]}
+                >
+                  {Math.round(item.amount)} ج.س
+                </Text>
+              </View>
+              <View style={styles.apptMetaItem}>
+                <Feather name="user" size={13} color={colors.mutedForeground} />
+                <Text style={[styles.apptMetaText, { color: colors.foreground }]}>
+                  Patient {item.user_id.slice(0, 8)}
+                </Text>
+              </View>
+              <View style={styles.apptMetaItem}>
+                <Feather name="clock" size={13} color={colors.mutedForeground} />
+                <Text style={[styles.apptMetaText, { color: colors.foreground }]}>
+                  {new Date(item.created_at).toLocaleString("en", {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.payActions}>
+              <Pressable
+                disabled={busy}
+                onPress={() =>
+                  handle(item, "rejected", "رقم العملية غير مطابق")
+                }
+                style={[
+                  styles.payActionBtn,
+                  {
+                    borderColor: colors.danger,
+                    backgroundColor: colors.accents.red.bg,
+                    opacity: busy ? 0.5 : 1,
+                  },
+                ]}
+              >
+                <Feather name="x" size={14} color={colors.danger} />
+                <Text
+                  style={{
+                    color: colors.danger,
+                    fontFamily: "IBMPlexSansArabic_700Bold",
+                    fontSize: 13,
+                  }}
+                >
+                  Reject
+                </Text>
+              </Pressable>
+              <Pressable
+                disabled={busy}
+                onPress={() => handle(item, "confirmed")}
+                style={[
+                  styles.payActionBtn,
+                  {
+                    borderColor: colors.primary,
+                    backgroundColor: colors.primary,
+                    opacity: busy ? 0.7 : 1,
+                  },
+                ]}
+              >
+                {busy ? (
+                  <ActivityIndicator color={colors.primaryForeground} size="small" />
+                ) : (
+                  <Feather
+                    name="check"
+                    size={14}
+                    color={colors.primaryForeground}
+                  />
+                )}
+                <Text
+                  style={{
+                    color: colors.primaryForeground,
+                    fontFamily: "IBMPlexSansArabic_700Bold",
+                    fontSize: 13,
+                  }}
+                >
+                  Confirm
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        );
+      }}
+    />
   );
 }
 
@@ -1121,5 +1355,20 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
+  },
+  payActions: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 12,
+  },
+  payActionBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
   },
 });
