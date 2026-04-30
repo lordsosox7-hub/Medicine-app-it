@@ -26,7 +26,8 @@ import { InsightCard } from "@/components/InsightCard";
 import { PressableScale } from "@/components/PressableScale";
 import { getTodayAdvice } from "@/constants/advices";
 import { getUserName } from "@/lib/userId";
-import { useUpcomingAppointment } from "@/hooks/useGkmData";
+import { DoctorCard } from "@/components/DoctorCard";
+import { useUpcomingAppointment, useDoctors } from "@/hooks/useGkmData";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useVitals } from "@/hooks/useVitals";
 
@@ -35,6 +36,8 @@ export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { data: upcomingAppointment, isLoading } = useUpcomingAppointment();
+  const { data: doctors = [] } = useDoctors();
+  const recommendedDoctors = doctors.slice(0, 3);
   const { unreadCount } = useNotifications();
   const { getDisplayValue, getStatus, getTrend } = useVitals();
   const [userName, setUserName] = useState("أحمد");
@@ -422,32 +425,32 @@ export default function HomeScreen() {
         />
       </Animated.View>
 
-      {/* Quick Services */}
+      {/* Recommended Doctors */}
       <Animated.View entering={FadeInDown.delay(420).duration(480).springify().damping(16)} style={styles.section}>
-        <SectionHeader title="خدمات سريعة" />
-        <View style={styles.quickServicesRow}>
-          <QuickActionCard
-            label="تواصل مع طبيب"
-            iconNode={<MaterialCommunityIcons name="phone-in-talk" size={22} color={a.green.color} />}
-            iconColor={a.green.color}
-            iconBg={a.green.bg}
-            onPress={() => router.push("/(tabs)/chats")}
-          />
-          <QuickActionCard
-            label="إعادة وصفة"
-            iconNode={<MaterialCommunityIcons name="prescription" size={22} color={a.teal.color} />}
-            iconColor={a.teal.color}
-            iconBg={a.teal.bg}
-            onPress={() => {}}
-          />
-          <QuickActionCard
-            label="زيارة منزلية"
-            iconNode={<MaterialCommunityIcons name="home-heart" size={22} color={a.blue.color} />}
-            iconColor={a.blue.color}
-            iconBg={a.blue.bg}
-            onPress={() => {}}
-          />
-        </View>
+        <SectionHeader
+          title="أطباء موصى بهم"
+          actionLabel="عرض الكل"
+          onAction={() => router.push("/(tabs)/my-doctor")}
+        />
+        {recommendedDoctors.length === 0 ? (
+          <View
+            style={[
+              styles.emptyContainer,
+              { backgroundColor: colors.card, borderRadius: 20, borderColor: colors.border, borderWidth: 1 },
+            ]}
+          >
+            <Feather name="user" size={28} color={colors.mutedForeground} />
+            <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>لا يوجد أطباء بعد</Text>
+          </View>
+        ) : (
+          recommendedDoctors.map((doctor) => (
+            <DoctorCard
+              key={doctor.id}
+              doctor={doctor}
+              onPress={() => router.push({ pathname: "/doctor/[id]", params: { id: doctor.id } })}
+            />
+          ))
+        )}
       </Animated.View>
     </ScrollView>
   );
