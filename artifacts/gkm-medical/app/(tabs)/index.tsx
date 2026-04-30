@@ -261,7 +261,11 @@ export default function HomeScreen() {
 
       {/* Quick Actions */}
       <View style={styles.section}>
-        <SectionHeader title="الخدمات السريعة" actionLabel="عرض الكل" onAction={() => {}} />
+        <SectionHeader
+          title="الخدمات السريعة"
+          actionLabel="عرض الكل"
+          onAction={() => router.push("/all-services")}
+        />
         <View style={styles.actionsGrid}>
           {[0, 1, 2].map((rowIdx) => (
             <View key={rowIdx} style={styles.actionsRow}>
