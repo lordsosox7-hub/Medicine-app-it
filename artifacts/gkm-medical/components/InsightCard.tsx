@@ -50,13 +50,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 12,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     marginBottom: 4,
   },
   body: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     lineHeight: 20,
   },

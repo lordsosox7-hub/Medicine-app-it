@@ -45,7 +45,7 @@ export default function PrivacyScreen() {
         آخر تحديث: 1 يناير 2026
       </Text>
       <Text style={[styles.preface, { color: colors.foreground }]}>
-        نحرص في GKM للرعاية الطبية على حماية خصوصيتك وسرية معلوماتك الطبية. توضح هذه السياسة كيف نقوم بجمع، استخدام، وحماية بياناتك.
+        نحرص في راحة للرعاية الطبية على حماية خصوصيتك وسرية معلوماتك الطبية. توضح هذه السياسة كيف نقوم بجمع، استخدام، وحماية بياناتك.
       </Text>
       {SECTIONS.map((s, i) => (
         <View
@@ -63,18 +63,18 @@ export default function PrivacyScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   intro: {
-    fontSize: 12, fontFamily: "Tajawal_500Medium", textAlign: "right", marginBottom: 8,
+    fontSize: 12, fontFamily: "IBMPlexSansArabic_500Medium", textAlign: "right", marginBottom: 8,
   },
   preface: {
-    fontSize: 14, fontFamily: "Tajawal_500Medium", textAlign: "right", lineHeight: 22, marginBottom: 20,
+    fontSize: 14, fontFamily: "IBMPlexSansArabic_500Medium", textAlign: "right", lineHeight: 22, marginBottom: 20,
   },
   card: {
     padding: 16, borderRadius: 16, borderWidth: 1, marginBottom: 12,
   },
   title: {
-    fontSize: 15, fontFamily: "Tajawal_700Bold", textAlign: "right", marginBottom: 8,
+    fontSize: 15, fontFamily: "IBMPlexSansArabic_700Bold", textAlign: "right", marginBottom: 8,
   },
   body: {
-    fontSize: 13, fontFamily: "Tajawal_500Medium", textAlign: "right", lineHeight: 22,
+    fontSize: 13, fontFamily: "IBMPlexSansArabic_500Medium", textAlign: "right", lineHeight: 22,
   },
 });

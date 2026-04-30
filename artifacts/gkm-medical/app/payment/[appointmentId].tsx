@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
   },
   cardIcon: {
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     marginTop: 20,
     marginBottom: 12,
@@ -432,12 +432,12 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
   },
   summaryValue: {
     fontSize: 13.5,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "left",
     flexShrink: 1,
   },
@@ -447,12 +447,12 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
   },
   totalValue: {
     fontSize: 17,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "left",
   },
   methodCard: {
@@ -471,13 +471,13 @@ const styles = StyleSheet.create({
   },
   methodLabel: {
     fontSize: 14.5,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     marginBottom: 2,
   },
   methodHint: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
   },
   radioOuter: {
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
   },
   secureText: {
     fontSize: 12.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     flex: 1,
     textAlign: "right",
   },
@@ -528,11 +528,11 @@ const styles = StyleSheet.create({
   },
   footerTotalLabel: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
   footerTotalValue: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   processingBtn: {
     height: 56,
@@ -545,6 +545,6 @@ const styles = StyleSheet.create({
   processingText: {
     color: "#ffffff",
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
 });

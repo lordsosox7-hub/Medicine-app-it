@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 24,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   info: {
     flex: 1,
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   name: {
     flex: 1,
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
   },
   heart: {
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
   specialty: {
     fontSize: 12.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     lineHeight: 18,
   },
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontSize: 12,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   metaItem: {
     flexDirection: "row",
@@ -182,6 +182,6 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
 });

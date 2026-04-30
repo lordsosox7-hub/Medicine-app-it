@@ -47,7 +47,7 @@ export default function GateScreen() {
       colors={[colors.gradientFrom, colors.gradientTo]}
       style={styles.container}
     >
-      <Text style={styles.title}>GKM&apos;s Unit</Text>
+      <Text style={styles.title}>راحة</Text>
       <Text style={styles.subtitle}>Medical Care</Text>
     </LinearGradient>
   );
@@ -55,11 +55,11 @@ export default function GateScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: "center", justifyContent: "center" },
-  title: { color: "#ffffff", fontSize: 32, fontFamily: "Tajawal_700Bold" },
+  title: { color: "#ffffff", fontSize: 32, fontFamily: "IBMPlexSansArabic_700Bold" },
   subtitle: {
     color: "#ffffff",
     fontSize: 20,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     opacity: 0.8,
     marginTop: 8,
   },

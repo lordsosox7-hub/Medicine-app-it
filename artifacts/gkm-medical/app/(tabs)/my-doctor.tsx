@@ -133,6 +133,6 @@ const styles = StyleSheet.create({
   emptyText: {
     textAlign: "center",
     marginTop: 32,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   }
 });

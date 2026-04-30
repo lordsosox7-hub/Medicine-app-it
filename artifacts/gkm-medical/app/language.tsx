@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   intro: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     marginBottom: 16,
     paddingHorizontal: 4,
@@ -95,12 +95,12 @@ const styles = StyleSheet.create({
   text: { flex: 1 },
   name: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
   },
   native: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     marginTop: 2,
   },

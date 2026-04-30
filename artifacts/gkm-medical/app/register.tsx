@@ -113,7 +113,7 @@ export default function RegisterScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.header}>
-            <Text style={styles.brand}>GKM&apos;s Unit</Text>
+            <Text style={styles.brand}>راحة</Text>
             <Text style={styles.brandSub}>Medical Care</Text>
           </View>
 
@@ -125,7 +125,7 @@ export default function RegisterScreen() {
                 </Text>
                 <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
                   أرسلنا رسالة تفعيل إلى{"\n"}
-                  <Text style={{ fontFamily: "Tajawal_700Bold" }}>{email}</Text>
+                  <Text style={{ fontFamily: "IBMPlexSansArabic_700Bold" }}>{email}</Text>
                   {"\n"}اضغط على رابط التفعيل ثم سجّل الدخول.
                 </Text>
                 <GradientButton
@@ -191,12 +191,12 @@ export default function RegisterScreen() {
                 <View
                   style={[
                     styles.inputWrap,
-                    styles.inputWrapRow,
+                    
                     { backgroundColor: colors.primarySoft },
                   ]}
                 >
                   <TextInput
-                    style={[styles.input, styles.inputFlex, { color: colors.foreground }]}
+                    style={[styles.input, styles.passwordInput, { color: colors.foreground }]}
                     placeholder="6 أحرف على الأقل"
                     placeholderTextColor={colors.mutedForeground}
                     value={password}
@@ -226,12 +226,12 @@ export default function RegisterScreen() {
                 <View
                   style={[
                     styles.inputWrap,
-                    styles.inputWrapRow,
+                    
                     { backgroundColor: colors.primarySoft },
                   ]}
                 >
                   <TextInput
-                    style={[styles.input, styles.inputFlex, { color: colors.foreground }]}
+                    style={[styles.input, styles.passwordInput, { color: colors.foreground }]}
                     placeholder="••••••••"
                     placeholderTextColor={colors.mutedForeground}
                     value={confirmPassword}
@@ -267,7 +267,7 @@ export default function RegisterScreen() {
                 >
                   <Text style={[styles.altText, { color: colors.mutedForeground }]}>
                     لديك حساب بالفعل؟{" "}
-                    <Text style={{ color: colors.primary, fontFamily: "Tajawal_700Bold" }}>
+                    <Text style={{ color: colors.primary, fontFamily: "IBMPlexSansArabic_700Bold" }}>
                       سجّل الدخول
                     </Text>
                   </Text>
@@ -316,12 +316,12 @@ const styles = StyleSheet.create({
   brand: {
     color: "#ffffff",
     fontSize: 26,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   brandSub: {
     color: "#ffffff",
     fontSize: 15,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     opacity: 0.85,
     marginTop: 2,
   },
@@ -336,20 +336,20 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "center",
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 14,
-    fontFamily: "Tajawal_400Regular",
+    fontFamily: "IBMPlexSansArabic_400Regular",
     textAlign: "center",
     marginBottom: 18,
     lineHeight: 22,
   },
   label: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     marginBottom: 6,
     textAlign: "right",
   },
@@ -359,22 +359,24 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: "center",
     marginBottom: 12,
-  },
-  inputWrapRow: {
-    flexDirection: "row-reverse",
-    alignItems: "center",
+    position: "relative",
   },
   input: {
     fontSize: 16,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
+    height: "100%",
+    width: "100%",
+    paddingVertical: 0,
   },
-  inputFlex: {
-    flex: 1,
+  passwordInput: {
+    paddingLeft: 40,
   },
   eyeBtn: {
-    paddingStart: 10,
-    paddingEnd: 4,
-    height: "100%",
+    position: "absolute",
+    left: 8,
+    top: 0,
+    bottom: 0,
+    width: 40,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -385,6 +387,6 @@ const styles = StyleSheet.create({
   },
   altText: {
     fontSize: 14,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
 });

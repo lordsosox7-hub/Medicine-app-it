@@ -25,7 +25,7 @@ export default function AboutScreen() {
           contentFit="contain"
         />
       </View>
-      <Text style={[styles.appName, { color: colors.foreground }]}>GKM للرعاية الطبية</Text>
+      <Text style={[styles.appName, { color: colors.foreground }]}>راحة للرعاية الطبية</Text>
       <Text style={[styles.tagline, { color: colors.mutedForeground }]}>
         رعاية صحية متكاملة بين يديك
       </Text>
@@ -34,7 +34,7 @@ export default function AboutScreen() {
       <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <Text style={[styles.cardTitle, { color: colors.foreground }]}>عن التطبيق</Text>
         <Text style={[styles.cardBody, { color: colors.mutedForeground }]}>
-          GKM للرعاية الطبية هو تطبيق متكامل يربطك بأفضل الأطباء والمستشفيات في المملكة. يمكنك حجز المواعيد، التواصل مع الأطباء، متابعة نتائج التحاليل، وإدارة ملفك الطبي بكل سهولة وأمان.
+          راحة للرعاية الطبية هو تطبيق متكامل يربطك بأفضل الأطباء والمستشفيات في المملكة. يمكنك حجز المواعيد، التواصل مع الأطباء، متابعة نتائج التحاليل، وإدارة ملفك الطبي بكل سهولة وأمان.
         </Text>
       </View>
 
@@ -59,7 +59,7 @@ export default function AboutScreen() {
       </View>
 
       <Text style={[styles.copyright, { color: colors.mutedForeground }]}>
-        © 2026 GKM للرعاية الطبية{"\n"}جميع الحقوق محفوظة
+        © 2026 راحة للرعاية الطبية{"\n"}جميع الحقوق محفوظة
       </Text>
     </ScrollView>
   );
@@ -73,22 +73,22 @@ const styles = StyleSheet.create({
     marginTop: 12, marginBottom: 16,
   },
   logo: { width: 64, height: 64 },
-  appName: { fontSize: 22, fontFamily: "Tajawal_700Bold", marginBottom: 4 },
-  tagline: { fontSize: 14, fontFamily: "Tajawal_500Medium", marginBottom: 8 },
-  version: { fontSize: 12, fontFamily: "Tajawal_500Medium", marginBottom: 24 },
+  appName: { fontSize: 22, fontFamily: "IBMPlexSansArabic_700Bold", marginBottom: 4 },
+  tagline: { fontSize: 14, fontFamily: "IBMPlexSansArabic_500Medium", marginBottom: 8 },
+  version: { fontSize: 12, fontFamily: "IBMPlexSansArabic_500Medium", marginBottom: 24 },
   card: {
     width: "100%", padding: 16, borderRadius: 16, borderWidth: 1, marginBottom: 12,
   },
-  cardTitle: { fontSize: 15, fontFamily: "Tajawal_700Bold", textAlign: "right", marginBottom: 8 },
-  cardBody: { fontSize: 13, fontFamily: "Tajawal_500Medium", textAlign: "right", lineHeight: 22 },
+  cardTitle: { fontSize: 15, fontFamily: "IBMPlexSansArabic_700Bold", textAlign: "right", marginBottom: 8 },
+  cardBody: { fontSize: 13, fontFamily: "IBMPlexSansArabic_500Medium", textAlign: "right", lineHeight: 22 },
   linkRow: {
     flexDirection: "row", alignItems: "center", padding: 16, gap: 12,
   },
   iconBox: {
     width: 36, height: 36, borderRadius: 10, alignItems: "center", justifyContent: "center",
   },
-  linkLabel: { flex: 1, fontSize: 14, fontFamily: "Tajawal_700Bold", textAlign: "right" },
+  linkLabel: { flex: 1, fontSize: 14, fontFamily: "IBMPlexSansArabic_700Bold", textAlign: "right" },
   copyright: {
-    fontSize: 11, fontFamily: "Tajawal_500Medium", textAlign: "center", marginTop: 16, lineHeight: 18,
+    fontSize: 11, fontFamily: "IBMPlexSansArabic_500Medium", textAlign: "center", marginTop: 16, lineHeight: 18,
   },
 });

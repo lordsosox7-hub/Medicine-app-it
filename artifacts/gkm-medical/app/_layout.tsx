@@ -1,9 +1,9 @@
 import {
-  Tajawal_400Regular,
-  Tajawal_500Medium,
-  Tajawal_700Bold,
+  IBMPlexSansArabic_400Regular,
+  IBMPlexSansArabic_500Medium,
+  IBMPlexSansArabic_700Bold,
   useFonts,
-} from "@expo-google-fonts/tajawal";
+} from "@expo-google-fonts/ibm-plex-sans-arabic";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -41,7 +41,7 @@ function RootLayoutNav() {
       screenOptions={{
         headerBackTitle: "رجوع",
         headerTitleAlign: 'center',
-        headerTitleStyle: { fontFamily: 'Tajawal_700Bold', color: colors.foreground },
+        headerTitleStyle: { fontFamily: 'IBMPlexSansArabic_700Bold', color: colors.foreground },
         headerStyle: { backgroundColor: colors.background },
         headerTintColor: colors.foreground,
         headerShadowVisible: false,
@@ -81,9 +81,9 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    Tajawal_400Regular,
-    Tajawal_500Medium,
-    Tajawal_700Bold,
+    IBMPlexSansArabic_400Regular,
+    IBMPlexSansArabic_500Medium,
+    IBMPlexSansArabic_700Bold,
   });
 
   useEffect(() => {

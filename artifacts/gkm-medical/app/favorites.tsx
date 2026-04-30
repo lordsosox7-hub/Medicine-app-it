@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   list: { padding: 16 },
   count: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     marginBottom: 12,
     textAlign: "right",
   },
@@ -196,18 +196,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  placeholderText: { fontSize: 22, fontFamily: "Tajawal_700Bold" },
+  placeholderText: { fontSize: 22, fontFamily: "IBMPlexSansArabic_700Bold" },
   info: { flex: 1, justifyContent: "center", minWidth: 0 },
   name: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     marginBottom: 4,
     textAlign: "right",
     writingDirection: "rtl",
   },
   specialty: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     marginBottom: 6,
     textAlign: "right",
     writingDirection: "rtl",
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
   },
-  metaText: { fontSize: 12, fontFamily: "Tajawal_700Bold" },
+  metaText: { fontSize: 12, fontFamily: "IBMPlexSansArabic_700Bold" },
   metaDot: { fontSize: 12 },
   heartBtn: {
     width: 40,
@@ -234,5 +234,5 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 6,
   },
-  refreshText: { fontSize: 13, fontFamily: "Tajawal_700Bold" },
+  refreshText: { fontSize: 13, fontFamily: "IBMPlexSansArabic_700Bold" },
 });

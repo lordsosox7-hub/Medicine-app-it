@@ -62,6 +62,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
 });

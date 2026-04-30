@@ -70,7 +70,7 @@ export default function AdminScreen() {
                 <Text
                   style={{
                     color: active ? colors.primaryForeground : colors.foreground,
-                    fontFamily: "Tajawal_700Bold",
+                    fontFamily: "IBMPlexSansArabic_700Bold",
                     fontSize: 13,
                   }}
                 >
@@ -153,7 +153,7 @@ function AppointmentsView() {
               <Text
                 style={{
                   color: active ? colors.primaryForeground : colors.primary,
-                  fontFamily: "Tajawal_700Bold",
+                  fontFamily: "IBMPlexSansArabic_700Bold",
                   fontSize: 13,
                 }}
               >
@@ -172,7 +172,7 @@ function AppointmentsView() {
                 <Text
                   style={{
                     color: active ? colors.primaryForeground : colors.primary,
-                    fontFamily: "Tajawal_700Bold",
+                    fontFamily: "IBMPlexSansArabic_700Bold",
                     fontSize: 11,
                   }}
                 >
@@ -255,7 +255,7 @@ function AppointmentRow({ appointment }: { appointment: Appointment }) {
           </Text>
         </View>
         <View style={[styles.statusPill, { backgroundColor: statusBg }]}>
-          <Text style={{ color: statusColor, fontFamily: "Tajawal_700Bold", fontSize: 11 }}>
+          <Text style={{ color: statusColor, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 11 }}>
             {appointment.status}
           </Text>
         </View>
@@ -284,7 +284,7 @@ function AppointmentRow({ appointment }: { appointment: Appointment }) {
         </View>
         <View style={styles.apptMetaItem}>
           <Feather name="dollar-sign" size={13} color={colors.primary} />
-          <Text style={[styles.apptMetaText, { color: colors.primary, fontFamily: "Tajawal_700Bold" }]}>
+          <Text style={[styles.apptMetaText, { color: colors.primary, fontFamily: "IBMPlexSansArabic_700Bold" }]}>
             {appointment.doctor?.price ?? 0} ر.س
           </Text>
         </View>
@@ -646,7 +646,7 @@ function DoctorConsoleView() {
                       color: active
                         ? colors.primaryForeground
                         : colors.primary,
-                      fontFamily: "Tajawal_700Bold",
+                      fontFamily: "IBMPlexSansArabic_700Bold",
                       fontSize: 13,
                     }}
                   >
@@ -924,12 +924,12 @@ const styles = StyleSheet.create({
   },
   apptDoctor: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
   },
   apptSpecialty: {
     fontSize: 12.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     marginTop: 2,
   },
@@ -952,7 +952,7 @@ const styles = StyleSheet.create({
   },
   apptMetaText: {
     fontSize: 12.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
 
   // Revenue view
@@ -979,15 +979,15 @@ const styles = StyleSheet.create({
   },
   kpiLabel: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
   kpiValue: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   kpiSub: {
     fontSize: 11.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
   section: {
     borderRadius: 16,
@@ -996,7 +996,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 14.5,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   monthHeader: {
     flexDirection: "row",
@@ -1005,11 +1005,11 @@ const styles = StyleSheet.create({
   },
   monthLabel: {
     fontSize: 12.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
   monthValue: {
     fontSize: 13,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   barTrack: {
     height: 10,
@@ -1029,18 +1029,18 @@ const styles = StyleSheet.create({
   },
   doctorName: {
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
   },
   doctorMeta: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     marginTop: 2,
   },
   doctorRevenue: {
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
 
   // Console view (existing)
@@ -1052,7 +1052,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
   },
-  toolbarLabel: { fontSize: 13, fontFamily: "Tajawal_500Medium" },
+  toolbarLabel: { fontSize: 13, fontFamily: "IBMPlexSansArabic_500Medium" },
   doctorChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -1071,7 +1071,7 @@ const styles = StyleSheet.create({
   },
   sidebarHeader: {
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     padding: 16,
     paddingBottom: 8,
   },
@@ -1080,20 +1080,20 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderBottomWidth: 1,
   },
-  convName: { fontSize: 14, fontFamily: "Tajawal_700Bold", marginBottom: 2 },
-  convPreview: { fontSize: 12, fontFamily: "Tajawal_400Regular" },
+  convName: { fontSize: 14, fontFamily: "IBMPlexSansArabic_700Bold", marginBottom: 2 },
+  convPreview: { fontSize: 12, fontFamily: "IBMPlexSansArabic_400Regular" },
   chatPane: { flex: 1 },
   chatHeader: {
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
   },
-  chatHeaderTitle: { fontSize: 14, fontFamily: "Tajawal_700Bold" },
-  chatHeaderStatus: { fontSize: 11, fontFamily: "Tajawal_500Medium", marginTop: 2 },
+  chatHeaderTitle: { fontSize: 14, fontFamily: "IBMPlexSansArabic_700Bold" },
+  chatHeaderStatus: { fontSize: 11, fontFamily: "IBMPlexSansArabic_500Medium", marginTop: 2 },
   empty: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 12 },
   emptyText: {
     fontSize: 14,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
     maxWidth: 320,
   },
@@ -1112,7 +1112,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 14,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
   },
   sendBtn: {

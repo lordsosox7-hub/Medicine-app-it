@@ -245,17 +245,17 @@ const styles = StyleSheet.create({
   },
   avatarInitial: {
     fontSize: 36,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   name: {
     fontSize: 22,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     color: '#ffffff',
     marginBottom: 4,
   },
   specialty: {
     fontSize: 15,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     color: 'rgba(255,255,255,0.8)',
     marginBottom: 24,
   },
@@ -278,13 +278,13 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 16,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     color: '#ffffff',
     marginBottom: 2,
   },
   statLabel: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     color: 'rgba(255,255,255,0.8)',
   },
   content: {
@@ -292,13 +292,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     marginBottom: 12,
     textAlign: 'right',
   },
   about: {
     fontSize: 15,
-    fontFamily: "Tajawal_400Regular",
+    fontFamily: "IBMPlexSansArabic_400Regular",
     lineHeight: 24,
     textAlign: 'right',
   },
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
   },
   serviceText: {
     fontSize: 14,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
   clinicCard: {
     borderWidth: 1,
@@ -339,14 +339,14 @@ const styles = StyleSheet.create({
   },
   clinicName: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     marginBottom: 4,
     lineHeight: 22,
   },
   clinicAddress: {
     fontSize: 13,
-    fontFamily: "Tajawal_400Regular",
+    fontFamily: "IBMPlexSansArabic_400Regular",
     textAlign: "right",
     lineHeight: 20,
   },
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   },
   clinicMetaText: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     flex: 1,
     textAlign: "right",
   },
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   },
   clinicActionText: {
     fontSize: 13,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   bottomBar: {
     position: 'absolute',
@@ -407,13 +407,13 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     marginBottom: 2,
     textAlign: 'right',
   },
   priceValue: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: 'right',
   },
   bookButton: {

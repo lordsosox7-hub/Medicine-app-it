@@ -132,7 +132,7 @@ export default function PaymentsScreen() {
                     },
                   ]}
                 >
-                  <Text style={{ color: newType === t ? colors.primaryForeground : colors.foreground, fontFamily: "Tajawal_700Bold", fontSize: 12 }}>
+                  <Text style={{ color: newType === t ? colors.primaryForeground : colors.foreground, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 12 }}>
                     {TYPE_LABELS[t]}
                   </Text>
                 </TouchableOpacity>
@@ -195,12 +195,12 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 16,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     marginBottom: 6,
   },
   emptyText: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
   },
   cardItem: {
@@ -220,17 +220,17 @@ const styles = StyleSheet.create({
   brandText: {
     color: "#fff",
     fontSize: 11,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   cardNumber: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     letterSpacing: 1,
   },
   cardHolder: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     marginTop: 2,
   },
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
   },
   addText: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   modalBg: {
     flex: 1,
@@ -260,13 +260,13 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     marginBottom: 20,
   },
   fieldLabel: {
     fontSize: 13,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     marginBottom: 6,
     marginTop: 4,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 14,
     fontSize: 14,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     marginBottom: 12,
   },
@@ -306,6 +306,6 @@ const styles = StyleSheet.create({
   },
   modalBtnText: {
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
 });

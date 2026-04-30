@@ -142,14 +142,14 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 20,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     marginBottom: 8,
     textAlign: "center",
     writingDirection: "rtl",
   },
   subInfo: {
     fontSize: 14,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
     writingDirection: "rtl",
     marginBottom: 14,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   },
   editPillText: {
     fontSize: 13,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   emptyState: {
     alignItems: "center",
@@ -181,13 +181,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 17,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "center",
     writingDirection: "rtl",
   },
   emptySubtitle: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
     writingDirection: "rtl",
     lineHeight: 20,
@@ -203,6 +203,6 @@ const styles = StyleSheet.create({
   },
   emptyCtaText: {
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
 });

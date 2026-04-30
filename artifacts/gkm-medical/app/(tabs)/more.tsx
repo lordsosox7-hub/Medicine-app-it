@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: 24,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
   },
   profileCard: {
@@ -174,20 +174,20 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontSize: 24,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   profileInfo: {
     flex: 1,
   },
   name: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     marginBottom: 2,
     textAlign: "right",
   },
   profileEmail: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
   },
   editBtn: {
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 12,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     marginHorizontal: 24,
     marginBottom: 8,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   },
   versionText: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
     marginTop: 8,
   },

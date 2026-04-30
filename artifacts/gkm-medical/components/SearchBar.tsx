@@ -35,7 +35,7 @@ export function SearchBar({
     >
       <Feather name="search" size={20} color={colors.mutedForeground} style={styles.icon} />
       <TextInput
-        style={[styles.input, { color: colors.foreground, fontFamily: "Tajawal_500Medium" }]}
+        style={[styles.input, { color: colors.foreground, fontFamily: "IBMPlexSansArabic_500Medium" }]}
         placeholder={placeholder}
         placeholderTextColor={colors.mutedForeground}
         value={value}

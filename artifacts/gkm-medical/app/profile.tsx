@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontSize: 36,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   avatarEdit: {
     position: "absolute",
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   fieldLabel: {
     fontSize: 13,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     marginBottom: 8,
   },
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 14,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     height: "100%",
   },
@@ -199,6 +199,6 @@ const styles = StyleSheet.create({
   },
   saveText: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
 });

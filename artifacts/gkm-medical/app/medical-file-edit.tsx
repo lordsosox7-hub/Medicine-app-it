@@ -239,7 +239,7 @@ function TextField({
         keyboardType={keyboardType ?? "default"}
         style={[
           styles.fieldInput,
-          { color: colors.foreground, fontFamily: "Tajawal_500Medium" },
+          { color: colors.foreground, fontFamily: "IBMPlexSansArabic_500Medium" },
         ]}
       />
     </View>
@@ -338,7 +338,7 @@ function ListEditor({
         <Text
           style={{
             color: colors.mutedForeground,
-            fontFamily: "Tajawal_500Medium",
+            fontFamily: "IBMPlexSansArabic_500Medium",
             textAlign: "right",
             writingDirection: "rtl",
             fontSize: 13,
@@ -385,7 +385,7 @@ function ListEditor({
           returnKeyType="done"
           style={[
             styles.addInput,
-            { color: colors.foreground, fontFamily: "Tajawal_500Medium" },
+            { color: colors.foreground, fontFamily: "IBMPlexSansArabic_500Medium" },
           ]}
         />
         <TouchableOpacity
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
   loading: { flex: 1, justifyContent: "center", alignItems: "center" },
   sectionTitle: {
     fontSize: 12,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     writingDirection: "rtl",
     marginTop: 16,
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   },
   fieldLabel: {
     fontSize: 11,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     writingDirection: "rtl",
     marginBottom: 6,
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontSize: 13,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   listRow: {
     flexDirection: "row-reverse",
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
   listText: {
     flex: 1,
     fontSize: 14,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     writingDirection: "rtl",
   },
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
   },
   saveText: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   cancelBtn: {
     paddingVertical: 14,
@@ -522,6 +522,6 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
 });

@@ -278,14 +278,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "center",
     writingDirection: "rtl",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
     writingDirection: "rtl",
     lineHeight: 22,
@@ -305,13 +305,13 @@ const styles = StyleSheet.create({
   },
   refLabel: {
     fontSize: 12.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     writingDirection: "rtl",
   },
   refValue: {
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "left",
     writingDirection: "ltr",
   },
@@ -330,20 +330,20 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 11.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     writingDirection: "rtl",
     marginBottom: 2,
   },
   detailValue: {
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     writingDirection: "rtl",
   },
   detailSub: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     writingDirection: "rtl",
     marginTop: 2,
@@ -360,13 +360,13 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     writingDirection: "rtl",
   },
   totalValue: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "left",
     writingDirection: "rtl",
   },
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
   },
   ghostBtnText: {
     fontSize: 14.5,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     writingDirection: "rtl",
   },
 });

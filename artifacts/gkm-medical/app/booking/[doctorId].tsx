@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     paddingHorizontal: 16,
     marginBottom: 16,
     textAlign: 'right',
@@ -202,17 +202,17 @@ const styles = StyleSheet.create({
   },
   dayName: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     marginBottom: 2,
   },
   dayNum: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     marginBottom: 2,
   },
   monthName: {
     fontSize: 11,
-    fontFamily: "Tajawal_400Regular",
+    fontFamily: "IBMPlexSansArabic_400Regular",
   },
   timeGrid: {
     flexDirection: 'row',
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   footer: {
     position: 'absolute',
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   },
   recapLabel: {
     fontSize: 12,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: 'right',
     marginBottom: 2,
   },
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   recapValue: {
     flex: 1,
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: 'right',
   }
 });

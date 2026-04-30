@@ -45,13 +45,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: 'center',
     marginBottom: 8,
   },
   description: {
     fontSize: 14,
-    fontFamily: "Tajawal_400Regular",
+    fontFamily: "IBMPlexSansArabic_400Regular",
     textAlign: 'center',
     lineHeight: 20,
   },

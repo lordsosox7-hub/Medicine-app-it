@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: 'right',
     writingDirection: 'rtl',
   },
@@ -92,14 +92,14 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 14,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     flex: 1,
     textAlign: 'right',
     writingDirection: 'rtl',
   },
   emptyText: {
     fontSize: 14,
-    fontFamily: "Tajawal_400Regular",
+    fontFamily: "IBMPlexSansArabic_400Regular",
     fontStyle: 'italic',
     textAlign: 'right',
     writingDirection: 'rtl',

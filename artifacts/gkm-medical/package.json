@@ -56,7 +56,7 @@
     "zod-validation-error": "^3.4.0"
   },
   "dependencies": {
-    "@expo-google-fonts/tajawal": "^0.4.1",
+    "@expo-google-fonts/ibm-plex-sans-arabic": "^0.4.2",
     "@supabase/supabase-js": "^2.104.1",
     "react-native-url-polyfill": "^3.0.0"
   }

@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   toolbarCount: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     writingDirection: "rtl",
   },
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   },
   toolbarBtnText: {
     fontSize: 12,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     writingDirection: "rtl",
   },
   list: {
@@ -242,18 +242,18 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     writingDirection: "rtl",
   },
   time: {
     fontSize: 11,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     writingDirection: "rtl",
   },
   body: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     writingDirection: "rtl",
     lineHeight: 18,
@@ -278,11 +278,11 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 16,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   emptySubtitle: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
     paddingHorizontal: 40,
   },

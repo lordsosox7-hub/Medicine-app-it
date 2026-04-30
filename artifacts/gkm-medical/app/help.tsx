@@ -100,7 +100,7 @@ function ContactBtn({ icon, label, color, bg, onPress }: { icon: keyof typeof Fe
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  sectionLabel: { fontSize: 12, fontFamily: "Tajawal_700Bold", textAlign: "right", marginBottom: 10, paddingHorizontal: 4 },
+  sectionLabel: { fontSize: 12, fontFamily: "IBMPlexSansArabic_700Bold", textAlign: "right", marginBottom: 10, paddingHorizontal: 4 },
   contactRow: { flexDirection: "row", gap: 12 },
   contactBtn: {
     flex: 1, alignItems: "center", padding: 16, borderRadius: 16, borderWidth: 1, gap: 8,
@@ -108,9 +108,9 @@ const styles = StyleSheet.create({
   contactIcon: {
     width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center",
   },
-  contactLabel: { fontSize: 13, fontFamily: "Tajawal_700Bold" },
+  contactLabel: { fontSize: 13, fontFamily: "IBMPlexSansArabic_700Bold" },
   faqCard: { borderRadius: 16, borderWidth: 1, overflow: "hidden" },
   faqHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16, gap: 12 },
-  faqQ: { flex: 1, fontSize: 14, fontFamily: "Tajawal_700Bold", textAlign: "right" },
-  faqA: { fontSize: 13, fontFamily: "Tajawal_500Medium", textAlign: "right", lineHeight: 22, paddingHorizontal: 16, paddingBottom: 16 },
+  faqQ: { flex: 1, fontSize: 14, fontFamily: "IBMPlexSansArabic_700Bold", textAlign: "right" },
+  faqA: { fontSize: 13, fontFamily: "IBMPlexSansArabic_500Medium", textAlign: "right", lineHeight: 22, paddingHorizontal: 16, paddingBottom: 16 },
 });

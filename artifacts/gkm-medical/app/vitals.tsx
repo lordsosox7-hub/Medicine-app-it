@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   intro: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     writingDirection: "rtl",
     lineHeight: 20,
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
   },
   vitalLabel: {
     fontSize: 12.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     writingDirection: "rtl",
     marginBottom: 4,
@@ -508,15 +508,15 @@ const styles = StyleSheet.create({
   },
   vitalValue: {
     fontSize: 22,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   vitalUnit: {
     fontSize: 11,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
   vitalStatus: {
     fontSize: 11.5,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     writingDirection: "rtl",
     marginTop: 4,
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 17,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     writingDirection: "rtl",
     marginBottom: 12,
@@ -541,12 +541,12 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 14.5,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     marginTop: 6,
   },
   emptyText: {
     fontSize: 12.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
   },
   historyRow: {
@@ -566,13 +566,13 @@ const styles = StyleSheet.create({
   },
   historyLabel: {
     fontSize: 14,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     writingDirection: "rtl",
   },
   historyDate: {
     fontSize: 11.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     writingDirection: "rtl",
     marginTop: 2,
@@ -584,11 +584,11 @@ const styles = StyleSheet.create({
   },
   historyValue: {
     fontSize: 14.5,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   historyUnit: {
     fontSize: 11,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
   historyStatusDot: {
     width: 8,
@@ -597,7 +597,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: 11.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
     marginTop: 6,
   },
@@ -632,13 +632,13 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 16,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     writingDirection: "rtl",
   },
   modalHint: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     writingDirection: "rtl",
     marginTop: 2,
@@ -655,14 +655,14 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     paddingVertical: 12,
     textAlign: "right",
     writingDirection: "rtl",
   },
   inputUnit: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     marginEnd: 8,
   },
   modalActions: {
@@ -682,6 +682,6 @@ const styles = StyleSheet.create({
   },
   modalBtnText: {
     fontSize: 14.5,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
 });

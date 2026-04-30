@@ -377,12 +377,12 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
   },
   greetingSub: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     marginTop: 2,
   },
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   searchContainer: {
     paddingHorizontal: 16,
@@ -417,14 +417,14 @@ const styles = StyleSheet.create({
   heroTitle: {
     color: "#ffffff",
     fontSize: 22,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     marginBottom: 8,
     textAlign: "right",
   },
   heroSubtitle: {
     color: "rgba(255,255,255,0.9)",
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     marginBottom: 18,
     textAlign: "right",
     lineHeight: 20,
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
   },
   heroButtonText: {
     fontSize: 13,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   heroImage: {
     position: "absolute",
@@ -477,6 +477,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
 });

@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 18,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   info: {
     flex: 1,
@@ -142,12 +142,12 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
   },
   specialty: {
     fontSize: 12.5,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
   },
   divider: {
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 12.5,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     flexShrink: 1,
   },
   deleteBtn: {

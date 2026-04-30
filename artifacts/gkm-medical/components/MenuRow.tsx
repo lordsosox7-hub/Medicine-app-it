@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: 'right',
     flex: 1,
   },

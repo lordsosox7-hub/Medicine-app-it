@@ -1,6 +1,6 @@
 kind = "mobile"
 previewPath = "/"
-title = "GKM's Unit Medical Care"
+title = "راحة"
 version = "1.0.0"
 id = "artifacts/gkm-medical"
 router = "expo-domain"

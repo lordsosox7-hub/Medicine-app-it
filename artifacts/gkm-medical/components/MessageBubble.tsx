@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 15,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     lineHeight: 22,
     textAlign: "right",
   },
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   },
   time: {
     fontSize: 11,
-    fontFamily: "Tajawal_400Regular",
+    fontFamily: "IBMPlexSansArabic_400Regular",
   },
   ticks: {
     flexDirection: "row",

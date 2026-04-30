@@ -73,13 +73,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: 'center',
     marginBottom: 16,
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 32,

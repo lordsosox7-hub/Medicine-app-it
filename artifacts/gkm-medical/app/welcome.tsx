@@ -25,8 +25,8 @@ export default function WelcomeScreen() {
       </View>
 
       <View style={styles.bottom}>
-        <Text style={styles.brand}>GKM&apos;s Unit</Text>
-        <Text style={styles.brandSub}>وحدة GKM للرعاية الطبية</Text>
+        <Text style={styles.brand}>راحة</Text>
+        <Text style={styles.brandSub}>راحة للرعاية الطبية</Text>
         <Text style={styles.tagline}>
           رعاية صحية سهلة وآمنة بين يديك
         </Text>
@@ -83,13 +83,13 @@ const styles = StyleSheet.create({
   brand: {
     color: "#ffffff",
     fontSize: 32,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "center",
   },
   brandSub: {
     color: "#ffffff",
     fontSize: 16,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
     opacity: 0.9,
     marginTop: 4,
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   tagline: {
     color: "#ffffff",
     fontSize: 14,
-    fontFamily: "Tajawal_400Regular",
+    fontFamily: "IBMPlexSansArabic_400Regular",
     textAlign: "center",
     opacity: 0.85,
     marginTop: 12,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
   primaryBtnText: {
     fontSize: 16,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   secondaryBtn: {
     height: 56,
@@ -125,6 +125,6 @@ const styles = StyleSheet.create({
   secondaryBtnText: {
     color: "#ffffff",
     fontSize: 16,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
   },
 });

@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   intro: {
     fontSize: 13,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     marginBottom: 16,
     paddingHorizontal: 4,
@@ -95,13 +95,13 @@ const styles = StyleSheet.create({
   text: { flex: 1 },
   label: {
     fontSize: 15,
-    fontFamily: "Tajawal_700Bold",
+    fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
     marginBottom: 2,
   },
   desc: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
   },
   check: {
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   },
   note: {
     fontSize: 12,
-    fontFamily: "Tajawal_500Medium",
+    fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
     marginTop: 16,
     lineHeight: 18,

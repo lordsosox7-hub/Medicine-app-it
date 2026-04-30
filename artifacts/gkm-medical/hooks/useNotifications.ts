@@ -105,7 +105,7 @@ export function useNotifications() {
     list.push({
       id: "system:welcome",
       kind: "system",
-      title: "مرحباً بك في GKM للرعاية الطبية",
+      title: "مرحباً بك في راحة للرعاية الطبية",
       body: "احجز مواعيدك، تابع حالتك الصحية، وتواصل مع الأطباء بسهولة.",
       timestamp: new Date(0).toISOString(),
       icon: "heart",
