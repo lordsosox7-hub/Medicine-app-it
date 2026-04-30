@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
+import Svg, { Circle, Path, G } from "react-native-svg";
 import { SearchBar } from "@/components/SearchBar";
 import { SectionHeader } from "@/components/SectionHeader";
 import { AppointmentCard } from "@/components/AppointmentCard";
@@ -183,10 +184,41 @@ export default function HomeScreen() {
         end={{ x: 1, y: 1 }}
         style={[styles.heroCard, { borderRadius: 24 }]}
       >
+        {/* Decorative art layer */}
+        <View style={styles.heroArt} pointerEvents="none">
+          <Svg width="100%" height="100%" viewBox="0 0 360 200">
+            <G opacity={0.18}>
+              <Circle cx={40} cy={30} r={70} fill="#ffffff" />
+              <Circle cx={20} cy={170} r={50} fill="#ffffff" />
+              <Circle cx={110} cy={180} r={28} fill="#ffffff" />
+            </G>
+            <G opacity={0.32}>
+              <Circle cx={70} cy={100} r={46} stroke="#ffffff" strokeWidth={1.5} fill="none" />
+              <Circle cx={70} cy={100} r={66} stroke="#ffffff" strokeWidth={1} fill="none" />
+            </G>
+            {/* Pulse line */}
+            <Path
+              d="M0 130 L25 130 L35 110 L45 150 L60 90 L75 130 L150 130"
+              stroke="#ffffff"
+              strokeWidth={1.6}
+              fill="none"
+              opacity={0.55}
+            />
+            {/* Plus signs scattered */}
+            <G fill="#ffffff" opacity={0.45}>
+              <Path d="M120 40 h10 v3 h-10 z M124 36 h2 v11 h-2 z" />
+              <Path d="M30 70 h8 v2.5 h-8 z M33 67 h2 v8.5 h-2 z" />
+              <Path d="M150 90 h6 v2 h-6 z M152 87 h2 v8 h-2 z" />
+            </G>
+            {/* Soft heart pulse circle */}
+            <Circle cx={70} cy={100} r={20} fill="#ffffff" opacity={0.22} />
+          </Svg>
+        </View>
+
         <View style={styles.heroContent}>
           <Text style={styles.heroTitle}>صحتك أولويتنا</Text>
           <Text style={styles.heroSubtitle}>
-            احجز مواعيدك بسهولة، تابع حالتك الصحية، واحصل على أفضل رعاية طبية.
+            احجز مواعيدك بسهولة، تابع حالتك الصحية، واحصل على أفضل رعاية.
           </Text>
           <TouchableOpacity
             style={[styles.heroButton, { backgroundColor: colors.primaryForeground }]}
@@ -418,10 +450,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 28,
     overflow: "hidden",
-    minHeight: 180,
+    minHeight: 200,
+    position: "relative",
+  },
+  heroArt: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 0,
   },
   heroContent: {
     flex: 1,
+    maxWidth: "62%",
     zIndex: 2,
     alignItems: "flex-start",
   },
