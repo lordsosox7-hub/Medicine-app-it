@@ -325,7 +325,11 @@ export default function VitalsScreen() {
             behavior={Platform.OS === "ios" ? "padding" : undefined}
             style={styles.modalCenterWrap}
           >
-            <TouchableOpacity activeOpacity={1} onPress={() => {}}>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => {}}
+              style={styles.modalContentWrap}
+            >
               <View
                 style={[
                   styles.modalContent,
@@ -612,10 +616,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 24,
   },
+  modalContentWrap: {
+    width: "100%",
+    maxWidth: 420,
+    alignSelf: "center",
+  },
   modalContent: {
     borderRadius: 22,
     borderWidth: 1,
     padding: 20,
+    width: "100%",
   },
   modalHeader: {
     flexDirection: "row-reverse",
