@@ -100,7 +100,7 @@ export default function HomeScreen() {
       ),
       iconColor: a.teal.color,
       iconBg: a.teal.bg,
-      onPress: () => {},
+      onPress: () => router.push("/medications"),
     },
     {
       label: "الملف الطبي",
