@@ -11,15 +11,18 @@ interface QuickActionCardProps {
   iconColor: string;
   iconBg: string;
   onPress: () => void;
+  onLongPress?: () => void;
 }
 
-export function QuickActionCard({ label, subtitle, icon, iconNode, iconColor, iconBg, onPress }: QuickActionCardProps) {
+export function QuickActionCard({ label, subtitle, icon, iconNode, iconColor, iconBg, onPress, onLongPress }: QuickActionCardProps) {
   const colors = useColors();
 
   return (
     <TouchableOpacity
       activeOpacity={0.75}
       onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={400}
       style={[
         styles.container,
         {

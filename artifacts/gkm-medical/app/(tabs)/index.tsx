@@ -47,6 +47,13 @@ export default function HomeScreen() {
 
   const a = colors.accents;
 
+  const dial911 = () => {
+    const url = Platform.OS === "android" ? "tel:911" : "telprompt:911";
+    Linking.openURL(url).catch(() => {
+      Alert.alert("تعذّر إجراء المكالمة", "يرجى المحاولة مرة أخرى.");
+    });
+  };
+
   const quickActions: Array<{
     label: string;
     subtitle: string;
@@ -55,6 +62,7 @@ export default function HomeScreen() {
     iconColor: string;
     iconBg: string;
     onPress: () => void;
+    onLongPress?: () => void;
   }> = [
     {
       label: "احجز موعد",
@@ -106,7 +114,7 @@ export default function HomeScreen() {
     },
     {
       label: "الطوارئ",
-      subtitle: "اتصل الآن",
+      subtitle: "اتصل الآن • اضغط مطولاً للاتصال المباشر",
       iconNode: (
         <MaterialCommunityIcons name="ambulance" size={22} color={a.red.color} />
       ),
@@ -121,17 +129,13 @@ export default function HomeScreen() {
             {
               text: "اتصل",
               style: "destructive",
-              onPress: () => {
-                const url = Platform.OS === "android" ? "tel:911" : "telprompt:911";
-                Linking.openURL(url).catch(() => {
-                  Alert.alert("تعذّر إجراء المكالمة", "يرجى المحاولة مرة أخرى.");
-                });
-              },
+              onPress: dial911,
             },
           ],
           { cancelable: true }
         );
       },
+      onLongPress: dial911,
     },
   ];
 
