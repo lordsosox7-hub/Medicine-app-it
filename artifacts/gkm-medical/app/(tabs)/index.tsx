@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity, Alert, Linking } from "react-native";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -112,7 +112,26 @@ export default function HomeScreen() {
       ),
       iconColor: a.red.color,
       iconBg: a.red.bg,
-      onPress: () => {},
+      onPress: () => {
+        Alert.alert(
+          "اتصال الطوارئ",
+          "هل تريد الاتصال بالرقم 911؟",
+          [
+            { text: "إلغاء", style: "cancel" },
+            {
+              text: "اتصل",
+              style: "destructive",
+              onPress: () => {
+                const url = Platform.OS === "android" ? "tel:911" : "telprompt:911";
+                Linking.openURL(url).catch(() => {
+                  Alert.alert("تعذّر إجراء المكالمة", "يرجى المحاولة مرة أخرى.");
+                });
+              },
+            },
+          ],
+          { cancelable: true }
+        );
+      },
     },
   ];
 
