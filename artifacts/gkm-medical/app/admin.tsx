@@ -1291,7 +1291,7 @@ function ConversationViewer({
                     fontFamily: "IBMPlexSansArabic_500Medium",
                     fontSize: 10.5,
                     marginTop: 4,
-                    textAlign: "left",
+                    textAlign: "right",
                   }}
                 >
                   {new Date(item.created_at).toLocaleString("ar")}
@@ -2217,6 +2217,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
+    textAlignVertical: "center",
   },
   primaryBtn: {
     flexDirection: "row-reverse",
@@ -2386,6 +2387,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "flex-end",
     marginBottom: 4,
   },
 
@@ -2412,7 +2414,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 16,
     fontFamily: "IBMPlexSansArabic_700Bold",
-    textAlign: "right",
+    textAlign: "center",
     flex: 1,
   },
   twoCol: { flexDirection: "row-reverse", gap: 10 },
