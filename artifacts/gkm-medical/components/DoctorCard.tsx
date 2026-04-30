@@ -1,10 +1,18 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { Doctor } from "@/lib/supabase";
 import { useColors } from "@/hooks/useColors";
 import { useIsFavorite, useToggleFavorite } from "@/hooks/useGkmData";
+import { PressableScale } from "./PressableScale";
 
 interface DoctorCardProps {
   doctor: Doctor;
@@ -15,15 +23,29 @@ export function DoctorCard({ doctor, onPress }: DoctorCardProps) {
   const colors = useColors();
   const { data: isFav = false } = useIsFavorite(doctor.id);
   const toggleFav = useToggleFavorite();
+  const heartScale = useSharedValue(1);
+
+  useEffect(() => {
+    if (isFav) {
+      heartScale.value = withSequence(
+        withTiming(1.35, { duration: 140 }),
+        withSpring(1, { damping: 6, stiffness: 220 }),
+      );
+    }
+  }, [isFav, heartScale]);
+
+  const heartStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: heartScale.value }],
+  }));
 
   const onToggleFavorite = () => {
     toggleFav.mutate({ doctor_id: doctor.id, current: isFav });
   };
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.85}
+    <PressableScale
       onPress={onPress}
+      scaleTo={0.97}
       style={[
         styles.container,
         {
@@ -52,22 +74,24 @@ export function DoctorCard({ doctor, onPress }: DoctorCardProps) {
           <Text style={[styles.name, { color: colors.foreground }]} numberOfLines={1}>
             {doctor.name_ar}
           </Text>
-          <TouchableOpacity
+          <PressableScale
+            scaleTo={0.85}
             style={[
               styles.heart,
               { backgroundColor: isFav ? "#fee2e2" : colors.muted },
             ]}
-            activeOpacity={0.7}
             hitSlop={6}
             onPress={onToggleFavorite}
             disabled={toggleFav.isPending}
           >
-            <Ionicons
-              name={isFav ? "heart" : "heart-outline"}
-              size={16}
-              color={isFav ? "#ef4444" : colors.mutedForeground}
-            />
-          </TouchableOpacity>
+            <Animated.View style={heartStyle}>
+              <Ionicons
+                name={isFav ? "heart" : "heart-outline"}
+                size={16}
+                color={isFav ? "#ef4444" : colors.mutedForeground}
+              />
+            </Animated.View>
+          </PressableScale>
         </View>
 
         <Text style={[styles.specialty, { color: colors.mutedForeground }]} numberOfLines={2}>
@@ -89,7 +113,7 @@ export function DoctorCard({ doctor, onPress }: DoctorCardProps) {
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 

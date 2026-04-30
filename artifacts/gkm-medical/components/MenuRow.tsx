@@ -1,8 +1,9 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
+import { Text, StyleSheet, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { RTLChevron } from "./RTLChevron";
+import { PressableScale } from "./PressableScale";
 
 interface MenuRowProps {
   icon: keyof typeof Feather.glyphMap;
@@ -15,11 +16,11 @@ export function MenuRow({ icon, label, onPress, destructive }: MenuRowProps) {
   const colors = useColors();
   const textColor = destructive ? colors.destructive : colors.foreground;
   const iconColor = destructive ? colors.destructive : colors.primary;
-  
+
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
+    <PressableScale
       onPress={onPress}
+      scaleTo={0.98}
       style={[styles.container, { borderBottomColor: colors.border }]}
     >
       <View style={styles.left}>
@@ -29,7 +30,7 @@ export function MenuRow({ icon, label, onPress, destructive }: MenuRowProps) {
         <Text style={[styles.label, { color: textColor }]} numberOfLines={1}>{label}</Text>
       </View>
       <RTLChevron color={colors.mutedForeground} />
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 

@@ -46,6 +46,8 @@ function RootLayoutNav() {
         headerTintColor: colors.foreground,
         headerShadowVisible: false,
         contentStyle: { backgroundColor: colors.background },
+        animation: Platform.OS === 'ios' ? 'default' : 'slide_from_right',
+        animationDuration: 260,
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />

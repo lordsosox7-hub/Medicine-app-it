@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity, Alert, Linking } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Platform, Alert, Linking } from "react-native";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -7,12 +7,23 @@ import { Feather, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import Svg, { Circle, Path, G } from "react-native-svg";
+import Animated, {
+  FadeInDown,
+  FadeIn,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 import { SearchBar } from "@/components/SearchBar";
 import { SectionHeader } from "@/components/SectionHeader";
 import { AppointmentCard } from "@/components/AppointmentCard";
 import { QuickActionCard } from "@/components/QuickActionCard";
 import { HealthMetricCard } from "@/components/HealthMetricCard";
 import { InsightCard } from "@/components/InsightCard";
+import { PressableScale } from "@/components/PressableScale";
 import { getTodayAdvice } from "@/constants/advices";
 import { getUserName } from "@/lib/userId";
 import { useUpcomingAppointment } from "@/hooks/useGkmData";
@@ -28,6 +39,42 @@ export default function HomeScreen() {
   const { getDisplayValue, getStatus, getTrend } = useVitals();
   const [userName, setUserName] = useState("أحمد");
   const [todayAdvice, setTodayAdvice] = useState(() => getTodayAdvice());
+
+  // Hero heartbeat-style pulse on the heart image
+  const heroHeart = useSharedValue(1);
+  useEffect(() => {
+    heroHeart.value = withRepeat(
+      withSequence(
+        withTiming(1.06, { duration: 700, easing: Easing.inOut(Easing.quad) }),
+        withTiming(1, { duration: 700, easing: Easing.inOut(Easing.quad) }),
+      ),
+      -1,
+      false,
+    );
+  }, [heroHeart]);
+  const heroHeartStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: heroHeart.value }],
+  }));
+
+  // Notification badge gentle pulse when there are unread items
+  const badgePulse = useSharedValue(1);
+  useEffect(() => {
+    if (unreadCount > 0) {
+      badgePulse.value = withRepeat(
+        withSequence(
+          withTiming(1.35, { duration: 600, easing: Easing.inOut(Easing.quad) }),
+          withTiming(1, { duration: 600, easing: Easing.inOut(Easing.quad) }),
+        ),
+        -1,
+        false,
+      );
+    } else {
+      badgePulse.value = withTiming(1, { duration: 200 });
+    }
+  }, [unreadCount, badgePulse]);
+  const badgeStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: badgePulse.value }],
+  }));
 
   useEffect(() => {
     getUserName().then(setUserName);
@@ -146,15 +193,15 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}
     >
       {/* Header */}
-      <View style={styles.header}>
+      <Animated.View entering={FadeIn.duration(360)} style={styles.header}>
         <View style={styles.userBlock}>
-          <TouchableOpacity
+          <PressableScale
+            scaleTo={0.92}
             style={[styles.avatar, { backgroundColor: colors.primarySoft }]}
-            activeOpacity={0.8}
             onPress={() => router.push("/profile")}
           >
             <Feather name="user" size={22} color={colors.primary} />
-          </TouchableOpacity>
+          </PressableScale>
           <View style={styles.greetingBlock}>
             <Text style={[styles.greeting, { color: colors.foreground }]} numberOfLines={1}>
               مرحباً، {userName} 👋
@@ -164,7 +211,8 @@ export default function HomeScreen() {
             </Text>
           </View>
         </View>
-        <TouchableOpacity
+        <PressableScale
+          scaleTo={0.9}
           style={[
             styles.iconButton,
             {
@@ -172,24 +220,24 @@ export default function HomeScreen() {
               shadowColor: colors.primary,
             },
           ]}
-          activeOpacity={0.7}
           onPress={() => router.push("/notifications")}
           accessibilityLabel="الإشعارات"
         >
           <Ionicons name="notifications-outline" size={22} color={colors.primary} />
           {unreadCount > 0 && (
-            <View
+            <Animated.View
               style={[
                 styles.badge,
                 { backgroundColor: colors.danger, borderColor: colors.background },
+                badgeStyle,
               ]}
             />
           )}
-        </TouchableOpacity>
-      </View>
+        </PressableScale>
+      </Animated.View>
 
       {/* Search */}
-      <View style={styles.searchContainer}>
+      <Animated.View entering={FadeInDown.delay(60).duration(420).springify().damping(16)} style={styles.searchContainer}>
         <SearchBar
           placeholder="ابحث عن طبيب، تخصص، خدمة..."
           editable={false}
@@ -198,69 +246,73 @@ export default function HomeScreen() {
             router.push({ pathname: "/(tabs)/my-doctor", params: { q: text } })
           }
         />
-      </View>
+      </Animated.View>
 
       {/* Hero */}
-      <LinearGradient
-        colors={[colors.gradientFrom, colors.gradientTo]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.heroCard, { borderRadius: 24 }]}
-      >
-        {/* Decorative art layer */}
-        <View style={styles.heroArt} pointerEvents="none">
-          <Svg width="100%" height="100%" viewBox="0 0 360 200">
-            <G opacity={0.18}>
-              <Circle cx={40} cy={30} r={70} fill="#ffffff" />
-              <Circle cx={20} cy={170} r={50} fill="#ffffff" />
-              <Circle cx={110} cy={180} r={28} fill="#ffffff" />
-            </G>
-            <G opacity={0.32}>
-              <Circle cx={70} cy={100} r={46} stroke="#ffffff" strokeWidth={1.5} fill="none" />
-              <Circle cx={70} cy={100} r={66} stroke="#ffffff" strokeWidth={1} fill="none" />
-            </G>
-            {/* Pulse line */}
-            <Path
-              d="M0 130 L25 130 L35 110 L45 150 L60 90 L75 130 L150 130"
-              stroke="#ffffff"
-              strokeWidth={1.6}
-              fill="none"
-              opacity={0.55}
-            />
-            {/* Plus signs scattered */}
-            <G fill="#ffffff" opacity={0.45}>
-              <Path d="M120 40 h10 v3 h-10 z M124 36 h2 v11 h-2 z" />
-              <Path d="M30 70 h8 v2.5 h-8 z M33 67 h2 v8.5 h-2 z" />
-              <Path d="M150 90 h6 v2 h-6 z M152 87 h2 v8 h-2 z" />
-            </G>
-            {/* Soft heart pulse circle */}
-            <Circle cx={70} cy={100} r={20} fill="#ffffff" opacity={0.22} />
-          </Svg>
-        </View>
+      <Animated.View entering={FadeInDown.delay(120).duration(480).springify().damping(16)}>
+        <LinearGradient
+          colors={[colors.gradientFrom, colors.gradientTo]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.heroCard, { borderRadius: 24 }]}
+        >
+          {/* Decorative art layer */}
+          <View style={styles.heroArt} pointerEvents="none">
+            <Svg width="100%" height="100%" viewBox="0 0 360 200">
+              <G opacity={0.18}>
+                <Circle cx={40} cy={30} r={70} fill="#ffffff" />
+                <Circle cx={20} cy={170} r={50} fill="#ffffff" />
+                <Circle cx={110} cy={180} r={28} fill="#ffffff" />
+              </G>
+              <G opacity={0.32}>
+                <Circle cx={70} cy={100} r={46} stroke="#ffffff" strokeWidth={1.5} fill="none" />
+                <Circle cx={70} cy={100} r={66} stroke="#ffffff" strokeWidth={1} fill="none" />
+              </G>
+              {/* Pulse line */}
+              <Path
+                d="M0 130 L25 130 L35 110 L45 150 L60 90 L75 130 L150 130"
+                stroke="#ffffff"
+                strokeWidth={1.6}
+                fill="none"
+                opacity={0.55}
+              />
+              {/* Plus signs scattered */}
+              <G fill="#ffffff" opacity={0.45}>
+                <Path d="M120 40 h10 v3 h-10 z M124 36 h2 v11 h-2 z" />
+                <Path d="M30 70 h8 v2.5 h-8 z M33 67 h2 v8.5 h-2 z" />
+                <Path d="M150 90 h6 v2 h-6 z M152 87 h2 v8 h-2 z" />
+              </G>
+              {/* Soft heart pulse circle */}
+              <Circle cx={70} cy={100} r={20} fill="#ffffff" opacity={0.22} />
+            </Svg>
+          </View>
 
-        <View style={styles.heroContent}>
-          <Text style={styles.heroTitle}>صحتك أولويتنا</Text>
-          <Text style={styles.heroSubtitle}>
-            احجز مواعيدك بسهولة، تابع حالتك الصحية، واحصل على أفضل رعاية.
-          </Text>
-          <TouchableOpacity
-            style={[styles.heroButton, { backgroundColor: colors.primaryForeground }]}
-            onPress={() => router.push("/(tabs)/my-doctor")}
-            activeOpacity={0.85}
-          >
-            <Text style={[styles.heroButtonText, { color: colors.primary }]}>احجز موعد</Text>
-            <Feather name="calendar" size={16} color={colors.primary} />
-          </TouchableOpacity>
-        </View>
-        <Image
-          source={require("@/assets/images/hero-heart.png")}
-          style={styles.heroImage}
-          contentFit="contain"
-        />
-      </LinearGradient>
+          <View style={styles.heroContent}>
+            <Text style={styles.heroTitle}>صحتك أولويتنا</Text>
+            <Text style={styles.heroSubtitle}>
+              احجز مواعيدك بسهولة، تابع حالتك الصحية، واحصل على أفضل رعاية.
+            </Text>
+            <PressableScale
+              scaleTo={0.95}
+              style={[styles.heroButton, { backgroundColor: colors.primaryForeground }]}
+              onPress={() => router.push("/(tabs)/my-doctor")}
+            >
+              <Text style={[styles.heroButtonText, { color: colors.primary }]}>احجز موعد</Text>
+              <Feather name="calendar" size={16} color={colors.primary} />
+            </PressableScale>
+          </View>
+          <Animated.View style={[styles.heroImageWrap, heroHeartStyle]} pointerEvents="none">
+            <Image
+              source={require("@/assets/images/hero-heart.png")}
+              style={styles.heroImage}
+              contentFit="contain"
+            />
+          </Animated.View>
+        </LinearGradient>
+      </Animated.View>
 
       {/* Quick Actions */}
-      <View style={styles.section}>
+      <Animated.View entering={FadeInDown.delay(180).duration(480).springify().damping(16)} style={styles.section}>
         <SectionHeader
           title="الخدمات السريعة"
           actionLabel="عرض الكل"
@@ -274,10 +326,10 @@ export default function HomeScreen() {
             </View>
           ))}
         </View>
-      </View>
+      </Animated.View>
 
       {/* Upcoming Appointment */}
-      <View style={styles.section}>
+      <Animated.View entering={FadeInDown.delay(240).duration(480).springify().damping(16)} style={styles.section}>
         <SectionHeader
           title="المواعيد القادمة"
           actionLabel="عرض الكل"
@@ -298,10 +350,10 @@ export default function HomeScreen() {
             <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>لا يوجد موعد قادم</Text>
           </View>
         )}
-      </View>
+      </Animated.View>
 
       {/* Health Indicators */}
-      <View style={[styles.section, { paddingHorizontal: 0 }]}>
+      <Animated.View entering={FadeInDown.delay(300).duration(480).springify().damping(16)} style={[styles.section, { paddingHorizontal: 0 }]}>
         <View style={{ paddingHorizontal: 16 }}>
           <SectionHeader
             title="المؤشرات الصحية"
@@ -358,20 +410,20 @@ export default function HomeScreen() {
             onPress={() => router.push("/vitals")}
           />
         </ScrollView>
-      </View>
+      </Animated.View>
 
       {/* Smart Insight */}
-      <View style={styles.section}>
+      <Animated.View entering={FadeInDown.delay(360).duration(480).springify().damping(16)} style={styles.section}>
         <SectionHeader title="نصيحة اليوم" />
         <InsightCard
           title={todayAdvice.title}
           body={todayAdvice.body}
           icon={todayAdvice.icon}
         />
-      </View>
+      </Animated.View>
 
       {/* Quick Services */}
-      <View style={styles.section}>
+      <Animated.View entering={FadeInDown.delay(420).duration(480).springify().damping(16)} style={styles.section}>
         <SectionHeader title="خدمات سريعة" />
         <View style={styles.quickServicesRow}>
           <QuickActionCard
@@ -396,7 +448,7 @@ export default function HomeScreen() {
             onPress={() => {}}
           />
         </View>
-      </View>
+      </Animated.View>
     </ScrollView>
   );
 }
@@ -521,14 +573,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "IBMPlexSansArabic_700Bold",
   },
-  heroImage: {
+  heroImageWrap: {
     position: "absolute",
     insetInlineStart: -10,
     bottom: -10,
     width: 150,
     height: 150,
-    opacity: 0.85,
     zIndex: 1,
+  },
+  heroImage: {
+    width: "100%",
+    height: "100%",
+    opacity: 0.85,
   },
   section: {
     paddingHorizontal: 16,

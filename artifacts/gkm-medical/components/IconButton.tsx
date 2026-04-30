@@ -1,7 +1,8 @@
 import React from "react";
-import { TouchableOpacity, StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet, ViewStyle } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
+import { PressableScale } from "./PressableScale";
 
 interface IconButtonProps {
   icon: keyof typeof Feather.glyphMap;
@@ -15,9 +16,9 @@ export function IconButton({ icon, onPress, size = 24, color, style }: IconButto
   const colors = useColors();
 
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={[styles.container, style]}>
+    <PressableScale onPress={onPress} scaleTo={0.9} style={[styles.container, style]}>
       <Feather name={icon} size={size} color={color || colors.foreground} />
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 

@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { Feather } from "@expo/vector-icons";
 import { Appointment } from "@/lib/supabase";
 import { useColors } from "@/hooks/useColors";
 import { StatusPill } from "./StatusPill";
+import { PressableScale } from "./PressableScale";
 
 interface AppointmentCardProps {
   appointment: Appointment;
@@ -26,9 +27,9 @@ export function AppointmentCard({ appointment, onPress, onDelete }: AppointmentC
   });
 
   return (
-    <TouchableOpacity
-      activeOpacity={onPress ? 0.85 : 1}
+    <PressableScale
       onPress={onPress}
+      scaleTo={onPress ? 0.97 : 1}
       style={[
         styles.container,
         {
@@ -63,14 +64,15 @@ export function AppointmentCard({ appointment, onPress, onDelete }: AppointmentC
         </View>
         <StatusPill status={appointment.status} />
         {onDelete && (
-          <TouchableOpacity
+          <PressableScale
             onPress={onDelete}
+            scaleTo={0.85}
             style={[styles.deleteBtn, { backgroundColor: colors.destructive + "1A" }]}
             hitSlop={8}
             accessibilityLabel="حذف الموعد"
           >
             <Feather name="trash-2" size={16} color={colors.destructive} />
-          </TouchableOpacity>
+          </PressableScale>
         )}
       </View>
 
@@ -96,7 +98,7 @@ export function AppointmentCard({ appointment, onPress, onDelete }: AppointmentC
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 

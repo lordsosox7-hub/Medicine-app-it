@@ -1,6 +1,16 @@
-import React from "react";
-import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
+import React, { useEffect } from "react";
+import { Text, StyleSheet, Pressable } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  withSpring,
+  interpolateColor,
+  Easing,
+} from "react-native-reanimated";
 import { useColors } from "@/hooks/useColors";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface CategoryChipProps {
   label: string;
@@ -10,28 +20,59 @@ interface CategoryChipProps {
 
 export function CategoryChip({ label, selected, onPress }: CategoryChipProps) {
   const colors = useColors();
+  const progress = useSharedValue(selected ? 1 : 0);
+  const press = useSharedValue(0);
+
+  useEffect(() => {
+    progress.value = withTiming(selected ? 1 : 0, {
+      duration: 220,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [selected, progress]);
+
+  const containerStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      [colors.card, colors.primary],
+    ),
+    borderColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      [colors.border, colors.primary],
+    ),
+    transform: [
+      {
+        scale: withSpring(1 - press.value * 0.06, {
+          damping: 15,
+          stiffness: 240,
+          mass: 0.5,
+        }),
+      },
+    ],
+  }));
+
+  const labelStyle = useAnimatedStyle(() => ({
+    color: interpolateColor(
+      progress.value,
+      [0, 1],
+      [colors.foreground, colors.primaryForeground],
+    ),
+  }));
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
+    <AnimatedPressable
       onPress={onPress}
-      style={[
-        styles.container,
-        {
-          backgroundColor: selected ? colors.primary : colors.card,
-          borderColor: selected ? colors.primary : colors.border,
-        },
-      ]}
+      onPressIn={() => {
+        press.value = 1;
+      }}
+      onPressOut={() => {
+        press.value = 0;
+      }}
+      style={[styles.container, containerStyle]}
     >
-      <Text
-        style={[
-          styles.label,
-          { color: selected ? colors.primaryForeground : colors.foreground },
-        ]}
-      >
-        {label}
-      </Text>
-    </TouchableOpacity>
+      <Animated.Text style={[styles.label, labelStyle]}>{label}</Animated.Text>
+    </AnimatedPressable>
   );
 }
 

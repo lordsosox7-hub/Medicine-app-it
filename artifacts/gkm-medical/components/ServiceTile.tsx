@@ -1,7 +1,8 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
+import { Text, StyleSheet, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
+import { PressableScale } from "./PressableScale";
 
 interface ServiceTileProps {
   label: string;
@@ -13,16 +14,16 @@ export function ServiceTile({ label, icon, onPress }: ServiceTileProps) {
   const colors = useColors();
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
+    <PressableScale
       onPress={onPress}
+      scaleTo={0.94}
       style={[styles.container, { backgroundColor: colors.card, borderRadius: colors.radius, shadowColor: colors.foreground }]}
     >
       <View style={[styles.iconContainer, { backgroundColor: colors.primarySoft, borderRadius: 12 }]}>
         <Feather name={icon} size={24} color={colors.primary} />
       </View>
       <Text style={[styles.label, { color: colors.foreground }]} numberOfLines={1}>{label}</Text>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 

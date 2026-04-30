@@ -1,18 +1,18 @@
 import { Tabs } from "expo-router";
-import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
+import { AnimatedTabIcon } from "@/components/AnimatedTabIcon";
 
 export default function TabLayout() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === "web";
-  
+
   // RTL flips the order visually, so we define them left-to-right in code
   // visually they will appear right-to-left: Home on the right.
-  
+
   const tabBarHeight = isWeb ? 76 : 64 + insets.bottom;
 
   return (
@@ -53,7 +53,12 @@ export default function TabLayout() {
         options={{
           title: "المزيد",
           tabBarIcon: ({ focused }) => (
-            <Feather name="grid" size={22} color={focused ? colors.primary : colors.mutedForeground} />
+            <AnimatedTabIcon
+              name="grid"
+              focused={focused}
+              activeColor={colors.primary}
+              inactiveColor={colors.mutedForeground}
+            />
           ),
         }}
       />
@@ -62,7 +67,12 @@ export default function TabLayout() {
         options={{
           title: "طبيبي",
           tabBarIcon: ({ focused }) => (
-            <Feather name="user" size={22} color={focused ? colors.primary : colors.mutedForeground} />
+            <AnimatedTabIcon
+              name="user"
+              focused={focused}
+              activeColor={colors.primary}
+              inactiveColor={colors.mutedForeground}
+            />
           ),
         }}
       />
@@ -71,7 +81,12 @@ export default function TabLayout() {
         options={{
           title: "المحادثات",
           tabBarIcon: ({ focused }) => (
-            <Feather name="message-circle" size={22} color={focused ? colors.primary : colors.mutedForeground} />
+            <AnimatedTabIcon
+              name="message-circle"
+              focused={focused}
+              activeColor={colors.primary}
+              inactiveColor={colors.mutedForeground}
+            />
           ),
         }}
       />
@@ -80,7 +95,12 @@ export default function TabLayout() {
         options={{
           title: "المواعيد",
           tabBarIcon: ({ focused }) => (
-            <Feather name="calendar" size={22} color={focused ? colors.primary : colors.mutedForeground} />
+            <AnimatedTabIcon
+              name="calendar"
+              focused={focused}
+              activeColor={colors.primary}
+              inactiveColor={colors.mutedForeground}
+            />
           ),
         }}
       />
@@ -89,7 +109,12 @@ export default function TabLayout() {
         options={{
           title: "الرئيسية",
           tabBarIcon: ({ focused }) => (
-            <Feather name="home" size={22} color={focused ? colors.primary : colors.mutedForeground} />
+            <AnimatedTabIcon
+              name="home"
+              focused={focused}
+              activeColor={colors.primary}
+              inactiveColor={colors.mutedForeground}
+            />
           ),
         }}
       />

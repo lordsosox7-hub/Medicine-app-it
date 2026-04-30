@@ -1,7 +1,8 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
+import { StyleSheet, Text, ViewStyle } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useColors } from "@/hooks/useColors";
+import { PressableScale } from "./PressableScale";
 
 interface GradientButtonProps {
   title: string;
@@ -13,7 +14,7 @@ export function GradientButton({ title, onPress, style }: GradientButtonProps) {
   const colors = useColors();
 
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={style}>
+    <PressableScale onPress={onPress} scaleTo={0.97} style={style}>
       <LinearGradient
         colors={[colors.gradientFrom, colors.gradientTo]}
         start={{ x: 0, y: 0 }}
@@ -22,7 +23,7 @@ export function GradientButton({ title, onPress, style }: GradientButtonProps) {
       >
         <Text style={[styles.title, { color: "#ffffff" }]}>{title}</Text>
       </LinearGradient>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 

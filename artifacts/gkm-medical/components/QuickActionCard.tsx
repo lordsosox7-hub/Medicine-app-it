@@ -1,7 +1,8 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
+import { Text, StyleSheet, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
+import { PressableScale } from "./PressableScale";
 
 interface QuickActionCardProps {
   label: string;
@@ -18,11 +19,11 @@ export function QuickActionCard({ label, subtitle, icon, iconNode, iconColor, ic
   const colors = useColors();
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.75}
+    <PressableScale
       onPress={onPress}
       onLongPress={onLongPress}
       delayLongPress={400}
+      scaleTo={0.95}
       style={[
         styles.container,
         {
@@ -45,7 +46,7 @@ export function QuickActionCard({ label, subtitle, icon, iconNode, iconColor, ic
           {subtitle}
         </Text>
       )}
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 
