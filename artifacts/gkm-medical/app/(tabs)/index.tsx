@@ -12,6 +12,7 @@ import { AppointmentCard } from "@/components/AppointmentCard";
 import { QuickActionCard } from "@/components/QuickActionCard";
 import { HealthMetricCard } from "@/components/HealthMetricCard";
 import { InsightCard } from "@/components/InsightCard";
+import { getTodayAdvice } from "@/constants/advices";
 import { getUserName } from "@/lib/userId";
 import { useUpcomingAppointment } from "@/hooks/useGkmData";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -25,9 +26,19 @@ export default function HomeScreen() {
   const { unreadCount } = useNotifications();
   const { getDisplayValue, getStatus, getTrend } = useVitals();
   const [userName, setUserName] = useState("أحمد");
+  const [todayAdvice, setTodayAdvice] = useState(() => getTodayAdvice());
 
   useEffect(() => {
     getUserName().then(setUserName);
+  }, []);
+
+  useEffect(() => {
+    // Re-evaluate the daily advice every 5 minutes so it auto-rotates
+    // at midnight London time even if the app stays open.
+    const interval = setInterval(() => {
+      setTodayAdvice(getTodayAdvice());
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const isWeb = Platform.OS === "web";
@@ -294,9 +305,9 @@ export default function HomeScreen() {
       <View style={styles.section}>
         <SectionHeader title="نصيحة اليوم" />
         <InsightCard
-          title="نصيحة صحية ذكية"
-          body="اشرب الماء بانتظام للحفاظ على ضغط الدم ودعم وظائف الجسم الحيوية."
-          icon="droplet"
+          title={todayAdvice.title}
+          body={todayAdvice.body}
+          icon={todayAdvice.icon}
         />
       </View>
 
