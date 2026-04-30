@@ -1,5 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase, type VitalReadingRow } from "@/lib/supabase";
+import { getUserId } from "@/lib/userId";
 
 export type VitalType =
   | "heart_rate"
@@ -128,118 +131,218 @@ export function evaluateVitalStatus(type: VitalType, value: string): VitalStatus
   }
 }
 
-const STORAGE_KEY = "gkm:vitals:v1";
+const LEGACY_STORAGE_KEY = "gkm:vitals:v1";
+const MIGRATION_FLAG_KEY = "gkm:vitals:v1:migrated";
 
-async function readAll(): Promise<VitalReading[]> {
+function rowToReading(row: VitalReadingRow): VitalReading {
+  return {
+    id: row.id,
+    type: row.type,
+    value: row.value,
+    recorded_at: row.recorded_at,
+    note: row.note ?? undefined,
+  };
+}
+
+// One-time best-effort migration of any vitals previously stored on-device
+// (AsyncStorage) into the cloud-backed `vital_readings` table. After a
+// successful upload we clear the local data so it can't double-import.
+async function migrateLegacyLocalIfNeeded(userId: string): Promise<void> {
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+    const flag = await AsyncStorage.getItem(MIGRATION_FLAG_KEY);
+    if (flag === "1") return;
+    const raw = await AsyncStorage.getItem(LEGACY_STORAGE_KEY);
+    if (!raw) {
+      await AsyncStorage.setItem(MIGRATION_FLAG_KEY, "1");
+      return;
+    }
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed as VitalReading[];
-  } catch {
-    return [];
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      await AsyncStorage.setItem(MIGRATION_FLAG_KEY, "1");
+      return;
+    }
+    const payload = parsed
+      .filter(
+        (r) =>
+          r &&
+          typeof r.type === "string" &&
+          typeof r.value === "string" &&
+          typeof r.recorded_at === "string"
+      )
+      .map((r) => ({
+        user_id: userId,
+        type: r.type,
+        value: r.value,
+        note: r.note ?? null,
+        recorded_at: r.recorded_at,
+      }));
+    if (payload.length === 0) {
+      await AsyncStorage.setItem(MIGRATION_FLAG_KEY, "1");
+      return;
+    }
+    const { error } = await supabase.from("vital_readings").insert(payload);
+    if (error) {
+      // Don't flip the flag — try again next launch
+      console.warn("[vitals] legacy migration failed:", error.message);
+      return;
+    }
+    await AsyncStorage.removeItem(LEGACY_STORAGE_KEY);
+    await AsyncStorage.setItem(MIGRATION_FLAG_KEY, "1");
+  } catch (e) {
+    console.warn("[vitals] legacy migration error:", e);
   }
 }
 
-async function writeAll(readings: VitalReading[]): Promise<void> {
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(readings));
-}
-
-// Tiny pub/sub so components stay in sync after a write
-const listeners = new Set<() => void>();
-function notify() {
-  listeners.forEach((fn) => fn());
-}
-
 export function useVitals() {
-  const [readings, setReadings] = useState<VitalReading[]>([]);
-  const [loading, setLoading] = useState(true);
+  const qc = useQueryClient();
 
-  const refresh = useCallback(async () => {
-    const data = await readAll();
-    data.sort((a, b) => (a.recorded_at < b.recorded_at ? 1 : -1));
-    setReadings(data);
-    setLoading(false);
+  const query = useQuery({
+    queryKey: ["vital_readings"],
+    queryFn: async (): Promise<VitalReading[]> => {
+      const userId = await getUserId();
+      await migrateLegacyLocalIfNeeded(userId);
+      const { data, error } = await supabase
+        .from("vital_readings")
+        .select("*")
+        .eq("user_id", userId)
+        .order("recorded_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []).map(rowToReading);
+    },
+  });
+
+  const readings = query.data ?? [];
+  const loading = query.isLoading;
+
+  // Keep cache fresh if other surfaces (e.g. home page) mount this hook later
+  useEffect(() => {
+    // no-op; query hook already handles this. Kept for clarity.
   }, []);
 
-  useEffect(() => {
-    refresh();
-    const fn = () => refresh();
-    listeners.add(fn);
-    return () => {
-      listeners.delete(fn);
-    };
-  }, [refresh]);
+  const addMutation = useMutation({
+    mutationFn: async (input: {
+      type: VitalType;
+      value: string;
+      note?: string;
+    }): Promise<VitalReading> => {
+      const userId = await getUserId();
+      const trimmed = input.value.trim();
+      const { data, error } = await supabase
+        .from("vital_readings")
+        .insert({
+          user_id: userId,
+          type: input.type,
+          value: trimmed,
+          note: input.note?.trim() || null,
+          recorded_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return rowToReading(data as VitalReadingRow);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["vital_readings"] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string): Promise<void> => {
+      const userId = await getUserId();
+      const { error } = await supabase
+        .from("vital_readings")
+        .delete()
+        .eq("user_id", userId)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["vital_readings"] });
+    },
+  });
 
   const addReading = useCallback(
     async (type: VitalType, value: string, note?: string) => {
       const trimmed = value.trim();
       if (!trimmed) return;
-      const all = await readAll();
-      const newReading: VitalReading = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        type,
-        value: trimmed,
-        recorded_at: new Date().toISOString(),
-        note: note?.trim() || undefined,
-      };
-      const next = [newReading, ...all];
-      await writeAll(next);
-      notify();
+      try {
+        await addMutation.mutateAsync({ type, value: trimmed, note });
+      } catch (e) {
+        console.warn("[vitals] addReading failed:", e);
+        throw e;
+      }
     },
-    []
+    [addMutation]
   );
 
-  const deleteReading = useCallback(async (id: string) => {
-    const all = await readAll();
-    const next = all.filter((r) => r.id !== id);
-    await writeAll(next);
-    notify();
-  }, []);
-
-  const latestByType: Partial<Record<VitalType, VitalReading>> = {};
-  for (const r of readings) {
-    if (!latestByType[r.type]) latestByType[r.type] = r;
-  }
-
-  const getLatest = (type: VitalType): VitalReading | undefined =>
-    latestByType[type];
-
-  const getDisplayValue = (type: VitalType): string => {
-    const r = latestByType[type];
-    if (r) return r.value;
-    return getVitalMeta(type).defaultValue;
-  };
-
-  const getStatus = (type: VitalType): VitalStatus => {
-    const r = latestByType[type];
-    if (!r) return "normal";
-    return evaluateVitalStatus(type, r.value);
-  };
-
-  const getHistory = (type: VitalType): VitalReading[] =>
-    readings.filter((r) => r.type === type);
-
-  // Returns the last `n` readings for `type` as numeric points,
-  // ordered oldest -> newest, ready to plot in a sparkline.
-  // For blood_pressure (e.g. "120/80"), uses the systolic number.
-  const getTrend = (type: VitalType, n: number = 7): number[] => {
-    const list = readings.filter((r) => r.type === type).slice(0, n);
-    if (list.length === 0) return [];
-    const nums: number[] = [];
-    for (let i = list.length - 1; i >= 0; i--) {
-      const r = list[i];
-      if (type === "blood_pressure") {
-        const m = r.value.match(/^\s*(\d{2,3})\s*\/\s*\d{2,3}\s*$/);
-        if (m) nums.push(Number(m[1]));
-      } else {
-        const v = Number(r.value);
-        if (isFinite(v)) nums.push(v);
+  const deleteReading = useCallback(
+    async (id: string) => {
+      try {
+        await deleteMutation.mutateAsync(id);
+      } catch (e) {
+        console.warn("[vitals] deleteReading failed:", e);
+        throw e;
       }
+    },
+    [deleteMutation]
+  );
+
+  const latestByType = useMemo(() => {
+    const map: Partial<Record<VitalType, VitalReading>> = {};
+    for (const r of readings) {
+      if (!map[r.type]) map[r.type] = r;
     }
-    return nums;
-  };
+    return map;
+  }, [readings]);
+
+  const getLatest = useCallback(
+    (type: VitalType): VitalReading | undefined => latestByType[type],
+    [latestByType]
+  );
+
+  const getDisplayValue = useCallback(
+    (type: VitalType): string => {
+      const r = latestByType[type];
+      if (r) return r.value;
+      return getVitalMeta(type).defaultValue;
+    },
+    [latestByType]
+  );
+
+  const getStatus = useCallback(
+    (type: VitalType): VitalStatus => {
+      const r = latestByType[type];
+      if (!r) return "normal";
+      return evaluateVitalStatus(type, r.value);
+    },
+    [latestByType]
+  );
+
+  const getHistory = useCallback(
+    (type: VitalType): VitalReading[] =>
+      readings.filter((r) => r.type === type),
+    [readings]
+  );
+
+  const getTrend = useCallback(
+    (type: VitalType, n: number = 7): number[] => {
+      const list = readings.filter((r) => r.type === type).slice(0, n);
+      if (list.length === 0) return [];
+      const nums: number[] = [];
+      for (let i = list.length - 1; i >= 0; i--) {
+        const r = list[i];
+        if (type === "blood_pressure") {
+          const m = r.value.match(/^\s*(\d{2,3})\s*\/\s*\d{2,3}\s*$/);
+          if (m) nums.push(Number(m[1]));
+        } else {
+          const v = Number(r.value);
+          if (isFinite(v)) nums.push(v);
+        }
+      }
+      return nums;
+    },
+    [readings]
+  );
 
   return {
     loading,

@@ -92,11 +92,22 @@ create table if not exists lab_results (
   created_at timestamptz not null default now()
 );
 
+create table if not exists vital_readings (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid not null,
+  type text not null check (type in ('heart_rate','blood_pressure','blood_sugar','weight','temperature','oxygen')),
+  value text not null,
+  note text,
+  recorded_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
+);
+
 -- Indexes
 create index if not exists idx_appointments_user on appointments(user_id, appointment_date);
 create index if not exists idx_messages_conversation on messages(conversation_id, created_at);
 create index if not exists idx_lab_results_user on lab_results(user_id, test_date desc);
 create index if not exists idx_doctors_category on doctors(category);
+create index if not exists idx_vital_readings_user on vital_readings(user_id, recorded_at desc);
 
 -- =========================
 -- Row Level Security
@@ -110,6 +121,7 @@ alter table conversations enable row level security;
 alter table messages enable row level security;
 alter table medical_files enable row level security;
 alter table lab_results enable row level security;
+alter table vital_readings enable row level security;
 
 drop policy if exists "doctors public read" on doctors;
 create policy "doctors public read" on doctors for select using (true);
@@ -128,6 +140,9 @@ create policy "medical_files anon all" on medical_files for all using (true) wit
 
 drop policy if exists "lab_results anon all" on lab_results;
 create policy "lab_results anon all" on lab_results for all using (true) with check (true);
+
+drop policy if exists "vital_readings anon all" on vital_readings;
+create policy "vital_readings anon all" on vital_readings for all using (true) with check (true);
 
 -- =========================
 -- Seed: doctors

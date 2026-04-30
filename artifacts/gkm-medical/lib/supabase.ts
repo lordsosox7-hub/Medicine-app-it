@@ -94,3 +94,19 @@ export type LabResult = {
   unit: string | null;
   reference_range: string | null;
 };
+
+export type VitalReadingRow = {
+  id: string;
+  user_id: string;
+  type:
+    | "heart_rate"
+    | "blood_pressure"
+    | "blood_sugar"
+    | "weight"
+    | "temperature"
+    | "oxygen";
+  value: string;
+  note: string | null;
+  recorded_at: string;
+  created_at: string;
+};
