@@ -145,7 +145,7 @@ function FavoriteRow({ doctor, onPress, onUnfavorite }: FavoriteRowProps) {
           </Text>
           <Text style={[styles.metaDot, { color: colors.mutedForeground }]}>•</Text>
           <Text style={[styles.metaText, { color: colors.mutedForeground }]}>
-            {doctor.price} ر.س
+            {doctor.price} ج.س
           </Text>
         </View>
       </View>

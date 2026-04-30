@@ -216,7 +216,7 @@ export default function BookingConfirmedScreen() {
                   المبلغ المدفوع
                 </Text>
                 <Text style={[styles.totalValue, { color: colors.success }]}>
-                  {total} ر.س
+                  {total} ج.س
                 </Text>
               </View>
             </>

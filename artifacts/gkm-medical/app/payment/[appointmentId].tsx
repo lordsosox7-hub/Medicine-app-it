@@ -14,7 +14,7 @@ import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { GradientButton } from "@/components/GradientButton";
 import * as Haptics from "expo-haptics";
 
@@ -41,6 +41,12 @@ const MANUAL_PAYMENT_INSTRUCTIONS: Record<
     label_ar: "فوري",
     note_ar:
       "ادفع المبلغ في أقرب منفذ فوري لكود الدفع التالي ثم أدخل آخر 4 أرقام من رقم العملية.",
+  },
+  my_cashy: {
+    account: "401106595",
+    label_ar: "ماي كاشي",
+    note_ar:
+      "حوّل المبلغ من تطبيق ماي كاشي إلى الرقم التالي ثم أدخل آخر 4 أرقام من رقم العملية.",
   },
 };
 
@@ -79,36 +85,6 @@ export default function PaymentScreen() {
     : "";
 
   const methods: PaymentMethod[] = [
-    {
-      id: "mada",
-      label_ar: "مدى",
-      icon: (
-        <MaterialCommunityIcons
-          name="credit-card-outline"
-          size={22}
-          color={colors.primary}
-        />
-      ),
-      hint_ar: "بطاقة بنكية سعودية",
-    },
-    {
-      id: "visa",
-      label_ar: "فيزا / ماستركارد",
-      icon: <Feather name="credit-card" size={22} color={colors.primary} />,
-      hint_ar: "بطاقة ائتمانية",
-    },
-    {
-      id: "apple_pay",
-      label_ar: "Apple Pay",
-      icon: <Ionicons name="logo-apple" size={22} color={colors.primary} />,
-      hint_ar: "دفع سريع وآمن",
-    },
-    {
-      id: "stc_pay",
-      label_ar: "STC Pay",
-      icon: <Feather name="smartphone" size={22} color={colors.primary} />,
-      hint_ar: "محفظة رقمية",
-    },
     {
       id: "bankak",
       label_ar: "بنكك",
@@ -165,7 +141,7 @@ export default function PaymentScreen() {
     },
   ];
 
-  const [selectedMethod, setSelectedMethod] = useState<string>("mada");
+  const [selectedMethod, setSelectedMethod] = useState<string>("bankak");
   const [processing, setProcessing] = useState(false);
   const [txnLast4, setTxnLast4] = useState<string>("");
 
@@ -530,7 +506,7 @@ export default function PaymentScreen() {
               رسوم الاستشارة
             </Text>
             <Text style={[styles.summaryValue, { color: colors.foreground }]}>
-              {consultationFee} ر.س
+              {consultationFee} ج.س
             </Text>
           </View>
           <View style={styles.summaryRow}>
@@ -540,7 +516,7 @@ export default function PaymentScreen() {
               رسوم الخدمة
             </Text>
             <Text style={[styles.summaryValue, { color: colors.foreground }]}>
-              {serviceFee} ر.س
+              {serviceFee} ج.س
             </Text>
           </View>
           <View style={styles.summaryRow}>
@@ -550,7 +526,7 @@ export default function PaymentScreen() {
               ضريبة القيمة المضافة (15%)
             </Text>
             <Text style={[styles.summaryValue, { color: colors.foreground }]}>
-              {vat} ر.س
+              {vat} ج.س
             </Text>
           </View>
           <View
@@ -561,7 +537,7 @@ export default function PaymentScreen() {
               الإجمالي
             </Text>
             <Text style={[styles.totalValue, { color: colors.primary }]}>
-              {total} ر.س
+              {total} ج.س
             </Text>
           </View>
         </View>
@@ -600,7 +576,7 @@ export default function PaymentScreen() {
             المبلغ المستحق
           </Text>
           <Text style={[styles.footerTotalValue, { color: colors.foreground }]}>
-            {total} ر.س
+            {total} ج.س
           </Text>
         </View>
         {processing ? (

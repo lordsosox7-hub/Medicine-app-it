@@ -285,7 +285,7 @@ function AppointmentRow({ appointment }: { appointment: Appointment }) {
         <View style={styles.apptMetaItem}>
           <Feather name="dollar-sign" size={13} color={colors.primary} />
           <Text style={[styles.apptMetaText, { color: colors.primary, fontFamily: "IBMPlexSansArabic_700Bold" }]}>
-            {appointment.doctor?.price ?? 0} ر.س
+            {appointment.doctor?.price ?? 0} ج.س
           </Text>
         </View>
       </View>
@@ -381,21 +381,21 @@ function RevenueView() {
       <View style={styles.kpiGrid}>
         <KpiCard
           label="Total revenue"
-          value={`${stats.totalRevenue.toLocaleString()} ر.س`}
+          value={`${stats.totalRevenue.toLocaleString()} ج.س`}
           sub={`${stats.completedCount} completed`}
           tone="success"
           icon="trending-up"
         />
         <KpiCard
           label="Projected"
-          value={`${stats.projected.toLocaleString()} ر.س`}
+          value={`${stats.projected.toLocaleString()} ج.س`}
           sub={`${stats.upcomingCount} upcoming`}
           tone="primary"
           icon="clock"
         />
         <KpiCard
           label="Lost (cancelled)"
-          value={`${stats.lost.toLocaleString()} ر.س`}
+          value={`${stats.lost.toLocaleString()} ج.س`}
           sub={`${stats.cancelledCount} cancelled`}
           tone="danger"
           icon="x-circle"
@@ -440,7 +440,7 @@ function RevenueView() {
                     <Text
                       style={[styles.monthValue, { color: colors.primary }]}
                     >
-                      {m.value.toLocaleString()} ر.س
+                      {m.value.toLocaleString()} ج.س
                     </Text>
                   </View>
                   <View
@@ -510,7 +510,7 @@ function RevenueView() {
                 <Text
                   style={[styles.doctorRevenue, { color: colors.primary }]}
                 >
-                  {d.revenue.toLocaleString()} ر.س
+                  {d.revenue.toLocaleString()} ج.س
                 </Text>
               </View>
             ))}
