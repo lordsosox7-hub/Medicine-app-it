@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, Text, Platform } from "react-native";
+import { StyleSheet, Text, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { isOnboarded } from "@/lib/userId";
