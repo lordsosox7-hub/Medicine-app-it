@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   inputWrap: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: 10,
     borderRadius: 14,
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   errorBox: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: 8,
     paddingHorizontal: 12,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   submitBtn: {
     height: 52,
     borderRadius: 14,
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     fontFamily: "IBMPlexSansArabic_700Bold",
   },
   hintCard: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     gap: 10,
     padding: 14,
     borderRadius: 16,

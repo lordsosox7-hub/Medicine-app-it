@@ -2180,7 +2180,7 @@ const styles = StyleSheet.create({
 
   tabBarWrap: { borderBottomWidth: 1 },
   tabBar: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     gap: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -2196,7 +2196,7 @@ const styles = StyleSheet.create({
   },
 
   toolbar: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: 10,
     paddingHorizontal: 16,
@@ -2204,7 +2204,7 @@ const styles = StyleSheet.create({
   },
   searchWrap: {
     flex: 1,
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: 8,
     paddingHorizontal: 12,
@@ -2243,7 +2243,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   rowReverse: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
@@ -2265,12 +2265,12 @@ const styles = StyleSheet.create({
   },
   divider: { height: 1 },
   metaRow: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
   },
   metaChip: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: 6,
     paddingHorizontal: 10,
@@ -2279,7 +2279,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   actionsRow: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     gap: 8,
     marginTop: 4,
   },
@@ -2321,13 +2321,13 @@ const styles = StyleSheet.create({
   },
 
   filterRow: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
   filterChip: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: 8,
     paddingHorizontal: 14,
@@ -2355,21 +2355,21 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   monthHeader: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   barTrack: { height: 10, borderRadius: 5, overflow: "hidden" },
   barFill: { height: "100%", borderRadius: 5 },
   doctorRevRow: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: 10,
     paddingVertical: 10,
     borderBottomWidth: 1,
   },
   kpiGrid: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
   },
@@ -2404,7 +2404,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   modalHeader: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
@@ -2417,8 +2417,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     flex: 1,
   },
-  twoCol: { flexDirection: "row-reverse", gap: 10 },
-  categoryRow: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8 },
+  twoCol: { flexDirection: "row", gap: 10 },
+  categoryRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   catChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -2426,7 +2426,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   errorBox: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: 8,
     paddingHorizontal: 12,
@@ -2449,7 +2449,7 @@ const styles = StyleSheet.create({
 
   // Conversation viewer
   viewerHeader: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: 12,
     paddingHorizontal: 16,
@@ -2457,7 +2457,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   eyeBadge: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: 4,
     paddingHorizontal: 8,
