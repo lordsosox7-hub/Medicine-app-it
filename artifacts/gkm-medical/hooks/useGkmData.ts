@@ -650,6 +650,9 @@ export function useUpdatePaymentStatus() {
       appointment_id: string;
       status: "confirmed" | "rejected";
       reason?: string;
+      user_id: string;
+      amount: number;
+      doctor_name_ar?: string;
     }) => {
       const patch: Record<string, unknown> = { status: input.status };
       if (input.status === "confirmed") {
@@ -663,10 +666,73 @@ export function useUpdatePaymentStatus() {
         .update(patch)
         .eq("id", input.id);
       if (error) throw error;
+
+      const doctorLabel = input.doctor_name_ar ? ` مع ${input.doctor_name_ar}` : "";
+      const amountLabel = `${Math.round(input.amount)} ج.س`;
+      const notif =
+        input.status === "confirmed"
+          ? {
+              user_id: input.user_id,
+              kind: "payment",
+              title_ar: "✅ تم تأكيد الدفع",
+              body_ar: `تم تأكيد دفعتك بمبلغ ${amountLabel}${doctorLabel}. موعدك مؤكد!`,
+              ref_id: input.appointment_id,
+            }
+          : {
+              user_id: input.user_id,
+              kind: "payment",
+              title_ar: "❌ لم يتم تأكيد الدفع",
+              body_ar: input.reason ?? "رقم العملية غير مطابق. يرجى التواصل مع الدعم.",
+              ref_id: input.appointment_id,
+            };
+      await supabase.from("notifications").insert(notif);
     },
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: ["payment", vars.appointment_id] });
       qc.invalidateQueries({ queryKey: ["pending_payments"] });
+      qc.invalidateQueries({ queryKey: ["user_notifications"] });
+    },
+  });
+}
+
+export function useUserNotifications() {
+  return useQuery({
+    queryKey: ["user_notifications"],
+    queryFn: async () => {
+      const userId = await getUserId();
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Array<{
+        id: string;
+        user_id: string;
+        kind: string;
+        title_ar: string;
+        body_ar: string;
+        ref_id: string | null;
+        read: boolean;
+        created_at: string;
+      }>;
+    },
+    refetchInterval: 20000,
+  });
+}
+
+export function useMarkDbNotificationRead() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("notifications")
+        .update({ read: true })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["user_notifications"] });
     },
   });
 }

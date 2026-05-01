@@ -60,6 +60,8 @@ export default function NotificationsScreen() {
       } else {
         router.push("/(tabs)/chats");
       }
+    } else if (item.kind === "payment") {
+      router.push("/(tabs)/appointments");
     }
   };
 

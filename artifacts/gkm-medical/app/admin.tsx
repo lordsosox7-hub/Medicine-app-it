@@ -1517,13 +1517,21 @@ function PaymentsTab() {
   }
 
   const handle = (
-    p: Payment,
+    p: Payment & { doctor?: Doctor },
     status: "confirmed" | "rejected",
     reason?: string,
   ) => {
     setActingId(p.id);
     updateStatus.mutate(
-      { id: p.id, appointment_id: p.appointment_id, status, reason },
+      {
+        id: p.id,
+        appointment_id: p.appointment_id,
+        status,
+        reason,
+        user_id: p.user_id,
+        amount: p.amount,
+        doctor_name_ar: p.doctor?.name_ar,
+      },
       { onSettled: () => setActingId("") },
     );
   };

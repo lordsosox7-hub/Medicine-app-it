@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Feather } from "@expo/vector-icons";
-import { useAppointments, useConversations } from "@/hooks/useGkmData";
+import {
+  useAppointments,
+  useConversations,
+  useUserNotifications,
+  useMarkDbNotificationRead,
+} from "@/hooks/useGkmData";
 import {
   addClearedIds,
   addReadIds,
@@ -11,7 +16,7 @@ import {
 
 export type NotificationItem = {
   id: string;
-  kind: "appointment" | "message" | "system";
+  kind: "appointment" | "message" | "system" | "payment";
   title: string;
   body: string;
   timestamp: string;
@@ -20,6 +25,8 @@ export type NotificationItem = {
   iconColor: string;
   doctorId?: string;
   conversationId?: string;
+  appointmentId?: string;
+  dbId?: string;
   read: boolean;
 };
 
@@ -38,6 +45,8 @@ function formatArDate(dateStr: string): string {
 export function useNotifications() {
   const { data: appointments } = useAppointments();
   const { data: conversations } = useConversations();
+  const { data: dbNotifications } = useUserNotifications();
+  const markDbRead = useMarkDbNotificationRead();
   const qc = useQueryClient();
 
   const [readIds, setReadIds] = useState<string[]>([]);
@@ -58,7 +67,25 @@ export function useNotifications() {
   const items: NotificationItem[] = useMemo(() => {
     const list: NotificationItem[] = [];
 
-    // Upcoming appointments → reminders
+    // ── Payment notifications from Supabase ──────────────────────────────────
+    (dbNotifications ?? []).forEach((n) => {
+      const isConfirmed = n.title_ar.includes("تأكيد الدفع") && !n.title_ar.includes("لم");
+      list.push({
+        id: `db:${n.id}`,
+        dbId: n.id,
+        kind: "payment",
+        title: n.title_ar,
+        body: n.body_ar,
+        timestamp: n.created_at,
+        icon: isConfirmed ? "check-circle" : "x-circle",
+        iconBg: isConfirmed ? "#e7f7ee" : "#fde8e8",
+        iconColor: isConfirmed ? "#16a34a" : "#ef4444",
+        appointmentId: n.ref_id ?? undefined,
+        read: n.read,
+      });
+    });
+
+    // ── Upcoming appointment reminders ───────────────────────────────────────
     (appointments ?? [])
       .filter((a) => a.status === "upcoming")
       .forEach((a) => {
@@ -80,7 +107,7 @@ export function useNotifications() {
         });
       });
 
-    // Recent conversations with a last message → message notifications
+    // ── Recent conversation messages ─────────────────────────────────────────
     (conversations ?? [])
       .filter((c) => c.last_message && c.last_message_at)
       .forEach((c) => {
@@ -101,7 +128,7 @@ export function useNotifications() {
         });
       });
 
-    // Static welcome / system message
+    // ── Static welcome / system message ─────────────────────────────────────
     list.push({
       id: "system:welcome",
       kind: "system",
@@ -118,13 +145,17 @@ export function useNotifications() {
     const read = new Set(readIds);
     return list
       .filter((it) => !cleared.has(it.id))
-      .map((it) => ({ ...it, read: read.has(it.id) }))
+      .map((it) => {
+        // DB notifications track read server-side; local ones use AsyncStorage
+        const isRead = it.dbId ? it.read : read.has(it.id);
+        return { ...it, read: isRead };
+      })
       .sort((a, b) => {
         const ta = new Date(a.timestamp).getTime() || 0;
         const tb = new Date(b.timestamp).getTime() || 0;
         return tb - ta;
       });
-  }, [appointments, conversations, readIds, clearedIds]);
+  }, [appointments, conversations, dbNotifications, readIds, clearedIds]);
 
   const unreadCount = useMemo(
     () => items.filter((it) => !it.read).length,
@@ -133,10 +164,20 @@ export function useNotifications() {
 
   const markRead = useCallback(
     async (ids: string[]) => {
-      await addReadIds(ids);
-      setReadIds((prev) => Array.from(new Set([...prev, ...ids])));
+      // For DB-backed notifications, mark them read on the server
+      const dbIds = ids
+        .filter((id) => id.startsWith("db:"))
+        .map((id) => id.replace("db:", ""));
+      dbIds.forEach((dbId) => markDbRead.mutate(dbId));
+
+      // For local notifications, use AsyncStorage
+      const localIds = ids.filter((id) => !id.startsWith("db:"));
+      if (localIds.length) {
+        await addReadIds(localIds);
+        setReadIds((prev) => Array.from(new Set([...prev, ...localIds])));
+      }
     },
-    [],
+    [markDbRead],
   );
 
   const markAllRead = useCallback(async () => {
@@ -154,6 +195,7 @@ export function useNotifications() {
   const refresh = useCallback(() => {
     qc.invalidateQueries({ queryKey: ["appointments"] });
     qc.invalidateQueries({ queryKey: ["conversations"] });
+    qc.invalidateQueries({ queryKey: ["user_notifications"] });
   }, [qc]);
 
   return {
