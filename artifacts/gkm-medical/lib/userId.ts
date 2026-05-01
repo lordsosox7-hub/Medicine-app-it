@@ -44,7 +44,7 @@ export async function getUserName(): Promise<string> {
     return local.charAt(0).toUpperCase() + local.slice(1);
   }
   const n = await AsyncStorage.getItem(NAME_KEY);
-  return n ?? "أحمد";
+  return n ?? "";
 }
 
 export async function setUserName(name: string): Promise<void> {

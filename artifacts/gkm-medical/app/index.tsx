@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { View, StyleSheet, Text, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
-import { isOnboarded, isAuthenticated } from "@/lib/userId";
+import { isOnboarded } from "@/lib/userId";
+import { supabase } from "@/lib/supabase";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function GateScreen() {
@@ -10,36 +11,51 @@ export default function GateScreen() {
   const colors = useColors();
 
   useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>;
-    const route = async () => {
-      try {
-        if (
-          Platform.OS === "web" &&
-          typeof window !== "undefined" &&
-          window.location.hash === "#admin"
-        ) {
-          router.replace("/admin");
-          return;
-        }
-        const [authed, onboarded] = await Promise.all([
-          isAuthenticated(),
-          isOnboarded(),
-        ]);
-        timeout = setTimeout(() => {
-          if (!authed) {
-            router.replace("/welcome");
-          } else if (onboarded) {
-            router.replace("/(tabs)");
-          } else {
-            router.replace("/onboarding");
-          }
-        }, 500);
-      } catch {
-        router.replace("/welcome");
+    let fallbackTimer: ReturnType<typeof setTimeout>;
+    let routed = false;
+
+    const navigate = async (authed: boolean) => {
+      if (routed) return;
+      routed = true;
+      clearTimeout(fallbackTimer);
+
+      if (
+        Platform.OS === "web" &&
+        typeof window !== "undefined" &&
+        window.location.hash === "#admin"
+      ) {
+        router.replace("/admin");
+        return;
       }
+
+      if (!authed) {
+        router.replace("/welcome");
+        return;
+      }
+      const onboarded = await isOnboarded();
+      router.replace(onboarded ? "/(tabs)" : "/onboarding");
     };
-    route();
-    return () => clearTimeout(timeout);
+
+    // Listen for auth state — this catches email-confirmation redirects
+    // where the token arrives in the URL hash after the page loads.
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "INITIAL_SESSION") {
+        if (session) {
+          navigate(true);
+        } else {
+          // No session yet — wait briefly for a SIGNED_IN from hash processing,
+          // then fall back to the welcome screen.
+          fallbackTimer = setTimeout(() => navigate(false), 800);
+        }
+      } else if (event === "SIGNED_IN" && session) {
+        navigate(true);
+      }
+    });
+
+    return () => {
+      clearTimeout(fallbackTimer);
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   return (
