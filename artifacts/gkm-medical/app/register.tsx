@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { GradientButton } from "@/components/GradientButton";
 import { supabase } from "@/lib/supabase";
-import { setUserName } from "@/lib/userId";
+import { setUserName, isOnboarded } from "@/lib/userId";
 import { RTLChevron } from "@/components/RTLChevron";
 
 export default function RegisterScreen() {
@@ -35,7 +35,8 @@ export default function RegisterScreen() {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
       if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
-        router.replace("/onboarding");
+        const onboarded = await isOnboarded();
+        router.replace(onboarded ? "/(tabs)" : "/onboarding");
       }
     });
     return () => sub.subscription.unsubscribe();
@@ -63,11 +64,16 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       await setUserName(trimmedName);
+      const emailRedirectTo =
+        Platform.OS === "web" && typeof window !== "undefined"
+          ? window.location.origin
+          : undefined;
       const { data, error } = await supabase.auth.signUp({
         email: trimmedEmail,
         password,
         options: {
           data: { full_name: trimmedName },
+          ...(emailRedirectTo ? { emailRedirectTo } : {}),
         },
       });
       if (error) throw error;

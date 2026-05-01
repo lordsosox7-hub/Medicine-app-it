@@ -57,11 +57,13 @@ export default function SignInScreen() {
       });
       if (error) throw error;
     } catch (e: any) {
-      const msg =
-        e?.message?.toLowerCase().includes("invalid") ||
-        e?.message?.toLowerCase().includes("credentials")
-          ? "البريد الإلكتروني أو كلمة المرور غير صحيحة"
-          : e?.message ?? "حدث خطأ";
+      const lower = (e?.message ?? "").toLowerCase();
+      let msg = e?.message ?? "حدث خطأ";
+      if (lower.includes("invalid") || lower.includes("credentials")) {
+        msg = "البريد الإلكتروني أو كلمة المرور غير صحيحة";
+      } else if (lower.includes("not confirmed") || lower.includes("email not confirmed")) {
+        msg = "لم يتم تفعيل البريد الإلكتروني بعد. يرجى فتح رابط التفعيل المُرسل إلى بريدك.";
+      }
       Alert.alert("تعذّر تسجيل الدخول", msg);
     } finally {
       setLoading(false);
