@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
@@ -20,6 +20,29 @@ export default function MoreScreen() {
     getUserName().then(setUserName);
     getUserEmail().then(setUserEmail);
   }, []);
+
+  const tapCountRef = useRef(0);
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [tapHint, setTapHint] = useState(0);
+
+  const handleVersionTap = () => {
+    tapCountRef.current += 1;
+    setTapHint(tapCountRef.current);
+
+    if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+
+    if (tapCountRef.current >= 5) {
+      tapCountRef.current = 0;
+      setTapHint(0);
+      router.push("/admin-login" as any);
+      return;
+    }
+
+    tapTimerRef.current = setTimeout(() => {
+      tapCountRef.current = 0;
+      setTapHint(0);
+    }, 3000);
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -134,9 +157,32 @@ export default function MoreScreen() {
           />
         </View>
 
-        <Text style={[styles.versionText, { color: colors.mutedForeground }]}>
-          الإصدار 1.0.0
-        </Text>
+        <TouchableOpacity
+          onPress={handleVersionTap}
+          activeOpacity={0.7}
+          hitSlop={12}
+          style={styles.versionBtn}
+        >
+          <Text style={[styles.versionText, { color: colors.mutedForeground }]}>
+            الإصدار 1.0.0
+          </Text>
+          {tapHint > 0 && (
+            <View style={styles.tapDots}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <View
+                  key={n}
+                  style={[
+                    styles.tapDot,
+                    {
+                      backgroundColor:
+                        n <= tapHint ? colors.primary : colors.border,
+                    },
+                  ]}
+                />
+              ))}
+            </View>
+          )}
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -216,5 +262,19 @@ const styles = StyleSheet.create({
     fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
     marginTop: 8,
+  },
+  versionBtn: {
+    alignItems: "center",
+    paddingVertical: 6,
+  },
+  tapDots: {
+    flexDirection: "row",
+    gap: 5,
+    marginTop: 6,
+  },
+  tapDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
 });
