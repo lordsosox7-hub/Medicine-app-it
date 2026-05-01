@@ -926,10 +926,3 @@ export function useAllConversations() {
   return query;
 }
 
-// ---------- Bootstrap demo data for the local user ----------
-
-export async function ensureDemoData(): Promise<void> {
-  const userId = await getUserId();
-  // Idempotent — calls a SQL function defined in supabase/schema.sql
-  await supabase.rpc("gkm_seed_demo_data", { p_user_id: userId });
-}

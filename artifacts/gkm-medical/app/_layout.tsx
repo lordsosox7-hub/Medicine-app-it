@@ -12,7 +12,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { I18nManager, Platform } from "react-native";
-import { ensureDemoData } from "@/hooks/useGkmData";
+
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { useColors } from "@/hooks/useColors";
@@ -96,18 +96,6 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
-
-  useEffect(() => {
-    // Seed demo data for the user on mount
-    const seedData = async () => {
-      try {
-        await ensureDemoData();
-      } catch (e) {
-        console.warn("Failed to seed demo data", e);
-      }
-    };
-    seedData();
-  }, []);
 
   if (!fontsLoaded && !fontError) return null;
 

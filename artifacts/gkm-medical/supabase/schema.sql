@@ -67,7 +67,7 @@ create table if not exists messages (
 create table if not exists medical_files (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid not null unique,
-  full_name_ar text not null default 'أحمد محمد',
+  full_name_ar text not null default '',
   age int not null default 28,
   gender text not null default 'ذكر',
   blood_type text not null default 'O+',
@@ -163,69 +163,6 @@ update doctors set clinic_name_ar = 'مركز المناظير المتقدم', 
 update doctors set clinic_name_ar = 'عيادة ندى للجلدية والتجميل', clinic_address_ar = 'برج المملكة، الدور 12، طريق العروبة، حي العليا، الرياض', clinic_phone = '+966112345674', clinic_maps_url = 'https://www.google.com/maps/search/?api=1&query=Kingdom+Tower+Riyadh' where name_ar = 'د. ندى حسن' and clinic_address_ar is null;
 update doctors set clinic_name_ar = 'عيادات الابتسامة الذهبية للأسنان', clinic_address_ar = 'مجمع النخيل الطبي، شارع الأمير سلطان، حي النخيل، الرياض', clinic_phone = '+966112345675', clinic_maps_url = 'https://www.google.com/maps/search/?api=1&query=Al+Nakheel+Riyadh' where name_ar = 'د. خالد المطيري' and clinic_address_ar is null;
 update doctors set clinic_name_ar = 'مركز الرشيد للنساء والولادة', clinic_address_ar = 'مجمع الورود الطبي، طريق الملك عبدالله، حي الورود، الرياض', clinic_phone = '+966112345676', clinic_maps_url = 'https://www.google.com/maps/search/?api=1&query=Al+Wurud+Riyadh' where name_ar = 'د. منى الرشيد' and clinic_address_ar is null;
-
--- =========================
--- Helper: create demo data for a given user_id
--- Call from app after first launch:  select gkm_seed_demo_data('uuid-here');
--- =========================
-create or replace function gkm_seed_demo_data(p_user_id uuid)
-returns void
-language plpgsql
-as $$
-declare
-  d_heart uuid;
-  d_kids  uuid;
-  conv_id uuid;
-begin
-  select id into d_heart from doctors where category='heart' limit 1;
-  select id into d_kids  from doctors where category='kids'  limit 1;
-
-  -- Medical file (one per user)
-  insert into medical_files (user_id, full_name_ar, age, gender, blood_type,
-    allergies, chronic_diseases, current_medications, past_surgeries, vaccinations)
-  values (p_user_id, 'أحمد محمد', 28, 'ذكر', 'O+',
-    ARRAY['حساسية البنسلين','حساسية المكسرات'],
-    ARRAY['ارتفاع ضغط الدم'],
-    ARRAY['لوسارتان 50 ملغ','أسبرين 81 ملغ'],
-    ARRAY['استئصال الزائدة الدودية - 2018'],
-    ARRAY['لقاح كوفيد-19','لقاح الإنفلونزا الموسمي','لقاح التيتانوس']
-  )
-  on conflict (user_id) do nothing;
-
-  -- Lab results
-  insert into lab_results (user_id, test_name_ar, test_type, test_date, status, result_value, unit, reference_range) values
-    (p_user_id, 'صورة دم كاملة (CBC)', 'blood', current_date - 5,  'normal', '14.2', 'g/dL', '13.5-17.5'),
-    (p_user_id, 'سكر صائم (FBS)',       'blood', current_date - 12, 'normal', '92',   'mg/dL','70-100'),
-    (p_user_id, 'الكوليسترول الكلي',     'blood', current_date - 20, 'high',   '235',  'mg/dL','<200'),
-    (p_user_id, 'تحليل بول كامل',         'urine', current_date - 30, 'normal', 'سليم', null,   '—')
-  on conflict do nothing;
-
-  -- Upcoming appointment
-  if d_heart is not null then
-    insert into appointments (user_id, doctor_id, appointment_date, appointment_time, status)
-    values (p_user_id, d_heart, current_date + 2, '10:30 صباحاً', 'upcoming')
-    on conflict do nothing;
-  end if;
-
-  -- A demo conversation with a doctor
-  if d_kids is not null then
-    insert into conversations (user_id, doctor_id, last_message, last_message_at)
-    values (p_user_id, d_kids, 'أين يمكنني شراء وسائل ما تنصحين؟', now() - interval '5 minutes')
-    on conflict (user_id, doctor_id) do update
-      set last_message = excluded.last_message, last_message_at = excluded.last_message_at
-    returning id into conv_id;
-
-    if conv_id is not null then
-      insert into messages (conversation_id, doctor_id, user_id, sender, text, created_at) values
-        (conv_id, d_kids, p_user_id, 'doctor', 'مرحباً، كيف يمكنني مساعدتك اليوم؟', now() - interval '20 minutes'),
-        (conv_id, d_kids, p_user_id, 'user',   'لدي بعض الأعراض، أحتاج استشارة سريعة.', now() - interval '15 minutes'),
-        (conv_id, d_kids, p_user_id, 'doctor', 'بكل تأكيد، صفي لي الأعراض من فضلك.', now() - interval '10 minutes'),
-        (conv_id, d_kids, p_user_id, 'user',   'أين يمكنني شراء وسائل ما تنصحين؟', now() - interval '5 minutes')
-      on conflict do nothing;
-    end if;
-  end if;
-end;
-$$;
 
 -- Enable realtime on messages so doctor replies stream into the chat instantly
 alter publication supabase_realtime add table messages;

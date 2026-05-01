@@ -13,7 +13,7 @@ export default function MoreScreen() {
   const router = useRouter();
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const [userName, setUserName] = useState("أحمد");
+  const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
