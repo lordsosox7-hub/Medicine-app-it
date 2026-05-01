@@ -35,6 +35,20 @@ export default function AdminLoginScreen() {
     });
   }, [router]);
 
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    const style = document.createElement("style");
+    style.textContent = [
+      "input[type='password']::-ms-reveal { display: none !important; }",
+      "input[type='password']::-ms-clear { display: none !important; }",
+      "input[type='password']::-webkit-credentials-auto-fill-button { visibility: hidden !important; display: none !important; }",
+      "input[type='password']::-webkit-textfield-decoration-container { display: none !important; }",
+      "input[type='password'] { -webkit-appearance: none; appearance: none; }",
+    ].join("\n");
+    document.head.appendChild(style);
+    return () => { document.head.removeChild(style); };
+  }, []);
+
   const handleLogin = async () => {
     if (!username.trim() || !password) {
       setError("الرجاء إدخال اسم المستخدم وكلمة المرور");
@@ -128,12 +142,12 @@ export default function AdminLoginScreen() {
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
                   autoCorrect={false}
-                  style={[styles.input, { color: colors.foreground }]}
+                  style={[styles.input, { color: colors.foreground, paddingLeft: 36 }]}
                   onSubmitEditing={handleLogin}
                 />
                 <Pressable
                   onPress={() => setShowPassword((v) => !v)}
-                  hitSlop={8}
+                  style={styles.eyeBtn}
                 >
                   <Feather
                     name={showPassword ? "eye-off" : "eye"}
@@ -283,6 +297,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
+  },
+  eyeBtn: {
+    position: "absolute",
+    left: 14,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
+    padding: 4,
   },
   errorBox: {
     flexDirection: "row",
