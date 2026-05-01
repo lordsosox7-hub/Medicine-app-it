@@ -13,12 +13,7 @@ import {
 import { Stack, useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
-import {
-  loginAdmin,
-  isAdminLoggedIn,
-  DEFAULT_ADMIN_USERNAME,
-  DEFAULT_ADMIN_PASSWORD,
-} from "@/lib/adminAuth";
+import { loginAdmin, isAdminLoggedIn } from "@/lib/adminAuth";
 
 export default function AdminLoginScreen() {
   const colors = useColors();
@@ -205,34 +200,6 @@ export default function AdminLoginScreen() {
             </Pressable>
           </View>
 
-          <View
-            style={[
-              styles.hintCard,
-              {
-                backgroundColor: colors.primarySoft,
-                borderColor: colors.border,
-              },
-            ]}
-          >
-            <Feather name="info" size={16} color={colors.primary} />
-            <View style={{ flex: 1, gap: 4 }}>
-              <Text style={[styles.hintTitle, { color: colors.foreground }]}>
-                بيانات الدخول الافتراضية
-              </Text>
-              <Text style={[styles.hintLine, { color: colors.mutedForeground }]}>
-                المستخدم: {DEFAULT_ADMIN_USERNAME}
-              </Text>
-              <Text style={[styles.hintLine, { color: colors.mutedForeground }]}>
-                كلمة المرور: {DEFAULT_ADMIN_PASSWORD}
-              </Text>
-              <Text
-                style={[styles.hintNote, { color: colors.mutedForeground }]}
-              >
-                يمكنك تغييرها لاحقاً من إعدادات اللوحة.
-              </Text>
-            </View>
-          </View>
-
           <Pressable onPress={() => router.back()} hitSlop={8}>
             <Text style={[styles.back, { color: colors.mutedForeground }]}>
               عودة
@@ -333,31 +300,6 @@ const styles = StyleSheet.create({
   submitText: {
     fontSize: 15,
     fontFamily: "IBMPlexSansArabic_700Bold",
-  },
-  hintCard: {
-    flexDirection: "row",
-    gap: 10,
-    padding: 14,
-    borderRadius: 16,
-    borderWidth: 1,
-    alignItems: "flex-start",
-  },
-  hintTitle: {
-    fontSize: 13,
-    fontFamily: "IBMPlexSansArabic_700Bold",
-    textAlign: "right",
-  },
-  hintLine: {
-    fontSize: 12.5,
-    fontFamily: "IBMPlexSansArabic_500Medium",
-    textAlign: "right",
-  },
-  hintNote: {
-    fontSize: 11.5,
-    fontFamily: "IBMPlexSansArabic_500Medium",
-    textAlign: "right",
-    marginTop: 4,
-    fontStyle: "italic",
   },
   back: {
     fontSize: 13,
