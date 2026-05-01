@@ -23,24 +23,20 @@ export default function MoreScreen() {
 
   const tapCountRef = useRef(0);
   const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [tapHint, setTapHint] = useState(0);
 
   const handleVersionTap = () => {
     tapCountRef.current += 1;
-    setTapHint(tapCountRef.current);
 
     if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
 
     if (tapCountRef.current >= 5) {
       tapCountRef.current = 0;
-      setTapHint(0);
       router.push("/admin-login" as any);
       return;
     }
 
     tapTimerRef.current = setTimeout(() => {
       tapCountRef.current = 0;
-      setTapHint(0);
     }, 3000);
   };
 
@@ -166,22 +162,6 @@ export default function MoreScreen() {
           <Text style={[styles.versionText, { color: colors.mutedForeground }]}>
             الإصدار 1.0.0
           </Text>
-          {tapHint > 0 && (
-            <View style={styles.tapDots}>
-              {[1, 2, 3, 4, 5].map((n) => (
-                <View
-                  key={n}
-                  style={[
-                    styles.tapDot,
-                    {
-                      backgroundColor:
-                        n <= tapHint ? colors.primary : colors.border,
-                    },
-                  ]}
-                />
-              ))}
-            </View>
-          )}
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -266,15 +246,5 @@ const styles = StyleSheet.create({
   versionBtn: {
     alignItems: "center",
     paddingVertical: 6,
-  },
-  tapDots: {
-    flexDirection: "row",
-    gap: 5,
-    marginTop: 6,
-  },
-  tapDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
   },
 });
