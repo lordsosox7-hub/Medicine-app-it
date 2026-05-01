@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "./supabase";
 
-const KEY = "gkm_user_id";
-const NAME_KEY = "gkm_user_name";
+const KEY = "rahah_user_id";
+const NAME_KEY = "rahah_user_name";
 
 function generateUUID(): string {
   const hex = "0123456789abcdef";
@@ -51,7 +51,7 @@ export async function setUserName(name: string): Promise<void> {
   await AsyncStorage.setItem(NAME_KEY, name);
 }
 
-const ONBOARDING_KEY = "gkm_onboarded";
+const ONBOARDING_KEY = "rahah_onboarded";
 
 export async function isOnboarded(): Promise<boolean> {
   const v = await AsyncStorage.getItem(ONBOARDING_KEY);

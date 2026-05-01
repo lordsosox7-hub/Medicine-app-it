@@ -1,12 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const KEYS = {
-  notifications: "gkm_notifications",
-  theme: "gkm_theme",
-  language: "gkm_language",
-  paymentMethods: "gkm_payment_methods",
-  addresses: "gkm_addresses",
-  userPhone: "gkm_user_phone",
+  notifications: "rahah_notifications",
+  theme: "rahah_theme",
+  language: "rahah_language",
+  paymentMethods: "rahah_payment_methods",
+  addresses: "rahah_addresses",
+  userPhone: "rahah_user_phone",
 } as const;
 
 export type NotificationPrefs = {

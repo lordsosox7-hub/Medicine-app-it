@@ -1,10 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const SESSION_KEY = "gkm_admin_session";
-const CREDS_KEY = "gkm_admin_credentials";
+const SESSION_KEY = "rahah_admin_session";
+const CREDS_KEY = "rahah_admin_credentials";
 
 export const DEFAULT_ADMIN_USERNAME = "admin";
-export const DEFAULT_ADMIN_PASSWORD = "gkm2026";
+export const DEFAULT_ADMIN_PASSWORD = "rahah2026";
 
 export type AdminCredentials = {
   username: string;

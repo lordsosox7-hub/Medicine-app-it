@@ -1,5 +1,5 @@
 /**
- * GKM's Unit Medical Care — palette
+ * Rahah Medical Care — palette
  * Inspired by the design mockups: clean medical blue with calming whites.
  */
 

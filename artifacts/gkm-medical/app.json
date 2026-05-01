@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "راحة",
-    "slug": "gkm-medical",
+    "slug": "rahah",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "gkm-medical",
+    "scheme": "rahah",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {

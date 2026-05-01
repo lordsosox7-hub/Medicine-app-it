@@ -8,9 +8,9 @@ export default function AboutScreen() {
   const colors = useColors();
 
   const links = [
-    { label: "الموقع الإلكتروني", icon: "globe" as const, url: "https://gkm-medical.app" },
-    { label: "تابعنا على تويتر", icon: "twitter" as const, url: "https://twitter.com/gkm_medical" },
-    { label: "تابعنا على إنستغرام", icon: "instagram" as const, url: "https://instagram.com/gkm_medical" },
+    { label: "الموقع الإلكتروني", icon: "globe" as const, url: "https://rahah.app" },
+    { label: "تابعنا على تويتر", icon: "twitter" as const, url: "https://twitter.com/rahah_app" },
+    { label: "تابعنا على إنستغرام", icon: "instagram" as const, url: "https://instagram.com/rahah_app" },
   ];
 
   return (

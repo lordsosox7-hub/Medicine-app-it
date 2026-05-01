@@ -23,7 +23,7 @@ export default function MoreScreen() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    await AsyncStorage.removeItem("gkm_user_name");
+    await AsyncStorage.removeItem("rahah_user_name");
     router.replace("/welcome");
   };
 

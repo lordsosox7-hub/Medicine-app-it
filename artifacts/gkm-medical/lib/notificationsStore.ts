@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const READ_KEY = "gkm_notifications_read_ids";
-const CLEARED_KEY = "gkm_notifications_cleared_ids";
+const READ_KEY = "rahah_notifications_read_ids";
+const CLEARED_KEY = "rahah_notifications_cleared_ids";
 
 export async function getReadIds(): Promise<string[]> {
   const raw = await AsyncStorage.getItem(READ_KEY);

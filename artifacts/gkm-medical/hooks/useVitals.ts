@@ -131,8 +131,8 @@ export function evaluateVitalStatus(type: VitalType, value: string): VitalStatus
   }
 }
 
-const LEGACY_STORAGE_KEY = "gkm:vitals:v1";
-const MIGRATION_FLAG_KEY = "gkm:vitals:v1:migrated";
+const LEGACY_STORAGE_KEY = "rahah:vitals:v1";
+const MIGRATION_FLAG_KEY = "rahah:vitals:v1:migrated";
 
 function rowToReading(row: VitalReadingRow): VitalReading {
   return {
