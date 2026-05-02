@@ -27,20 +27,24 @@ export default function TicketScreen() {
   const apt = appointments?.find((a) => a.id === appointmentId);
   const doc = apt?.doctor as any;
 
-  // Strip colour: red while payment is pending (not confirmed), green otherwise
-  const stripColor = (() => {
-    if (apt?.status === "cancelled") return "#dc2626";
-    if (payment?.status === "pending") return "#dc2626";
-    return "#16a34a";
+  // Derive the strip state from appointment + payment data
+  const stripState = (() => {
+    if (apt?.status === "cancelled")
+      return { color: "#dc2626", text: "ملغي",               icon: "x-circle"    } as const;
+    if (apt?.status === "completed")
+      return { color: "#16a34a", text: "مكتمل",              icon: "check-circle" } as const;
+    if (payment?.status === "pending")
+      return { color: "#dc2626", text: "بانتظار تأكيد الدفع", icon: "clock"        } as const;
+    if (payment?.status === "confirmed")
+      return { color: "#16a34a", text: "تم التأكيد",          icon: "check-circle" } as const;
+    if (payment?.status === "rejected")
+      return { color: "#dc2626", text: "تم الرفض",            icon: "x-circle"    } as const;
+    // No payment record = cash / pay-at-clinic
+    return   { color: "#d97706", text: "الدفع عند العيادة",   icon: "home"        } as const;
   })();
 
-  // Human-readable label shown inside the strip
-  const stripLabel = (() => {
-    if (apt?.status === "cancelled") return { text: "ملغي", icon: "x-circle" as const };
-    if (apt?.status === "completed") return { text: "مكتمل", icon: "check-circle" as const };
-    if (payment?.status === "pending") return { text: "بانتظار تأكيد الدفع", icon: "clock" as const };
-    return { text: "تم التأكيد", icon: "check-circle" as const };
-  })();
+  const stripColor = stripState.color;
+  const stripLabel = stripState;
 
   const dateObj = apt ? new Date(apt.appointment_date) : null;
   const formattedDate = dateObj
