@@ -31,9 +31,13 @@ import {
   useAdminUsers,
   useDeleteUser,
   useAllConversations,
+  useDoctorAdmins,
+  useCreateDoctorAdmin,
+  useDeleteDoctorAdmin,
   type AdminUser,
   type NewDoctorInput,
   type AppointmentWithPatient,
+  type DoctorAdminRow,
 } from "@/hooks/useGkmData";
 import type { Appointment, Payment, Doctor, Conversation } from "@/lib/supabase";
 import {
@@ -2457,6 +2461,9 @@ function SettingsTab() {
         </Pressable>
       </View>
 
+      {/* ── Doctor Admins Management ── */}
+      <DoctorAdminsSection />
+
       <Pressable
         onPress={async () => {
           await logoutAdmin();
@@ -2486,6 +2493,136 @@ function SettingsTab() {
         </Text>
       </Pressable>
     </ScrollView>
+  );
+}
+
+function DoctorAdminsSection() {
+  const colors = useColors();
+  const doctors = useDoctors();
+  const admins = useDoctorAdmins();
+  const createMut = useCreateDoctorAdmin();
+  const deleteMut = useDeleteDoctorAdmin();
+
+  const [showForm, setShowForm] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [selectedDoctorId, setSelectedDoctorId] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const handleCreate = async () => {
+    setFormError(null);
+    if (!newUsername.trim()) { setFormError("اسم المستخدم مطلوب"); return; }
+    if (!newPassword.trim()) { setFormError("كلمة المرور مطلوبة"); return; }
+    if (!selectedDoctorId) { setFormError("اختر طبيباً"); return; }
+    try {
+      await createMut.mutateAsync({
+        username: newUsername.trim(),
+        password: newPassword.trim(),
+        doctor_id: selectedDoctorId,
+      });
+      setNewUsername("");
+      setNewPassword("");
+      setSelectedDoctorId("");
+      setShowForm(false);
+    } catch (e: any) {
+      setFormError(e?.message?.includes("unique") ? "اسم المستخدم مستخدم من قبل" : (e?.message ?? "حدث خطأ"));
+    }
+  };
+
+  const list: DoctorAdminRow[] = admins.data ?? [];
+
+  return (
+    <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border, gap: 12 }]}>
+      <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
+        <Text style={[styles.sectionTitle, { color: colors.foreground }]}>مشرفو الأطباء</Text>
+        <Pressable
+          onPress={() => { setShowForm(!showForm); setFormError(null); }}
+          style={[styles.primaryBtn, { backgroundColor: colors.primary, paddingVertical: 6, paddingHorizontal: 12 }]}
+        >
+          <Feather name={showForm ? "x" : "plus"} size={14} color={colors.primaryForeground} />
+          <Text style={{ color: colors.primaryForeground, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 13 }}>
+            {showForm ? "إلغاء" : "إضافة"}
+          </Text>
+        </Pressable>
+      </View>
+
+      {showForm && (
+        <View style={{ gap: 10, paddingTop: 4 }}>
+          <FormField label="اسم المستخدم">
+            <BasicInput value={newUsername} onChangeText={setNewUsername} autoCapitalize="none" />
+          </FormField>
+          <FormField label="كلمة المرور">
+            <BasicInput value={newPassword} onChangeText={setNewPassword} secureTextEntry autoCapitalize="none" />
+          </FormField>
+          <FormField label="الطبيب المسؤول">
+            <View style={[styles.inputWrap, { flexDirection: "column", gap: 6, paddingHorizontal: 0, paddingVertical: 6 }]}>
+              {(doctors.data ?? []).map((doc) => (
+                <Pressable
+                  key={doc.id}
+                  onPress={() => setSelectedDoctorId(doc.id)}
+                  style={[
+                    { flexDirection: "row-reverse", alignItems: "center", gap: 8, padding: 8, borderRadius: 10, borderWidth: 1 },
+                    {
+                      borderColor: selectedDoctorId === doc.id ? colors.primary : colors.border,
+                      backgroundColor: selectedDoctorId === doc.id ? colors.primarySoft : "transparent",
+                    },
+                  ]}
+                >
+                  <View style={[{ width: 10, height: 10, borderRadius: 5, borderWidth: 2 }, { borderColor: selectedDoctorId === doc.id ? colors.primary : colors.mutedForeground, backgroundColor: selectedDoctorId === doc.id ? colors.primary : "transparent" }]} />
+                  <Text style={{ flex: 1, color: colors.foreground, fontFamily: "IBMPlexSansArabic_500Medium", fontSize: 13, textAlign: "right" }}>{doc.name_ar}</Text>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "IBMPlexSansArabic_400Regular", fontSize: 11 }}>{doc.specialty_ar}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </FormField>
+          {formError && (
+            <View style={[styles.errorBox, { backgroundColor: colors.accents.red.bg, borderColor: colors.danger }]}>
+              <Feather name="alert-circle" size={13} color={colors.danger} />
+              <Text style={[styles.errorText, { color: colors.danger }]}>{formError}</Text>
+            </View>
+          )}
+          <Pressable
+            onPress={handleCreate}
+            disabled={createMut.isPending}
+            style={[styles.submitBtn, { backgroundColor: colors.primary, opacity: createMut.isPending ? 0.7 : 1 }]}
+          >
+            {createMut.isPending ? (
+              <ActivityIndicator color={colors.primaryForeground} />
+            ) : (
+              <Text style={{ color: colors.primaryForeground, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 14 }}>إنشاء الحساب</Text>
+            )}
+          </Pressable>
+        </View>
+      )}
+
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+      {admins.isLoading && <ActivityIndicator color={colors.primary} />}
+      {list.length === 0 && !admins.isLoading && (
+        <Text style={{ color: colors.mutedForeground, fontFamily: "IBMPlexSansArabic_400Regular", fontSize: 13, textAlign: "center" }}>
+          لا يوجد مشرفو أطباء حتى الآن
+        </Text>
+      )}
+      {list.map((da) => (
+        <View key={da.id} style={[{ flexDirection: "row-reverse", alignItems: "center", gap: 10, paddingVertical: 8, borderBottomWidth: 1 }, { borderColor: colors.border }]}>
+          <View style={[styles.confirmedAvatar, { backgroundColor: colors.primarySoft }]}>
+            <Feather name="user-check" size={14} color={colors.primary} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: colors.foreground, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 13, textAlign: "right" }}>{da.username}</Text>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "IBMPlexSansArabic_400Regular", fontSize: 11, textAlign: "right" }}>
+              {da.doctor?.name_ar ?? da.doctor_id}
+            </Text>
+          </View>
+          <Pressable
+            onPress={() => deleteMut.mutate(da.id)}
+            style={[{ padding: 6, borderRadius: 8, backgroundColor: colors.accents.red.bg }]}
+          >
+            <Feather name="trash-2" size={14} color={colors.danger} />
+          </Pressable>
+        </View>
+      ))}
+    </View>
   );
 }
 

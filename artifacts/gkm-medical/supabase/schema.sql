@@ -164,6 +164,25 @@ update doctors set clinic_name_ar = 'عيادة ندى للجلدية والتج
 update doctors set clinic_name_ar = 'عيادات الابتسامة الذهبية للأسنان', clinic_address_ar = 'مجمع النخيل الطبي، شارع الأمير سلطان، حي النخيل، الرياض', clinic_phone = '+966112345675', clinic_maps_url = 'https://www.google.com/maps/search/?api=1&query=Al+Nakheel+Riyadh' where name_ar = 'د. خالد المطيري' and clinic_address_ar is null;
 update doctors set clinic_name_ar = 'مركز الرشيد للنساء والولادة', clinic_address_ar = 'مجمع الورود الطبي، طريق الملك عبدالله، حي الورود، الرياض', clinic_phone = '+966112345676', clinic_maps_url = 'https://www.google.com/maps/search/?api=1&query=Al+Wurud+Riyadh' where name_ar = 'د. منى الرشيد' and clinic_address_ar is null;
 
+-- =========================
+-- Doctor Admins
+-- =========================
+-- Staff accounts scoped to a single doctor — can scan QR tickets and monitor visits.
+-- Run this block if you haven't yet:
+
+create table if not exists doctor_admins (
+  id         uuid        primary key default gen_random_uuid(),
+  username   text        not null unique,
+  password   text        not null,
+  doctor_id  uuid        not null references doctors(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+alter table doctor_admins enable row level security;
+drop policy if exists "doctor_admins anon all" on doctor_admins;
+create policy "doctor_admins anon all" on doctor_admins
+  for all using (true) with check (true);
+
 -- Enable realtime on messages so doctor replies stream into the chat instantly
 alter publication supabase_realtime add table messages;
 

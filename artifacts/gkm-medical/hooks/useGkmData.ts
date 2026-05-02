@@ -982,6 +982,183 @@ export function useDeleteUser() {
   });
 }
 
+// ---------- Doctor Admins ----------
+
+export interface DoctorAdminRow {
+  id: string;
+  username: string;
+  password: string;
+  doctor_id: string;
+  created_at: string;
+  doctor?: Doctor;
+}
+
+export function useDoctorAdmins() {
+  return useQuery({
+    queryKey: ["doctor_admins"],
+    queryFn: async (): Promise<DoctorAdminRow[]> => {
+      const { data, error } = await supabase
+        .from("doctor_admins")
+        .select("*, doctor:doctors(*)")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as DoctorAdminRow[];
+    },
+  });
+}
+
+export function useCreateDoctorAdmin() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      username: string;
+      password: string;
+      doctor_id: string;
+    }) => {
+      const { data, error } = await supabase
+        .from("doctor_admins")
+        .insert(input)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["doctor_admins"] }),
+  });
+}
+
+export function useDeleteDoctorAdmin() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("doctor_admins")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["doctor_admins"] }),
+  });
+}
+
+// ---------- Doctor-admin appointments (with realtime) ----------
+
+export function useDoctorAdminAppointments(doctorId: string | null) {
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    if (!doctorId) return;
+    const ch = supabase
+      .channel(`doctor_appts_${doctorId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "appointments",
+          filter: `doctor_id=eq.${doctorId}`,
+        },
+        () =>
+          qc.invalidateQueries({
+            queryKey: ["doctor_admin_appointments", doctorId],
+          }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [doctorId, qc]);
+
+  return useQuery({
+    queryKey: ["doctor_admin_appointments", doctorId],
+    enabled: !!doctorId,
+    queryFn: async (): Promise<AppointmentWithPatient[]> => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("*")
+        .eq("doctor_id", doctorId!)
+        .order("appointment_date", { ascending: false })
+        .order("appointment_time", { ascending: true });
+      if (error) throw error;
+
+      const rows = (data ?? []) as Appointment[];
+      const userIds = [...new Set(rows.map((r) => r.user_id))];
+      const { data: files } = await supabase
+        .from("medical_files")
+        .select("user_id, full_name_ar")
+        .in("user_id", userIds.length ? userIds : ["__none__"]);
+
+      const nameMap = Object.fromEntries(
+        (files ?? []).map((f: any) => [f.user_id, f.full_name_ar]),
+      );
+      return rows.map((r) => ({
+        ...r,
+        patient_name: nameMap[r.user_id] ?? null,
+      }));
+    },
+  });
+}
+
+export type DoctorTicketScanResult =
+  | { status: "marked_used"; appointment: AppointmentWithPatient }
+  | { status: "already_used"; appointment: AppointmentWithPatient }
+  | { status: "cancelled"; appointment: AppointmentWithPatient }
+  | { status: "wrong_doctor"; appointment: AppointmentWithPatient };
+
+export function useMarkDoctorTicketScanned(doctorId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (
+      appointmentId: string,
+    ): Promise<DoctorTicketScanResult> => {
+      const { data: apt, error } = await supabase
+        .from("appointments")
+        .select("*, doctor:doctors(*)")
+        .eq("id", appointmentId)
+        .maybeSingle();
+      if (error) throw error;
+      if (!apt) throw new Error("not_found");
+
+      const { data: file } = await supabase
+        .from("medical_files")
+        .select("full_name_ar")
+        .eq("user_id", (apt as any).user_id)
+        .maybeSingle();
+
+      const appt: AppointmentWithPatient = {
+        ...(apt as Appointment),
+        patient_name: (file as any)?.full_name_ar ?? null,
+      };
+
+      if ((apt as any).doctor_id !== doctorId) {
+        return { status: "wrong_doctor", appointment: appt };
+      }
+      if ((apt as any).status === "completed") {
+        return { status: "already_used", appointment: appt };
+      }
+      if ((apt as any).status === "cancelled") {
+        return { status: "cancelled", appointment: appt };
+      }
+
+      const { error: updateError } = await supabase
+        .from("appointments")
+        .update({ status: "completed" })
+        .eq("id", appointmentId);
+      if (updateError) throw updateError;
+
+      return {
+        status: "marked_used",
+        appointment: { ...appt, status: "completed" },
+      };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({
+        queryKey: ["doctor_admin_appointments", doctorId],
+      });
+    },
+  });
+}
+
 // ---------- Admin: All conversations & message monitor ----------
 
 export function useAllConversations() {
