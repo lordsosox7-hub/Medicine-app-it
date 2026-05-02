@@ -13,7 +13,7 @@ import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { AppointmentQR } from "@/components/AppointmentQR";
-import { useAppointments, usePaymentByAppointment } from "@/hooks/useGkmData";
+import { useAppointments, usePaymentByAppointment, useRealtimePayment } from "@/hooks/useGkmData";
 import { StatusPill } from "@/components/StatusPill";
 
 export default function TicketScreen() {
@@ -23,6 +23,7 @@ export default function TicketScreen() {
   const { appointmentId } = useLocalSearchParams<{ appointmentId: string }>();
   const { data: appointments, isLoading } = useAppointments();
   const { data: payment } = usePaymentByAppointment(appointmentId ?? undefined);
+  useRealtimePayment(appointmentId ?? undefined);
 
   const apt = appointments?.find((a) => a.id === appointmentId);
   const doc = apt?.doctor as any;
