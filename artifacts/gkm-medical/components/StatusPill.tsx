@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { useColors } from "@/hooks/useColors";
 
 interface StatusPillProps {
-  status: "upcoming" | "completed" | "cancelled" | "normal" | "high" | "low";
+  status: "upcoming" | "completed" | "cancelled" | "missed" | "normal" | "high" | "low";
 }
 
 export function StatusPill({ status }: StatusPillProps) {
