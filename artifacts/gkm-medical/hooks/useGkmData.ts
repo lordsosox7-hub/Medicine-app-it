@@ -11,6 +11,12 @@ import {
   supabase,
 } from "@/lib/supabase";
 import { getUserId } from "@/lib/userId";
+import {
+  getFavoriteIds,
+  isFavoriteId,
+  addFavoriteId,
+  removeFavoriteId,
+} from "@/lib/localFavorites";
 
 // ---------- Doctors ----------
 
@@ -552,24 +558,22 @@ export function useLabResults(filter: "all" | "blood" | "urine" = "all") {
   });
 }
 
-// ---------- Favorites ----------
+// ---------- Favorites (stored locally in AsyncStorage) ----------
 
 export function useFavorites() {
   return useQuery({
     queryKey: ["favorites"],
-    staleTime: 60_000,
+    staleTime: 30_000,
     queryFn: async (): Promise<Doctor[]> => {
-      const userId = await getUserId();
-      if (!userId) return [];
+      const ids = await getFavoriteIds();
+      if (ids.length === 0) return [];
       const { data, error } = await supabase
-        .from("favorites")
-        .select("doctor:doctors(*)")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
+        .from("doctors")
+        .select("*")
+        .in("id", ids);
       if (error) throw error;
-      return ((data ?? [])
-        .map((row: { doctor: Doctor | null }) => row.doctor)
-        .filter(Boolean)) as Doctor[];
+      const map = new Map((data ?? []).map((d: Doctor) => [d.id, d]));
+      return ids.map((id) => map.get(id)).filter(Boolean) as Doctor[];
     },
   });
 }
@@ -578,19 +582,10 @@ export function useIsFavorite(doctorId?: string) {
   return useQuery({
     queryKey: ["favorite", doctorId],
     enabled: !!doctorId,
-    staleTime: 60_000,
+    staleTime: 30_000,
     queryFn: async (): Promise<boolean> => {
       if (!doctorId) return false;
-      const userId = await getUserId();
-      if (!userId) return false;
-      const { data, error } = await supabase
-        .from("favorites")
-        .select("id")
-        .eq("user_id", userId)
-        .eq("doctor_id", doctorId)
-        .maybeSingle();
-      if (error) throw error;
-      return !!data;
+      return isFavoriteId(doctorId);
     },
   });
 }
@@ -599,21 +594,11 @@ export function useToggleFavorite() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: { doctor_id: string; current: boolean }) => {
-      const userId = await getUserId();
-      if (!userId) throw new Error("no_user_id");
       if (input.current) {
-        const { error } = await supabase
-          .from("favorites")
-          .delete()
-          .eq("user_id", userId)
-          .eq("doctor_id", input.doctor_id);
-        if (error) throw error;
+        await removeFavoriteId(input.doctor_id);
         return false;
       }
-      const { error } = await supabase
-        .from("favorites")
-        .insert({ user_id: userId, doctor_id: input.doctor_id });
-      if (error && !error.message.toLowerCase().includes("duplicate")) throw error;
+      await addFavoriteId(input.doctor_id);
       return true;
     },
     onMutate: async (vars) => {
