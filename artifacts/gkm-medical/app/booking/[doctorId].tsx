@@ -11,6 +11,28 @@ import * as Haptics from "expo-haptics";
 
 const TIME_SLOTS = ['10:30 صباحاً','11:30 صباحاً','12:30 ظهراً','02:30 ظهراً','04:30 مساءً','06:30 مساءً'];
 
+const SLOT_HOURS_24: Record<string, { h: number; m: number }> = {
+  '10:30 صباحاً': { h: 10, m: 30 },
+  '11:30 صباحاً': { h: 11, m: 30 },
+  '12:30 ظهراً':  { h: 12, m: 30 },
+  '02:30 ظهراً':  { h: 14, m: 30 },
+  '04:30 مساءً':  { h: 16, m: 30 },
+  '06:30 مساءً':  { h: 18, m: 30 },
+};
+
+function isSlotPast(slot: string, selectedDate: string): boolean {
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (selectedDate !== todayStr) return false;
+  const now = new Date();
+  const t = SLOT_HOURS_24[slot];
+  if (!t) return false;
+  return now.getHours() > t.h || (now.getHours() === t.h && now.getMinutes() >= t.m);
+}
+
+function firstAvailableSlot(date: string): string {
+  return TIME_SLOTS.find((s) => !isSlotPast(s, date)) ?? TIME_SLOTS[0];
+}
+
 export default function BookingScreen() {
   const { doctorId } = useLocalSearchParams<{ doctorId: string }>();
   const router = useRouter();
@@ -34,7 +56,12 @@ export default function BookingScreen() {
   });
 
   const [selectedDate, setSelectedDate] = useState(days[0].dateString);
-  const [selectedTime, setSelectedTime] = useState(TIME_SLOTS[0]);
+  const [selectedTime, setSelectedTime] = useState(() => firstAvailableSlot(days[0].dateString));
+
+  const handleSelectDate = (dateString: string) => {
+    setSelectedDate(dateString);
+    setSelectedTime((prev) => (isSlotPast(prev, dateString) ? firstAvailableSlot(dateString) : prev));
+  };
 
   if (isLoading || !doctor) {
     return (
@@ -89,7 +116,7 @@ export default function BookingScreen() {
               <TouchableOpacity
                 key={idx}
                 activeOpacity={0.7}
-                onPress={() => setSelectedDate(day.dateString)}
+                onPress={() => handleSelectDate(day.dateString)}
                 style={[
                   styles.dateCard,
                   {
@@ -116,22 +143,36 @@ export default function BookingScreen() {
         <View style={styles.timeGrid}>
           {TIME_SLOTS.map((time, idx) => {
             const isSelected = selectedTime === time;
+            const isPast = isSlotPast(time, selectedDate);
             return (
               <TouchableOpacity
                 key={idx}
-                activeOpacity={0.7}
-                onPress={() => setSelectedTime(time)}
+                activeOpacity={isPast ? 1 : 0.7}
+                disabled={isPast}
+                onPress={() => !isPast && setSelectedTime(time)}
                 style={[
                   styles.timeSlot,
                   {
-                    backgroundColor: isSelected ? colors.primary : colors.card,
-                    borderColor: isSelected ? colors.primary : colors.border,
+                    backgroundColor: isPast
+                      ? colors.muted
+                      : isSelected ? colors.primary : colors.card,
+                    borderColor: isPast
+                      ? colors.border
+                      : isSelected ? colors.primary : colors.border,
+                    opacity: isPast ? 0.45 : 1,
                   }
                 ]}
               >
-                <Text style={[styles.timeText, { color: isSelected ? colors.primaryForeground : colors.foreground }]}>
+                <Text style={[styles.timeText, {
+                  color: isPast
+                    ? colors.mutedForeground
+                    : isSelected ? colors.primaryForeground : colors.foreground,
+                }]}>
                   {time}
                 </Text>
+                {isPast && (
+                  <Text style={[styles.pastLabel, { color: colors.mutedForeground }]}>انتهى</Text>
+                )}
               </TouchableOpacity>
             );
           })}
@@ -233,6 +274,11 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
     fontFamily: "IBMPlexSansArabic_700Bold",
+  },
+  pastLabel: {
+    fontSize: 10,
+    fontFamily: "IBMPlexSansArabic_400Regular",
+    marginTop: 2,
   },
   footer: {
     position: 'absolute',
