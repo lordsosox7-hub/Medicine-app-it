@@ -32,6 +32,7 @@ export default function AppointmentsScreen() {
             onPress: () => {
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
               cancelAppointment.mutate(appointment.id);
+              cancelAppointmentReminder(appointment.id);
             }
           }
         ]

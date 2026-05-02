@@ -29,6 +29,11 @@ export function StatusPill({ status }: StatusPillProps) {
       bg = colors.muted;
       text = colors.mutedForeground;
       break;
+    case "missed":
+      label = "فائت";
+      bg = `${colors.warning}20`;
+      text = colors.warning;
+      break;
     case "normal":
       label = "طبيعي";
       bg = `${colors.success}20`;
