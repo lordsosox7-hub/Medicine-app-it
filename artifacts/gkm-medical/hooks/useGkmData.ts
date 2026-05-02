@@ -557,8 +557,10 @@ export function useLabResults(filter: "all" | "blood" | "urine" = "all") {
 export function useFavorites() {
   return useQuery({
     queryKey: ["favorites"],
+    staleTime: 60_000,
     queryFn: async (): Promise<Doctor[]> => {
       const userId = await getUserId();
+      if (!userId) return [];
       const { data, error } = await supabase
         .from("favorites")
         .select("doctor:doctors(*)")
@@ -576,9 +578,11 @@ export function useIsFavorite(doctorId?: string) {
   return useQuery({
     queryKey: ["favorite", doctorId],
     enabled: !!doctorId,
+    staleTime: 60_000,
     queryFn: async (): Promise<boolean> => {
       if (!doctorId) return false;
       const userId = await getUserId();
+      if (!userId) return false;
       const { data, error } = await supabase
         .from("favorites")
         .select("id")
@@ -596,6 +600,7 @@ export function useToggleFavorite() {
   return useMutation({
     mutationFn: async (input: { doctor_id: string; current: boolean }) => {
       const userId = await getUserId();
+      if (!userId) throw new Error("no_user_id");
       if (input.current) {
         const { error } = await supabase
           .from("favorites")
@@ -613,13 +618,27 @@ export function useToggleFavorite() {
     },
     onMutate: async (vars) => {
       await qc.cancelQueries({ queryKey: ["favorite", vars.doctor_id] });
-      const previous = qc.getQueryData<boolean>(["favorite", vars.doctor_id]);
+      await qc.cancelQueries({ queryKey: ["favorites"] });
+
+      const previousIsFav = qc.getQueryData<boolean>(["favorite", vars.doctor_id]);
+      const previousList = qc.getQueryData<Doctor[]>(["favorites"]);
+
       qc.setQueryData(["favorite", vars.doctor_id], !vars.current);
-      return { previous };
+
+      if (vars.current) {
+        qc.setQueryData<Doctor[]>(["favorites"], (old) =>
+          old ? old.filter((d) => d.id !== vars.doctor_id) : [],
+        );
+      }
+
+      return { previousIsFav, previousList };
     },
     onError: (_err, vars, ctx) => {
-      if (ctx?.previous !== undefined) {
-        qc.setQueryData(["favorite", vars.doctor_id], ctx.previous);
+      if (ctx?.previousIsFav !== undefined) {
+        qc.setQueryData(["favorite", vars.doctor_id], ctx.previousIsFav);
+      }
+      if (ctx?.previousList !== undefined) {
+        qc.setQueryData(["favorites"], ctx.previousList);
       }
     },
     onSettled: (_data, _err, vars) => {
