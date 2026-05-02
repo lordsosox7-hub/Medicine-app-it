@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -16,10 +16,12 @@ export default function MoreScreen() {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  useEffect(() => {
-    getUserName().then(setUserName);
-    getUserEmail().then(setUserEmail);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getUserName().then(setUserName);
+      getUserEmail().then(setUserEmail);
+    }, [])
+  );
 
   const tapCountRef = useRef(0);
   const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

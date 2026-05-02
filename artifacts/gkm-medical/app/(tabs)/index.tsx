@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Platform, Alert, Linking } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
@@ -79,9 +79,11 @@ export default function HomeScreen() {
     transform: [{ scale: badgePulse.value }],
   }));
 
-  useEffect(() => {
-    getUserName().then(setUserName);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getUserName().then(setUserName);
+    }, [])
+  );
 
   useEffect(() => {
     // Re-evaluate the daily advice every 5 minutes so it auto-rotates

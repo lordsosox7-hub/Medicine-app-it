@@ -14,7 +14,7 @@ import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { useMedicalFile, useUpdateMedicalFile } from "@/hooks/useGkmData";
-import { getUserName } from "@/lib/userId";
+import { getUserName, setUserName } from "@/lib/userId";
 
 const GENDERS = ["ذكر", "أنثى"];
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -60,8 +60,9 @@ export default function MedicalFileEditScreen() {
     }
     const ageNum = parseInt(age, 10);
     try {
+      const trimmedName = fullName.trim();
       await update.mutateAsync({
-        full_name_ar: fullName.trim(),
+        full_name_ar: trimmedName,
         age: Number.isFinite(ageNum) ? ageNum : 0,
         gender,
         blood_type: bloodType,
@@ -71,6 +72,7 @@ export default function MedicalFileEditScreen() {
         past_surgeries: surgeries.filter((s) => s.trim().length > 0),
         vaccinations: vaccinations.filter((s) => s.trim().length > 0),
       });
+      await setUserName(trimmedName);
       router.back();
     } catch (e: any) {
       const msg = e?.message || "تعذر حفظ التغييرات";

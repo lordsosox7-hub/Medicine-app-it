@@ -5,10 +5,12 @@ import { useColors } from "@/hooks/useColors";
 import { Feather } from "@expo/vector-icons";
 import { getUserName, setUserName, getUserEmail } from "@/lib/userId";
 import { getUserPhone, setUserPhone } from "@/lib/preferences";
+import { useUpdateMedicalFile } from "@/hooks/useGkmData";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const colors = useColors();
+  const updateMedicalFile = useUpdateMedicalFile();
   const [name, setName] = useState("");
   const [email, setEmail] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
@@ -30,8 +32,10 @@ export default function ProfileScreen() {
       return;
     }
     setSaving(true);
-    await setUserName(name.trim());
+    const trimmedName = name.trim();
+    await setUserName(trimmedName);
     await setUserPhone(phone.trim());
+    updateMedicalFile.mutate({ full_name_ar: trimmedName });
     setSaving(false);
     if (Platform.OS === "web") {
       window.alert("تم حفظ التغييرات");
