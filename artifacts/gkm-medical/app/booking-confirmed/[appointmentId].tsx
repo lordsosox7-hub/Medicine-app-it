@@ -5,6 +5,7 @@ import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { GradientButton } from "@/components/GradientButton";
+import { AppointmentQR } from "@/components/AppointmentQR";
 
 const METHOD_LABELS: Record<string, string> = {
   mada: "مدى",
@@ -222,6 +223,39 @@ export default function BookingConfirmedScreen() {
             </>
           )}
         </View>
+
+        {/* QR Ticket */}
+        {!!appointmentId && (
+          <View
+            style={[
+              styles.qrCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.qrTitle, { color: colors.foreground }]}>
+              تذكرة الموعد
+            </Text>
+            <Text style={[styles.qrSub, { color: colors.mutedForeground }]}>
+              أرِ هذا الرمز عند الوصول إلى العيادة
+            </Text>
+            <View style={[styles.qrBox, { borderColor: colors.border }]}>
+              <AppointmentQR
+                appointmentId={appointmentId}
+                doctorName={doctorName}
+                specialty={doctorSpecialty}
+                date={date}
+                time={time}
+                size={190}
+                color="#000000"
+                backgroundColor="#ffffff"
+                showRef={false}
+              />
+            </View>
+            <Text style={[styles.qrRef, { color: colors.primary }]}>
+              {referenceCode}
+            </Text>
+          </View>
+        )}
       </ScrollView>
 
       {/* Footer actions */}
@@ -255,7 +289,7 @@ export default function BookingConfirmedScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { padding: 20, alignItems: "stretch" },
+  scrollContent: { padding: 20, alignItems: "stretch", gap: 16 },
   badgeWrap: {
     alignItems: "center",
     justifyContent: "center",
@@ -369,6 +403,36 @@ const styles = StyleSheet.create({
     fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "left",
     writingDirection: "rtl",
+  },
+  qrCard: {
+    borderWidth: 1,
+    borderRadius: 18,
+    padding: 20,
+    alignItems: "center",
+    gap: 10,
+  },
+  qrTitle: {
+    fontSize: 17,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    textAlign: "center",
+  },
+  qrSub: {
+    fontSize: 13,
+    fontFamily: "IBMPlexSansArabic_500Medium",
+    textAlign: "center",
+  },
+  qrBox: {
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    backgroundColor: "#ffffff",
+  },
+  qrRef: {
+    fontSize: 16,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    letterSpacing: 3,
+    textAlign: "center",
+    writingDirection: "ltr",
   },
   footer: {
     position: "absolute",

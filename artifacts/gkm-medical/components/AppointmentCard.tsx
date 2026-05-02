@@ -6,16 +6,24 @@ import { Appointment } from "@/lib/supabase";
 import { useColors } from "@/hooks/useColors";
 import { StatusPill } from "./StatusPill";
 import { PressableScale } from "./PressableScale";
+import { useRouter } from "expo-router";
 
 interface AppointmentCardProps {
   appointment: Appointment;
   onPress?: () => void;
   onDelete?: () => void;
+  onTicket?: () => void;
 }
 
-export function AppointmentCard({ appointment, onPress, onDelete }: AppointmentCardProps) {
+export function AppointmentCard({ appointment, onPress, onDelete, onTicket }: AppointmentCardProps) {
   const colors = useColors();
+  const router = useRouter();
   const doc = appointment.doctor;
+
+  const handleTicket = () => {
+    if (onTicket) { onTicket(); return; }
+    router.push(`/ticket/${appointment.id}`);
+  };
 
   if (!doc) return null;
 
@@ -79,7 +87,7 @@ export function AppointmentCard({ appointment, onPress, onDelete }: AppointmentC
       {/* Divider */}
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-      {/* Date + time row */}
+      {/* Date + time + QR row */}
       <View style={styles.metaRow}>
         <View style={styles.metaItem}>
           <View style={[styles.metaIcon, { backgroundColor: colors.primarySoft }]}>
@@ -97,6 +105,15 @@ export function AppointmentCard({ appointment, onPress, onDelete }: AppointmentC
             {appointment.appointment_time}
           </Text>
         </View>
+        <PressableScale
+          onPress={handleTicket}
+          scaleTo={0.88}
+          style={[styles.qrBtn, { backgroundColor: colors.primarySoft }]}
+          hitSlop={6}
+          accessibilityLabel="عرض تذكرة QR"
+        >
+          <Feather name="maximize" size={15} color={colors.primary} />
+        </PressableScale>
       </View>
     </PressableScale>
   );
@@ -187,5 +204,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
+  },
+  qrBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: "auto",
   },
 });
