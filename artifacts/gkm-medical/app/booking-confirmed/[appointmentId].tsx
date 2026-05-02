@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { GradientButton } from "@/components/GradientButton";
 import { AppointmentQR } from "@/components/AppointmentQR";
+import { scheduleAppointmentReminder } from "@/lib/pushNotifications";
 
 const METHOD_LABELS: Record<string, string> = {
   mada: "مدى",
@@ -68,6 +69,13 @@ export default function BookingConfirmedScreen() {
       ])
     ).start();
   }, [scale, ringScale, ringOpacity]);
+
+  // Schedule a reminder notification 1 hour before the appointment
+  useEffect(() => {
+    if (appointmentId && date && time && doctorName) {
+      scheduleAppointmentReminder(appointmentId, doctorName, date, time);
+    }
+  }, [appointmentId, doctorName, date, time]);
 
   const formattedDate = date
     ? new Date(date).toLocaleDateString("ar", {

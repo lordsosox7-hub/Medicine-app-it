@@ -9,6 +9,7 @@ import { AppointmentCard } from "@/components/AppointmentCard";
 import { EmptyState } from "@/components/EmptyState";
 import { GradientButton } from "@/components/GradientButton";
 import * as Haptics from "expo-haptics";
+import { cancelAppointmentReminder } from "@/lib/pushNotifications";
 
 export default function AppointmentsScreen() {
   const router = useRouter();
