@@ -34,6 +34,14 @@ export default function TicketScreen() {
     return "#16a34a";
   })();
 
+  // Human-readable label shown inside the strip
+  const stripLabel = (() => {
+    if (apt?.status === "cancelled") return { text: "ملغي", icon: "x-circle" as const };
+    if (apt?.status === "completed") return { text: "مكتمل", icon: "check-circle" as const };
+    if (payment?.status === "pending") return { text: "بانتظار تأكيد الدفع", icon: "clock" as const };
+    return { text: "تم التأكيد", icon: "check-circle" as const };
+  })();
+
   const dateObj = apt ? new Date(apt.appointment_date) : null;
   const formattedDate = dateObj
     ? dateObj.toLocaleDateString("ar", {
@@ -92,7 +100,10 @@ export default function TicketScreen() {
           {/* Top strip */}
           <View style={[styles.ticketStrip, { backgroundColor: stripColor }]}>
             <Text style={styles.stripText}>راحة · Medical Care</Text>
-            <StatusPill status={apt.status} />
+            <View style={styles.stripLabelPill}>
+              <Feather name={stripLabel.icon} size={13} color="#ffffff" />
+              <Text style={styles.stripLabelText}>{stripLabel.text}</Text>
+            </View>
           </View>
 
           {/* Doctor info */}
@@ -233,6 +244,20 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "IBMPlexSansArabic_700Bold",
     letterSpacing: 0.5,
+  },
+  stripLabelPill: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "rgba(0,0,0,0.18)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
+  stripLabelText: {
+    color: "#ffffff",
+    fontSize: 12,
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
   section: {
     flexDirection: "row-reverse",
