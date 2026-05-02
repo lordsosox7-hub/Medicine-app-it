@@ -13,7 +13,7 @@ import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { AppointmentQR } from "@/components/AppointmentQR";
-import { useAppointments } from "@/hooks/useGkmData";
+import { useAppointments, usePaymentByAppointment } from "@/hooks/useGkmData";
 import { StatusPill } from "@/components/StatusPill";
 
 export default function TicketScreen() {
@@ -22,9 +22,17 @@ export default function TicketScreen() {
   const insets = useSafeAreaInsets();
   const { appointmentId } = useLocalSearchParams<{ appointmentId: string }>();
   const { data: appointments, isLoading } = useAppointments();
+  const { data: payment } = usePaymentByAppointment(appointmentId ?? undefined);
 
   const apt = appointments?.find((a) => a.id === appointmentId);
   const doc = apt?.doctor as any;
+
+  // Strip colour: red while payment is pending (not confirmed), green otherwise
+  const stripColor = (() => {
+    if (apt?.status === "cancelled") return "#dc2626";
+    if (payment?.status === "pending") return "#dc2626";
+    return "#16a34a";
+  })();
 
   const dateObj = apt ? new Date(apt.appointment_date) : null;
   const formattedDate = dateObj
@@ -82,7 +90,7 @@ export default function TicketScreen() {
           ]}
         >
           {/* Top strip */}
-          <View style={[styles.ticketStrip, { backgroundColor: colors.primary }]}>
+          <View style={[styles.ticketStrip, { backgroundColor: stripColor }]}>
             <Text style={styles.stripText}>راحة · Medical Care</Text>
             <StatusPill status={apt.status} />
           </View>
