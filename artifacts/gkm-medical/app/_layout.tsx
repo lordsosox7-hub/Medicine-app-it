@@ -16,6 +16,7 @@ import { I18nManager, Platform } from "react-native";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { useColors } from "@/hooks/useColors";
+import { requestNotificationPermissions } from "@/lib/pushNotifications";
 
 // Force RTL BEFORE any rendering
 if (!I18nManager.isRTL) {
@@ -99,6 +100,10 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
+    requestNotificationPermissions();
+  }, []);
 
   if (!fontsLoaded && !fontError) return null;
 

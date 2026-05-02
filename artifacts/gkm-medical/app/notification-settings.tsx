@@ -31,6 +31,7 @@ export default function NotificationSettingsScreen() {
   }> = [
     { key: "appointments", icon: "calendar", label: "تذكير المواعيد", description: "تنبيهات قبل موعدك بساعة", iconBg: "#e8f0ff", iconColor: "#1e6bf0" },
     { key: "messages", icon: "message-circle", label: "الرسائل", description: "رسائل جديدة من الأطباء", iconBg: "#e7f7ee", iconColor: "#16a34a" },
+    { key: "payments", icon: "credit-card", label: "تأكيد الدفع", description: "إشعار فور قبول أو رفض تحويلك", iconBg: "#fef3d7", iconColor: "#f59e0b" },
     { key: "labResults", icon: "activity", label: "نتائج التحاليل", description: "تنبيه عند توفر نتائج جديدة", iconBg: "#f1ebff", iconColor: "#7c3aed" },
     { key: "promotions", icon: "tag", label: "العروض والتخفيضات", description: "تخفيضات على الخدمات الطبية", iconBg: "#fef3d7", iconColor: "#f59e0b" },
   ];

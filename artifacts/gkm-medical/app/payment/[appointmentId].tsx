@@ -22,6 +22,7 @@ import {
   usePaymentByAppointment,
   useRealtimePayment,
 } from "@/hooks/useGkmData";
+import { scheduleLocalNotification } from "@/lib/pushNotifications";
 
 const ACCOUNT_NAME = "اسامة ادم موسى ادم";
 
@@ -162,10 +163,23 @@ export default function PaymentScreen() {
   );
   useRealtimePayment(appointmentId ? String(appointmentId) : undefined);
 
-  // When the admin confirms, route to the success screen.
+  // Track the last seen status so we only fire notifications on actual changes.
+  const prevStatusRef = React.useRef<string | undefined>(undefined);
+
+  // When the admin confirms/rejects, fire a system notification then navigate.
   React.useEffect(() => {
     if (!payment) return;
+    const prev = prevStatusRef.current;
+    prevStatusRef.current = payment.status;
+
     if (payment.status === "confirmed") {
+      if (prev !== "confirmed") {
+        const docLabel = doctorName ? ` مع ${doctorName}` : "";
+        scheduleLocalNotification({
+          title: "✅ تم تأكيد الدفع",
+          body: `تم تأكيد دفعتك بمبلغ ${Math.round(total)} ج.س${docLabel}. موعدك مؤكد!`,
+        });
+      }
       router.replace({
         pathname: "/booking-confirmed/[appointmentId]",
         params: {
@@ -180,6 +194,12 @@ export default function PaymentScreen() {
         },
       });
     } else if (payment.status === "rejected") {
+      if (prev !== "rejected") {
+        scheduleLocalNotification({
+          title: "❌ لم يتم تأكيد الدفع",
+          body: payment.rejection_reason ?? "رقم العملية غير مطابق. يرجى إعادة المحاولة.",
+        });
+      }
       setSubmittedReason(payment.rejection_reason ?? null);
     }
   }, [

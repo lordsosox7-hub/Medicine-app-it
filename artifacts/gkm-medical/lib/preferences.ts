@@ -12,6 +12,7 @@ const KEYS = {
 export type NotificationPrefs = {
   appointments: boolean;
   messages: boolean;
+  payments: boolean;
   labResults: boolean;
   promotions: boolean;
 };
@@ -19,6 +20,7 @@ export type NotificationPrefs = {
 const defaultNotifications: NotificationPrefs = {
   appointments: true,
   messages: true,
+  payments: true,
   labResults: true,
   promotions: false,
 };
