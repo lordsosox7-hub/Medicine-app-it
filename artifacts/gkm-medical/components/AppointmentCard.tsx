@@ -8,6 +8,30 @@ import { StatusPill } from "./StatusPill";
 import { PressableScale } from "./PressableScale";
 import { useRouter } from "expo-router";
 
+function parseArabicTimeTo24h(timeStr: string): { hours: number; minutes: number } {
+  const match = timeStr.match(/(\d+):(\d+)/);
+  if (!match) return { hours: 12, minutes: 0 };
+  let hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  if (timeStr.includes("صباحاً")) {
+    if (hours === 12) hours = 0;
+  } else {
+    if (hours !== 12) hours += 12;
+  }
+  return { hours, minutes };
+}
+
+function isAppointmentPast(dateStr: string, timeStr: string): boolean {
+  try {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    const { hours, minutes } = parseArabicTimeTo24h(timeStr);
+    const apptDate = new Date(year, month - 1, day, hours, minutes, 0, 0);
+    return apptDate.getTime() < Date.now();
+  } catch {
+    return false;
+  }
+}
+
 interface AppointmentCardProps {
   appointment: Appointment;
   onPress?: () => void;
@@ -33,6 +57,13 @@ export function AppointmentCard({ appointment, onPress, onDelete, onTicket }: Ap
     day: "numeric",
     month: "long",
   });
+
+  // If the appointment is stored as "upcoming" but its datetime has already passed, show it as "فائت"
+  const displayStatus =
+    appointment.status === "upcoming" &&
+    isAppointmentPast(appointment.appointment_date, appointment.appointment_time)
+      ? "missed"
+      : appointment.status;
 
   return (
     <PressableScale
@@ -70,7 +101,7 @@ export function AppointmentCard({ appointment, onPress, onDelete, onTicket }: Ap
             {doc.specialty_ar}
           </Text>
         </View>
-        <StatusPill status={appointment.status} />
+        <StatusPill status={displayStatus as any} />
         {onDelete && (
           <PressableScale
             onPress={onDelete}

@@ -66,9 +66,35 @@ export function useAppointments() {
   });
 }
 
+function parseArabicTimeTo24h(timeStr: string): { hours: number; minutes: number } {
+  const match = timeStr.match(/(\d+):(\d+)/);
+  if (!match) return { hours: 12, minutes: 0 };
+  let hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  if (timeStr.includes("صباحاً")) {
+    if (hours === 12) hours = 0;
+  } else {
+    if (hours !== 12) hours += 12;
+  }
+  return { hours, minutes };
+}
+
+function isAppointmentInFuture(dateStr: string, timeStr: string): boolean {
+  try {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    const { hours, minutes } = parseArabicTimeTo24h(timeStr);
+    const apptDate = new Date(year, month - 1, day, hours, minutes, 0, 0);
+    return apptDate.getTime() > Date.now();
+  } catch {
+    return false;
+  }
+}
+
 export function useUpcomingAppointment() {
   const { data, ...rest } = useAppointments();
-  const upcoming = data?.find((a) => a.status === "upcoming");
+  const upcoming = data?.find(
+    (a) => a.status === "upcoming" && isAppointmentInFuture(a.appointment_date, a.appointment_time)
+  );
   return { data: upcoming, ...rest };
 }
 
