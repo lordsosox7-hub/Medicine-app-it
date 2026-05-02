@@ -134,6 +134,58 @@ export function useCreateAppointment() {
   });
 }
 
+export type TicketScanResult =
+  | { status: "marked_used"; appointment: AppointmentWithPatient }
+  | { status: "already_used"; appointment: AppointmentWithPatient }
+  | { status: "cancelled"; appointment: AppointmentWithPatient };
+
+export function useMarkTicketScanned() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (appointmentId: string): Promise<TicketScanResult> => {
+      const { data: apt, error } = await supabase
+        .from("appointments")
+        .select("*, doctor:doctors(*)")
+        .eq("id", appointmentId)
+        .maybeSingle();
+      if (error) throw error;
+      if (!apt) throw new Error("not_found");
+
+      const { data: file } = await supabase
+        .from("medical_files")
+        .select("full_name_ar")
+        .eq("user_id", (apt as any).user_id)
+        .maybeSingle();
+
+      const apptWithPatient: AppointmentWithPatient = {
+        ...(apt as Appointment),
+        patient_name: (file as any)?.full_name_ar ?? null,
+      };
+
+      if ((apt as any).status === "completed") {
+        return { status: "already_used", appointment: apptWithPatient };
+      }
+      if ((apt as any).status === "cancelled") {
+        return { status: "cancelled", appointment: apptWithPatient };
+      }
+
+      const { error: updateError } = await supabase
+        .from("appointments")
+        .update({ status: "completed" })
+        .eq("id", appointmentId);
+      if (updateError) throw updateError;
+
+      return {
+        status: "marked_used",
+        appointment: { ...apptWithPatient, status: "completed" },
+      };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+    },
+  });
+}
+
 export function useCancelAppointment() {
   const qc = useQueryClient();
   return useMutation({

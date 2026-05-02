@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -12,12 +12,14 @@ import {
   Alert,
   Modal,
 } from "react-native";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { Stack, useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import {
   useAllAppointments,
   useAllAppointmentsWithPatients,
+  useMarkTicketScanned,
   useDoctors,
   useMessages,
   useRealtimeMessages,
@@ -52,6 +54,7 @@ type AdminTab =
   | "appointments"
   | "payments"
   | "revenue"
+  | "scanner"
   | "settings";
 
 const TABS: Array<{
@@ -65,6 +68,7 @@ const TABS: Array<{
   { id: "appointments", label: "المواعيد", icon: "calendar" },
   { id: "payments", label: "المدفوعات", icon: "credit-card" },
   { id: "revenue", label: "الإيرادات", icon: "trending-up" },
+  { id: "scanner", label: "ماسح QR", icon: "camera" },
   { id: "settings", label: "الإعدادات", icon: "settings" },
 ];
 
@@ -204,6 +208,7 @@ export default function AdminScreen() {
         {tab === "appointments" && <AppointmentsTab />}
         {tab === "payments" && <PaymentsTab />}
         {tab === "revenue" && <RevenueTab />}
+        {tab === "scanner" && <ScannerTab />}
         {tab === "settings" && <SettingsTab />}
       </View>
     </>
@@ -1545,6 +1550,230 @@ function ConfirmedAppointmentRow({ item }: { item: AppointmentWithPatient }) {
   );
 }
 
+// ====================================================================
+// QR Scanner tab
+// ====================================================================
+
+function ScannerTab() {
+  const colors = useColors();
+  const [permission, requestPermission] = useCameraPermissions();
+  const markScanned = useMarkTicketScanned();
+  const [parseError, setParseError] = useState(false);
+  const scannedRef = useRef(false);
+
+  const reset = () => {
+    scannedRef.current = false;
+    setParseError(false);
+    markScanned.reset();
+  };
+
+  const handleBarcode = useCallback(
+    ({ data }: { data: string }) => {
+      if (scannedRef.current || markScanned.isPending) return;
+      scannedRef.current = true;
+      setParseError(false);
+      try {
+        const parsed = JSON.parse(data);
+        if (!parsed?.id) throw new Error("no_id");
+        markScanned.mutate(parsed.id);
+      } catch {
+        setParseError(true);
+      }
+    },
+    [markScanned],
+  );
+
+  const result = markScanned.data;
+  const isLoading = markScanned.isPending;
+  const isError = markScanned.isError || parseError;
+  const done = !!result || isError;
+
+  if (!permission) {
+    return (
+      <View style={styles.empty}>
+        <ActivityIndicator color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (!permission.granted) {
+    return (
+      <View style={styles.empty}>
+        <View style={[styles.scanPermBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Feather name="camera-off" size={40} color={colors.mutedForeground} />
+          <Text style={[styles.scanPermTitle, { color: colors.foreground }]}>
+            يلزم إذن الكاميرا
+          </Text>
+          <Text style={[styles.scanPermSub, { color: colors.mutedForeground }]}>
+            للمسح الضوئي لرموز QR يرجى السماح باستخدام الكاميرا
+          </Text>
+          <Pressable
+            onPress={requestPermission}
+            style={[styles.primaryBtn, { backgroundColor: colors.primary, marginTop: 8 }]}
+          >
+            <Feather name="camera" size={16} color={colors.primaryForeground} />
+            <Text style={{ color: colors.primaryForeground, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 14 }}>
+              السماح بالكاميرا
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.flex}>
+      {/* Camera view */}
+      {!done && (
+        <View style={styles.scanCameraWrap}>
+          <CameraView
+            style={styles.scanCamera}
+            facing="back"
+            barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+            onBarcodeScanned={handleBarcode}
+          />
+          {/* Overlay frame */}
+          <View style={styles.scanOverlay} pointerEvents="none">
+            <View style={styles.scanDimTop} />
+            <View style={styles.scanMiddleRow}>
+              <View style={styles.scanDimSide} />
+              <View style={styles.scanFrame}>
+                <View style={[styles.scanCorner, styles.scanCornerTL, { borderColor: colors.primary }]} />
+                <View style={[styles.scanCorner, styles.scanCornerTR, { borderColor: colors.primary }]} />
+                <View style={[styles.scanCorner, styles.scanCornerBL, { borderColor: colors.primary }]} />
+                <View style={[styles.scanCorner, styles.scanCornerBR, { borderColor: colors.primary }]} />
+              </View>
+              <View style={styles.scanDimSide} />
+            </View>
+            <View style={styles.scanDimBottom}>
+              <Text style={styles.scanHint}>وجّه الكاميرا نحو رمز QR في التذكرة</Text>
+            </View>
+          </View>
+          {isLoading && (
+            <View style={[styles.scanLoadingOverlay, { backgroundColor: "rgba(0,0,0,0.55)" }]}>
+              <ActivityIndicator size="large" color="#ffffff" />
+              <Text style={{ color: "#ffffff", fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 14, marginTop: 10 }}>
+                جارٍ التحقق...
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* Result panel */}
+      {done && (
+        <ScrollView contentContainerStyle={{ padding: 20, gap: 16, alignItems: "stretch" }}>
+          {isError && (
+            <View style={[styles.scanResultCard, { backgroundColor: colors.accents.red.bg, borderColor: colors.danger }]}>
+              <Feather name="alert-circle" size={36} color={colors.danger} />
+              <Text style={[styles.scanResultTitle, { color: colors.danger }]}>رمز غير صالح</Text>
+              <Text style={[styles.scanResultSub, { color: colors.danger, opacity: 0.8 }]}>
+                لم يتم التعرف على هذا الرمز. تأكد أنه رمز تذكرة راحة.
+              </Text>
+            </View>
+          )}
+
+          {result?.status === "marked_used" && (
+            <View style={[styles.scanResultCard, { backgroundColor: colors.accents.green.bg, borderColor: colors.success }]}>
+              <Feather name="check-circle" size={44} color={colors.success} />
+              <Text style={[styles.scanResultTitle, { color: colors.success }]}>تم التحقق ✓</Text>
+              <Text style={[styles.scanResultSub, { color: colors.success, opacity: 0.85 }]}>
+                تم تسجيل دخول المريض بنجاح
+              </Text>
+            </View>
+          )}
+
+          {result?.status === "already_used" && (
+            <View style={[styles.scanResultCard, { backgroundColor: colors.accents.red.bg, borderColor: colors.danger }]}>
+              <Feather name="x-circle" size={44} color={colors.danger} />
+              <Text style={[styles.scanResultTitle, { color: colors.danger }]}>تم الاستخدام من قبل</Text>
+              <Text style={[styles.scanResultSub, { color: colors.danger, opacity: 0.85 }]}>
+                هذه التذكرة سبق مسحها وتسجيل استخدامها
+              </Text>
+            </View>
+          )}
+
+          {result?.status === "cancelled" && (
+            <View style={[styles.scanResultCard, { backgroundColor: colors.accents.red.bg, borderColor: colors.danger }]}>
+              <Feather name="slash" size={44} color={colors.danger} />
+              <Text style={[styles.scanResultTitle, { color: colors.danger }]}>موعد ملغى</Text>
+              <Text style={[styles.scanResultSub, { color: colors.danger, opacity: 0.85 }]}>
+                هذا الموعد تم إلغاؤه ولا يمكن استخدامه
+              </Text>
+            </View>
+          )}
+
+          {/* Appointment details card */}
+          {result?.appointment && (
+            <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <Text style={[styles.scanDetailLabel, { color: colors.mutedForeground }]}>تفاصيل الموعد</Text>
+              <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+              <View style={styles.scanDetailRow}>
+                <View style={[styles.confirmedAvatar, { backgroundColor: colors.primarySoft }]}>
+                  <Feather name="user" size={14} color={colors.primary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.scanDetailKey, { color: colors.mutedForeground }]}>المريض</Text>
+                  <Text style={[styles.scanDetailValue, { color: colors.foreground }]}>
+                    {result.appointment.patient_name ?? "غير محدد"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.scanDetailRow}>
+                <View style={[styles.confirmedAvatar, { backgroundColor: colors.accents.green.bg }]}>
+                  <Feather name="activity" size={14} color={colors.success} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.scanDetailKey, { color: colors.mutedForeground }]}>الطبيب</Text>
+                  <Text style={[styles.scanDetailValue, { color: colors.foreground }]}>
+                    {(result.appointment as any).doctor?.name_ar ?? "—"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.scanDetailRow}>
+                <View style={[styles.confirmedAvatar, { backgroundColor: colors.primarySoft }]}>
+                  <Feather name="calendar" size={14} color={colors.primary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.scanDetailKey, { color: colors.mutedForeground }]}>التاريخ والوقت</Text>
+                  <Text style={[styles.scanDetailValue, { color: colors.foreground }]}>
+                    {result.appointment.appointment_date} · {result.appointment.appointment_time}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.scanDetailRow}>
+                <View style={[styles.confirmedAvatar, { backgroundColor: colors.primarySoft }]}>
+                  <Feather name="hash" size={14} color={colors.primary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.scanDetailKey, { color: colors.mutedForeground }]}>رقم التذكرة</Text>
+                  <Text style={[styles.scanDetailValue, { color: colors.foreground, writingDirection: "ltr" }]}>
+                    #{String(result.appointment.id).slice(0, 8).toUpperCase()}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
+
+          <Pressable
+            onPress={reset}
+            style={[styles.primaryBtn, { backgroundColor: colors.primary, justifyContent: "center" }]}
+          >
+            <Feather name="refresh-cw" size={16} color={colors.primaryForeground} />
+            <Text style={{ color: colors.primaryForeground, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 14 }}>
+              مسح تذكرة أخرى
+            </Text>
+          </Pressable>
+        </ScrollView>
+      )}
+    </View>
+  );
+}
+
 function StatusPill({ status }: { status: Appointment["status"] }) {
   const colors = useColors();
   const map = {
@@ -2635,5 +2864,149 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 14,
     borderWidth: 1,
+  },
+
+  // Scanner tab
+  scanPermBox: {
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 28,
+    alignItems: "center",
+    gap: 12,
+    maxWidth: 340,
+    width: "100%",
+  },
+  scanPermTitle: {
+    fontSize: 18,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    textAlign: "center",
+  },
+  scanPermSub: {
+    fontSize: 13,
+    fontFamily: "IBMPlexSansArabic_400Regular",
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  scanCameraWrap: {
+    flex: 1,
+    overflow: "hidden",
+    position: "relative",
+  },
+  scanCamera: {
+    flex: 1,
+  },
+  scanOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    flexDirection: "column",
+  },
+  scanDimTop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  scanMiddleRow: {
+    flexDirection: "row",
+    height: 240,
+  },
+  scanDimSide: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  scanFrame: {
+    width: 240,
+    height: 240,
+    position: "relative",
+  },
+  scanCorner: {
+    position: "absolute",
+    width: 28,
+    height: 28,
+    borderWidth: 3,
+  },
+  scanCornerTL: {
+    top: 0,
+    left: 0,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+    borderTopLeftRadius: 6,
+  },
+  scanCornerTR: {
+    top: 0,
+    right: 0,
+    borderLeftWidth: 0,
+    borderBottomWidth: 0,
+    borderTopRightRadius: 6,
+  },
+  scanCornerBL: {
+    bottom: 0,
+    left: 0,
+    borderRightWidth: 0,
+    borderTopWidth: 0,
+    borderBottomLeftRadius: 6,
+  },
+  scanCornerBR: {
+    bottom: 0,
+    right: 0,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderBottomRightRadius: 6,
+  },
+  scanDimBottom: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 16,
+  },
+  scanHint: {
+    color: "#ffffff",
+    fontFamily: "IBMPlexSansArabic_400Regular",
+    fontSize: 13,
+    textAlign: "center",
+    paddingHorizontal: 20,
+  },
+  scanLoadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scanResultCard: {
+    borderRadius: 20,
+    borderWidth: 1.5,
+    padding: 24,
+    alignItems: "center",
+    gap: 10,
+  },
+  scanResultTitle: {
+    fontSize: 20,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    textAlign: "center",
+  },
+  scanResultSub: {
+    fontSize: 13,
+    fontFamily: "IBMPlexSansArabic_400Regular",
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  scanDetailLabel: {
+    fontSize: 12,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    textAlign: "right",
+    marginBottom: 2,
+  },
+  scanDetailRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 6,
+  },
+  scanDetailKey: {
+    fontSize: 11,
+    fontFamily: "IBMPlexSansArabic_400Regular",
+    textAlign: "right",
+  },
+  scanDetailValue: {
+    fontSize: 14,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    textAlign: "right",
   },
 });

@@ -58,6 +58,7 @@
   "dependencies": {
     "@expo-google-fonts/ibm-plex-sans-arabic": "^0.4.2",
     "@supabase/supabase-js": "^2.104.1",
+    "expo-camera": "^55.0.16",
     "expo-clipboard": "~8.0.8",
     "expo-notifications": "^0.32.17",
     "react-native-qrcode-svg": "^6.3.21",
