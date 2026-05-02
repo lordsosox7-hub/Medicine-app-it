@@ -24,6 +24,10 @@ args = "Start application"
 task = "workflow.run"
 args = "API Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Doctor Admin App"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -47,6 +51,18 @@ outputType = "console"
 task = "shell.exec"
 args = "PORT=8080 pnpm --filter @workspace/api-server run dev"
 waitForPort = 8080
+
+[[workflows.workflow]]
+name = "Doctor Admin App"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=3002 pnpm --filter @workspace/doctor-admin-app run dev"
+waitForPort = 3002
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
@@ -91,6 +107,10 @@ externalPort = 3002
 [[ports]]
 localPort = 25495
 externalPort = 5173
+
+[[ports]]
+localPort = 3002
+externalPort = 3002
 
 [userenv]
 
