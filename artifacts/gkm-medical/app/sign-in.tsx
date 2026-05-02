@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { GradientButton } from "@/components/GradientButton";
 import { supabase } from "@/lib/supabase";
-import { isOnboarded } from "@/lib/userId";
+import { resolveOnboardingStatus } from "@/lib/userId";
 import { RTLChevron } from "@/components/RTLChevron";
 
 export default function SignInScreen() {
@@ -30,7 +30,7 @@ export default function SignInScreen() {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
       if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
-        const onboarded = await isOnboarded();
+        const onboarded = await resolveOnboardingStatus();
         router.replace(onboarded ? "/(tabs)" : "/onboarding");
       }
     });

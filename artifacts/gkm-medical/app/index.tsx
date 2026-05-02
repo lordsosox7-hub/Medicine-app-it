@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { StyleSheet, Text, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
-import { isOnboarded } from "@/lib/userId";
+import { resolveOnboardingStatus } from "@/lib/userId";
 import { supabase } from "@/lib/supabase";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -32,7 +32,7 @@ export default function GateScreen() {
         router.replace("/welcome");
         return;
       }
-      const onboarded = await isOnboarded();
+      const onboarded = await resolveOnboardingStatus();
       router.replace(onboarded ? "/(tabs)" : "/onboarding");
     };
 

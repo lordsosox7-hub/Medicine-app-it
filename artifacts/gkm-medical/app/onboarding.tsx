@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
-import { markOnboarded } from "@/lib/userId";
+import { markOnboarded, setUserName } from "@/lib/userId";
 import { GradientButton } from "@/components/GradientButton";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -83,6 +83,7 @@ export default function OnboardingScreen() {
           gender,
           blood_type: bloodType,
         });
+        await setUserName(fullName.trim());
         await markOnboarded();
         router.replace("/(tabs)");
       } catch {

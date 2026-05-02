@@ -62,6 +62,29 @@ export async function markOnboarded(): Promise<void> {
   await AsyncStorage.setItem(ONBOARDING_KEY, "true");
 }
 
+export async function resolveOnboardingStatus(): Promise<boolean> {
+  const local = await isOnboarded();
+  if (local) return true;
+
+  const { data } = await supabase.auth.getSession();
+  const userId = data.session?.user?.id;
+  if (!userId) return false;
+
+  const { data: file } = await supabase
+    .from("medical_files")
+    .select("full_name_ar")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (file?.full_name_ar) {
+    await markOnboarded();
+    await AsyncStorage.setItem(NAME_KEY, file.full_name_ar);
+    return true;
+  }
+
+  return false;
+}
+
 export async function isAuthenticated(): Promise<boolean> {
   const { data } = await supabase.auth.getSession();
   return !!data.session;
