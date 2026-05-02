@@ -80,6 +80,41 @@ export function useAllAppointments() {
   });
 }
 
+export type AppointmentWithPatient = Appointment & {
+  patient_name: string | null;
+};
+
+export function useAllAppointmentsWithPatients() {
+  return useQuery({
+    queryKey: ["appointments", "all", "with_patients"],
+    queryFn: async (): Promise<AppointmentWithPatient[]> => {
+      const [apptRes, filesRes] = await Promise.all([
+        supabase
+          .from("appointments")
+          .select("*, doctor:doctors(*)")
+          .order("appointment_date", { ascending: false }),
+        supabase
+          .from("medical_files")
+          .select("user_id, full_name_ar"),
+      ]);
+      if (apptRes.error) throw apptRes.error;
+      if (filesRes.error) throw filesRes.error;
+
+      const nameMap = new Map<string, string>();
+      for (const f of filesRes.data ?? []) {
+        if (f.user_id && (f as any).full_name_ar) {
+          nameMap.set(f.user_id as string, (f as any).full_name_ar as string);
+        }
+      }
+
+      return (apptRes.data ?? []).map((a) => ({
+        ...(a as Appointment),
+        patient_name: nameMap.get((a as any).user_id as string) ?? null,
+      }));
+    },
+  });
+}
+
 export function useCreateAppointment() {
   const qc = useQueryClient();
   return useMutation({

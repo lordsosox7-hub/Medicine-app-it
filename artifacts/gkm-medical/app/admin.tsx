@@ -17,6 +17,7 @@ import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import {
   useAllAppointments,
+  useAllAppointmentsWithPatients,
   useDoctors,
   useMessages,
   useRealtimeMessages,
@@ -30,6 +31,7 @@ import {
   useAllConversations,
   type AdminUser,
   type NewDoctorInput,
+  type AppointmentWithPatient,
 } from "@/hooks/useGkmData";
 import type { Appointment, Payment, Doctor, Conversation } from "@/lib/supabase";
 import {
@@ -1313,8 +1315,13 @@ type ApptFilter = "all" | "upcoming" | "completed" | "cancelled";
 
 function AppointmentsTab() {
   const colors = useColors();
-  const { data: appointments, isLoading } = useAllAppointments();
+  const { data: appointments, isLoading } = useAllAppointmentsWithPatients();
   const [filter, setFilter] = useState<ApptFilter>("all");
+
+  const confirmed = useMemo(
+    () => (appointments ?? []).filter((a) => a.status === "upcoming"),
+    [appointments],
+  );
 
   const filtered = useMemo(() => {
     const list = appointments ?? [];
@@ -1348,7 +1355,37 @@ function AppointmentsTab() {
   }
 
   return (
-    <View style={styles.flex}>
+    <ScrollView style={styles.flex} showsVerticalScrollIndicator={false}>
+      {/* ── Confirmed appointments section ── */}
+      <View style={[styles.confirmedSection, { backgroundColor: colors.primarySoft }]}>
+        <View style={styles.confirmedHeader}>
+          <Feather name="check-circle" size={18} color={colors.primary} />
+          <Text style={[styles.confirmedTitle, { color: colors.primary }]}>
+            المواعيد المؤكدة
+          </Text>
+          <View style={[styles.filterBadge, { backgroundColor: colors.primary }]}>
+            <Text style={{ color: colors.primaryForeground, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 11 }}>
+              {confirmed.length}
+            </Text>
+          </View>
+        </View>
+
+        {confirmed.length === 0 ? (
+          <View style={styles.confirmedEmpty}>
+            <Text style={[styles.confirmedEmptyText, { color: colors.mutedForeground }]}>
+              لا توجد مواعيد مؤكدة حالياً
+            </Text>
+          </View>
+        ) : (
+          <View style={{ gap: 8 }}>
+            {confirmed.map((item) => (
+              <ConfirmedAppointmentRow key={item.id} item={item} />
+            ))}
+          </View>
+        )}
+      </View>
+
+      {/* ── Filter chips ── */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -1410,12 +1447,10 @@ function AppointmentsTab() {
           </Text>
         </View>
       ) : (
-        <FlatList
-          data={filtered}
-          keyExtractor={(a) => a.id}
-          contentContainerStyle={{ padding: 16, gap: 12 }}
-          renderItem={({ item }) => (
+        <View style={{ padding: 16, gap: 12 }}>
+          {filtered.map((item) => (
             <View
+              key={item.id}
               style={[
                 styles.card,
                 { backgroundColor: colors.card, borderColor: colors.border },
@@ -1440,14 +1475,11 @@ function AppointmentsTab() {
               </View>
               <View style={[styles.divider, { backgroundColor: colors.border }]} />
               <View style={styles.metaRow}>
-                <MetaChip
-                  icon="calendar"
-                  text={item.appointment_date}
-                />
+                <MetaChip icon="calendar" text={item.appointment_date} />
                 <MetaChip icon="clock" text={item.appointment_time} />
                 <MetaChip
                   icon="user"
-                  text={`المريض ${item.user_id.slice(0, 8)}`}
+                  text={item.patient_name ?? item.user_id.slice(0, 8)}
                 />
                 <MetaChip
                   icon="dollar-sign"
@@ -1455,9 +1487,60 @@ function AppointmentsTab() {
                 />
               </View>
             </View>
-          )}
-        />
+          ))}
+        </View>
       )}
+    </ScrollView>
+  );
+}
+
+function ConfirmedAppointmentRow({ item }: { item: AppointmentWithPatient }) {
+  const colors = useColors();
+  return (
+    <View
+      style={[
+        styles.confirmedRow,
+        { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
+    >
+      {/* Patient */}
+      <View style={styles.confirmedParty}>
+        <View style={[styles.confirmedAvatar, { backgroundColor: colors.primarySoft }]}>
+          <Feather name="user" size={14} color={colors.primary} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.confirmedLabel, { color: colors.mutedForeground }]}>المريض</Text>
+          <Text style={[styles.confirmedName, { color: colors.foreground }]} numberOfLines={1}>
+            {item.patient_name ?? "غير محدد"}
+          </Text>
+        </View>
+      </View>
+
+      {/* Arrow */}
+      <Feather name="arrow-left" size={14} color={colors.mutedForeground} />
+
+      {/* Doctor */}
+      <View style={styles.confirmedParty}>
+        <View style={[styles.confirmedAvatar, { backgroundColor: colors.accents.green.bg }]}>
+          <Feather name="activity" size={14} color={colors.success} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.confirmedLabel, { color: colors.mutedForeground }]}>الطبيب</Text>
+          <Text style={[styles.confirmedName, { color: colors.foreground }]} numberOfLines={1}>
+            {item.doctor?.name_ar ?? "—"}
+          </Text>
+        </View>
+      </View>
+
+      {/* Date/time */}
+      <View style={[styles.confirmedDateBadge, { backgroundColor: colors.primarySoft }]}>
+        <Text style={[styles.confirmedDateText, { color: colors.primary }]}>
+          {item.appointment_date}
+        </Text>
+        <Text style={[styles.confirmedTimeText, { color: colors.primary }]}>
+          {item.appointment_time}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -2350,6 +2433,81 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  confirmedSection: {
+    margin: 16,
+    borderRadius: 18,
+    padding: 16,
+    gap: 12,
+  },
+  confirmedHeader: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+  },
+  confirmedTitle: {
+    fontSize: 15,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    flex: 1,
+    textAlign: "right",
+  },
+  confirmedEmpty: {
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  confirmedEmptyText: {
+    fontSize: 13,
+    fontFamily: "IBMPlexSansArabic_500Medium",
+  },
+  confirmedRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 12,
+  },
+  confirmedParty: {
+    flex: 1,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+  },
+  confirmedAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  confirmedLabel: {
+    fontSize: 10,
+    fontFamily: "IBMPlexSansArabic_500Medium",
+    textAlign: "right",
+  },
+  confirmedName: {
+    fontSize: 13,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    textAlign: "right",
+  },
+  confirmedDateBadge: {
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    alignItems: "center",
+    minWidth: 64,
+  },
+  confirmedDateText: {
+    fontSize: 11,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    textAlign: "center",
+  },
+  confirmedTimeText: {
+    fontSize: 10,
+    fontFamily: "IBMPlexSansArabic_500Medium",
+    textAlign: "center",
+    opacity: 0.8,
   },
 
   section: {
