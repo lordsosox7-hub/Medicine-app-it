@@ -56,6 +56,8 @@ function RootLayoutNav() {
       <Stack.Screen name="register" options={{ headerShown: false }} />
       <Stack.Screen name="admin" options={{ headerShown: true, title: "لوحة التحكم" }} />
       <Stack.Screen name="admin-login" options={{ headerShown: false }} />
+      <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
+      <Stack.Screen name="reset-password" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="doctor/[id]" options={{ headerShown: false }} />

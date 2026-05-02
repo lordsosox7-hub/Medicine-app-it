@@ -165,8 +165,20 @@ export default function SignInScreen() {
             />
 
             <Pressable
-              onPress={() => router.replace("/register")}
+              onPress={() => router.push("/forgot-password")}
               style={styles.altLink}
+            >
+              <Text style={[styles.altText, { color: colors.mutedForeground }]}>
+                نسيت كلمة المرور؟{" "}
+                <Text style={{ color: colors.primary, fontFamily: "IBMPlexSansArabic_700Bold" }}>
+                  استعادة الحساب
+                </Text>
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => router.replace("/register")}
+              style={[styles.altLink, { paddingTop: 0 }]}
             >
               <Text style={[styles.altText, { color: colors.mutedForeground }]}>
                 ليس لديك حساب؟{" "}

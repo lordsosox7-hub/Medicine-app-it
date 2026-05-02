@@ -36,9 +36,18 @@ export default function GateScreen() {
       router.replace(onboarded ? "/(tabs)" : "/onboarding");
     };
 
-    // Listen for auth state — this catches email-confirmation redirects
-    // where the token arrives in the URL hash after the page loads.
+    // Listen for auth state — catches email-confirmation and password-recovery
+    // redirects where the token arrives in the URL hash after the page loads.
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        // User clicked a password-reset link — send them straight to the
+        // reset-password screen (they already have a temporary session).
+        if (routed) return;
+        routed = true;
+        clearTimeout(fallbackTimer);
+        router.replace("/reset-password");
+        return;
+      }
       if (event === "INITIAL_SESSION") {
         if (session) {
           navigate(true);
