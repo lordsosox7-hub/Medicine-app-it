@@ -160,19 +160,21 @@ export const ADVICES: Advice[] = [
 ];
 
 /**
- * Returns the index of the advice for the given date based on London time.
- * Rotates through ADVICES.length items deterministically by day-of-year.
+ * Returns the index of the advice for the given date.
+ * Uses a simple UTC day-of-year calculation that works on all JS engines
+ * (Hermes included), falling back to date.getDate() if anything goes wrong.
  */
 export function getAdviceIndexForDate(date: Date = new Date()): number {
-  const londonNow = new Date(
-    date.toLocaleString("en-US", { timeZone: "Europe/London" }),
-  );
-  const start = new Date(londonNow.getFullYear(), 0, 0);
-  const diff = londonNow.getTime() - start.getTime();
-  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
-  return ((dayOfYear - 1) % ADVICES.length + ADVICES.length) % ADVICES.length;
+  try {
+    const y = date.getUTCFullYear();
+    const start = Date.UTC(y, 0, 1);
+    const dayOfYear = Math.floor((date.getTime() - start) / (1000 * 60 * 60 * 24));
+    const idx = ((dayOfYear) % ADVICES.length + ADVICES.length) % ADVICES.length;
+    if (Number.isFinite(idx)) return idx;
+  } catch {}
+  return date.getDate() % ADVICES.length;
 }
 
 export function getTodayAdvice(date: Date = new Date()): Advice {
-  return ADVICES[getAdviceIndexForDate(date)];
+  return ADVICES[getAdviceIndexForDate(date)] ?? ADVICES[0];
 }
