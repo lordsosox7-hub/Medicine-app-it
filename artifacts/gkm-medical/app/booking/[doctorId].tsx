@@ -42,17 +42,24 @@ export default function BookingScreen() {
 
   // Generate next 7 days
   const today = new Date();
-  const days = Array.from({ length: 7 }).map((_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    return {
-      date: d,
-      dateString: d.toISOString().split('T')[0],
-      dayName: d.toLocaleDateString('ar', { weekday: 'short' }),
-      dayNumber: d.getDate(),
-      month: d.toLocaleDateString('ar', { month: 'short' }),
-    };
-  });
+  const days = (() => {
+    const result = [];
+    let offset = 0;
+    while (result.length < 7) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + offset);
+      offset++;
+      if (d.getDay() === 5) continue; // skip Fridays
+      result.push({
+        date: d,
+        dateString: d.toISOString().split('T')[0],
+        dayName: d.toLocaleDateString('ar', { weekday: 'short' }),
+        dayNumber: d.getDate(),
+        month: d.toLocaleDateString('ar', { month: 'short' }),
+      });
+    }
+    return result;
+  })();
 
   const [selectedDate, setSelectedDate] = useState(days[0].dateString);
   const [selectedTime, setSelectedTime] = useState(() => firstAvailableSlot(days[0].dateString));
