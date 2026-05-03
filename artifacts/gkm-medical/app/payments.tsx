@@ -1,189 +1,229 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, Platform, Alert } from "react-native";
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Platform,
+} from "react-native";
+import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
-import { getPaymentMethods, setPaymentMethods, PaymentMethod } from "@/lib/preferences";
+import { useMyPayments } from "@/hooks/useGkmData";
 
-const TYPE_LABELS: Record<PaymentMethod["type"], string> = {
+const METHOD_LABEL: Record<string, string> = {
+  my_cashy: "ماي كاشي",
+  cash: "نقداً",
   visa: "Visa",
   mastercard: "Mastercard",
   mada: "مدى",
   applepay: "Apple Pay",
 };
 
-const TYPE_COLORS: Record<PaymentMethod["type"], string> = {
-  visa: "#1a1f71",
-  mastercard: "#eb001b",
-  mada: "#84bd00",
-  applepay: "#000",
+const METHOD_ICON: Record<string, "smartphone" | "dollar-sign" | "credit-card"> = {
+  my_cashy: "smartphone",
+  cash: "dollar-sign",
 };
 
+const STATUS_CONFIG = {
+  confirmed: { label: "مؤكد", bg: "#dcfce7", fg: "#16a34a" },
+  pending:   { label: "قيد المراجعة", bg: "#fef3c7", fg: "#d97706" },
+  rejected:  { label: "مرفوض", bg: "#fee2e2", fg: "#dc2626" },
+} as const;
+
 export default function PaymentsScreen() {
+  const router = useRouter();
   const colors = useColors();
-  const [methods, setMethods] = useState<PaymentMethod[]>([]);
-  const [showAdd, setShowAdd] = useState(false);
-  const [newType, setNewType] = useState<PaymentMethod["type"]>("visa");
-  const [newNumber, setNewNumber] = useState("");
-  const [newHolder, setNewHolder] = useState("");
+  const insets = useSafeAreaInsets();
+  const { data: payments, isLoading } = useMyPayments();
 
-  useEffect(() => {
-    getPaymentMethods().then(setMethods);
-  }, []);
+  const headerTop = Platform.OS === "web" ? 16 : insets.top + 8;
 
-  const onAdd = async () => {
-    if (newNumber.length < 4 || !newHolder.trim()) {
-      const msg = "الرجاء إدخال رقم البطاقة واسم حاملها";
-      if (Platform.OS === "web") window.alert(msg);
-      else Alert.alert("تنبيه", msg);
-      return;
-    }
-    const m: PaymentMethod = {
-      id: Date.now().toString(),
-      type: newType,
-      last4: newNumber.slice(-4),
-      holderName: newHolder.trim(),
-    };
-    const next = [...methods, m];
-    setMethods(next);
-    await setPaymentMethods(next);
-    setNewNumber("");
-    setNewHolder("");
-    setShowAdd(false);
-  };
-
-  const onRemove = async (id: string) => {
-    const doRemove = async () => {
-      const next = methods.filter((m) => m.id !== id);
-      setMethods(next);
-      await setPaymentMethods(next);
-    };
-    if (Platform.OS === "web") {
-      if (window.confirm("حذف وسيلة الدفع؟")) await doRemove();
-    } else {
-      Alert.alert("حذف", "هل تريد حذف وسيلة الدفع؟", [
-        { text: "إلغاء", style: "cancel" },
-        { text: "حذف", style: "destructive", onPress: doRemove },
-      ]);
-    }
-  };
+  const confirmedPayments = payments?.filter((p) => p.status === "confirmed") ?? [];
+  const totalSpent = confirmedPayments.reduce((sum, p) => sum + (p.amount ?? 0), 0);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
-        {methods.length === 0 ? (
-          <View style={styles.empty}>
-            <View style={[styles.emptyIcon, { backgroundColor: colors.primarySoft }]}>
-              <Feather name="credit-card" size={32} color={colors.primary} />
-            </View>
-            <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
-              لا توجد وسائل دفع
-            </Text>
-            <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
-              أضف بطاقتك الائتمانية لتسهيل عملية الدفع
-            </Text>
-          </View>
-        ) : (
-          methods.map((m) => (
-            <View
-              key={m.id}
-              style={[styles.cardItem, { backgroundColor: colors.card, borderColor: colors.border }]}
-            >
-              <View style={[styles.brand, { backgroundColor: TYPE_COLORS[m.type] }]}>
-                <Text style={styles.brandText}>{TYPE_LABELS[m.type]}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.cardNumber, { color: colors.foreground }]}>
-                  •••• •••• •••• {m.last4}
-                </Text>
-                <Text style={[styles.cardHolder, { color: colors.mutedForeground }]}>{m.holderName}</Text>
-              </View>
-              <TouchableOpacity onPress={() => onRemove(m.id)} hitSlop={10}>
-                <Feather name="trash-2" size={18} color={colors.destructive} />
-              </TouchableOpacity>
-            </View>
-          ))
-        )}
-
+      {/* Top bar */}
+      <View style={[styles.topBar, { paddingTop: headerTop }]}>
         <TouchableOpacity
-          style={[styles.addBtn, { backgroundColor: colors.primary }]}
-          activeOpacity={0.85}
-          onPress={() => setShowAdd(true)}
+          onPress={() => router.back()}
+          style={[styles.backBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
+          activeOpacity={0.7}
         >
-          <Feather name="plus" size={18} color={colors.primaryForeground} />
-          <Text style={[styles.addText, { color: colors.primaryForeground }]}>إضافة وسيلة دفع</Text>
+          <Feather name="arrow-right" size={20} color={colors.foreground} />
         </TouchableOpacity>
-      </ScrollView>
+        <Text style={[styles.topTitle, { color: colors.foreground }]}>سجل المدفوعات</Text>
+        <View style={{ width: 40 }} />
+      </View>
 
-      <Modal visible={showAdd} animationType="slide" transparent onRequestClose={() => setShowAdd(false)}>
-        <View style={styles.modalBg}>
-          <View style={[styles.modalCard, { backgroundColor: colors.background }]}>
-            <Text style={[styles.modalTitle, { color: colors.foreground }]}>إضافة وسيلة دفع</Text>
-
-            <Text style={[styles.fieldLabel, { color: colors.foreground }]}>نوع البطاقة</Text>
-            <View style={styles.typeRow}>
-              {(Object.keys(TYPE_LABELS) as PaymentMethod["type"][]).map((t) => (
-                <TouchableOpacity
-                  key={t}
-                  onPress={() => setNewType(t)}
-                  style={[
-                    styles.typeChip,
-                    {
-                      backgroundColor: newType === t ? colors.primary : colors.muted,
-                    },
-                  ]}
-                >
-                  <Text style={{ color: newType === t ? colors.primaryForeground : colors.foreground, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 12 }}>
-                    {TYPE_LABELS[t]}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <Text style={[styles.fieldLabel, { color: colors.foreground }]}>رقم البطاقة</Text>
-            <TextInput
-              value={newNumber}
-              onChangeText={(v) => setNewNumber(v.replace(/\D/g, "").slice(0, 16))}
-              placeholder="0000 0000 0000 0000"
-              placeholderTextColor={colors.mutedForeground}
-              keyboardType="number-pad"
-              style={[styles.modalInput, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
-            />
-
-            <Text style={[styles.fieldLabel, { color: colors.foreground }]}>اسم حامل البطاقة</Text>
-            <TextInput
-              value={newHolder}
-              onChangeText={setNewHolder}
-              placeholder="الاسم كما هو على البطاقة"
-              placeholderTextColor={colors.mutedForeground}
-              style={[styles.modalInput, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
-            />
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={[styles.modalBtn, { backgroundColor: colors.muted }]}
-                onPress={() => setShowAdd(false)}
-              >
-                <Text style={[styles.modalBtnText, { color: colors.foreground }]}>إلغاء</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalBtn, { backgroundColor: colors.primary }]}
-                onPress={onAdd}
-              >
-                <Text style={[styles.modalBtnText, { color: colors.primaryForeground }]}>حفظ</Text>
-              </TouchableOpacity>
+      {isLoading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : !payments || payments.length === 0 ? (
+        <View style={styles.center}>
+          <View style={[styles.emptyIcon, { backgroundColor: colors.primarySoft }]}>
+            <Feather name="credit-card" size={32} color={colors.primary} />
+          </View>
+          <Text style={[styles.emptyTitle, { color: colors.foreground }]}>لا توجد مدفوعات</Text>
+          <Text style={[styles.emptyBody, { color: colors.mutedForeground }]}>
+            ستظهر هنا جميع عمليات الدفع المرتبطة بمواعيدك
+          </Text>
+        </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 40, gap: 16 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Summary card */}
+          <View style={[styles.summaryCard, { backgroundColor: colors.primary }]}>
+            <View style={styles.summaryRow}>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>{Math.round(totalSpent)} ج.س</Text>
+                <Text style={styles.summaryLabel}>إجمالي المدفوع</Text>
+              </View>
+              <View style={[styles.summaryDivider]} />
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>{confirmedPayments.length}</Text>
+                <Text style={styles.summaryLabel}>معاملة مؤكدة</Text>
+              </View>
+              <View style={[styles.summaryDivider]} />
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>{payments.length}</Text>
+                <Text style={styles.summaryLabel}>إجمالي المعاملات</Text>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
+
+          {/* Transactions list */}
+          {payments.map((p) => {
+            const statusCfg = STATUS_CONFIG[p.status] ?? STATUS_CONFIG.pending;
+            const methodLabel = METHOD_LABEL[p.method] ?? p.method;
+            const methodIcon = METHOD_ICON[p.method] ?? "credit-card";
+            const dateObj = new Date(p.created_at);
+            const dateLabel = dateObj.toLocaleDateString("ar-SA", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            });
+            const timeLabel = dateObj.toLocaleTimeString("ar-SA", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+            return (
+              <View
+                key={p.id}
+                style={[styles.txnCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+              >
+                {/* Header row */}
+                <View style={styles.txnHeader}>
+                  <View style={[styles.statusPill, { backgroundColor: statusCfg.bg }]}>
+                    <Text style={[styles.statusText, { color: statusCfg.fg }]}>{statusCfg.label}</Text>
+                  </View>
+                  <Text style={[styles.txnAmount, { color: colors.foreground }]}>
+                    {Math.round(p.amount)} ج.س
+                  </Text>
+                </View>
+
+                {/* Divider */}
+                <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+                {/* Doctor info */}
+                {p.doctor && (
+                  <View style={styles.txnRow}>
+                    <View style={[styles.txnIconWrap, { backgroundColor: colors.primarySoft }]}>
+                      <Feather name="user" size={14} color={colors.primary} />
+                    </View>
+                    <View style={{ flex: 1, alignItems: "flex-end" }}>
+                      <Text style={[styles.txnDoctorName, { color: colors.foreground }]}>
+                        {p.doctor.name_ar}
+                      </Text>
+                      <Text style={[styles.txnDoctorSpec, { color: colors.mutedForeground }]}>
+                        {p.doctor.specialty_ar}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
+                {/* Appointment date / time */}
+                {p.appointment && (
+                  <View style={styles.txnRow}>
+                    <View style={[styles.txnIconWrap, { backgroundColor: colors.primarySoft }]}>
+                      <Feather name="calendar" size={14} color={colors.primary} />
+                    </View>
+                    <Text style={[styles.txnMeta, { color: colors.mutedForeground }]}>
+                      {new Date(p.appointment.appointment_date).toLocaleDateString("ar-SA", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                      })}{" "}
+                      — {p.appointment.appointment_time}
+                    </Text>
+                  </View>
+                )}
+
+                {/* Method + date row */}
+                <View style={styles.txnFooter}>
+                  <Text style={[styles.txnFooterText, { color: colors.mutedForeground }]}>
+                    {dateLabel} • {timeLabel}
+                  </Text>
+                  <View style={[styles.methodChip, { backgroundColor: colors.muted }]}>
+                    <Feather name={methodIcon} size={12} color={colors.mutedForeground} />
+                    <Text style={[styles.methodText, { color: colors.mutedForeground }]}>
+                      {methodLabel}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Rejection reason */}
+                {p.status === "rejected" && p.rejection_reason && (
+                  <View style={[styles.rejectionBox, { backgroundColor: "#fee2e2" }]}>
+                    <Feather name="alert-circle" size={13} color="#dc2626" />
+                    <Text style={styles.rejectionText}>{p.rejection_reason}</Text>
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </ScrollView>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  empty: {
+  center: {
+    flex: 1,
     alignItems: "center",
-    paddingVertical: 50,
+    justifyContent: "center",
+    padding: 32,
+    gap: 12,
+  },
+  topBar: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  topTitle: {
+    fontSize: 18,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    textAlign: "center",
   },
   emptyIcon: {
     width: 80,
@@ -191,121 +231,145 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 16,
     fontFamily: "IBMPlexSansArabic_700Bold",
-    marginBottom: 6,
+    marginTop: 4,
   },
-  emptyText: {
+  emptyBody: {
     fontSize: 13,
     fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "center",
+    lineHeight: 20,
   },
-  cardItem: {
-    flexDirection: "row",
+  summaryCard: {
+    borderRadius: 20,
+    padding: 20,
+  },
+  summaryRow: {
+    flexDirection: "row-reverse",
     alignItems: "center",
-    padding: 14,
+    justifyContent: "space-around",
+  },
+  summaryItem: {
+    alignItems: "center",
+    gap: 4,
+  },
+  summaryValue: {
+    fontSize: 18,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    color: "#ffffff",
+  },
+  summaryLabel: {
+    fontSize: 11,
+    fontFamily: "IBMPlexSansArabic_500Medium",
+    color: "rgba(255,255,255,0.75)",
+  },
+  summaryDivider: {
+    width: 1,
+    height: 36,
+    backgroundColor: "rgba(255,255,255,0.25)",
+  },
+  txnCard: {
     borderRadius: 16,
     borderWidth: 1,
-    marginBottom: 12,
-    gap: 12,
+    overflow: "hidden",
   },
-  brand: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
+  txnHeader: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
-  brandText: {
-    color: "#fff",
-    fontSize: 11,
+  txnAmount: {
+    fontSize: 20,
     fontFamily: "IBMPlexSansArabic_700Bold",
   },
-  cardNumber: {
-    fontSize: 15,
+  statusPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
+  statusText: {
+    fontSize: 12,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+  },
+  divider: {
+    height: 1,
+    marginHorizontal: 16,
+  },
+  txnRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+  },
+  txnIconWrap: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  txnDoctorName: {
+    fontSize: 14,
     fontFamily: "IBMPlexSansArabic_700Bold",
     textAlign: "right",
-    letterSpacing: 1,
   },
-  cardHolder: {
+  txnDoctorSpec: {
     fontSize: 12,
     fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
-    marginTop: 2,
+    marginTop: 1,
   },
-  addBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    height: 52,
-    borderRadius: 14,
-    gap: 8,
-    marginTop: 20,
-  },
-  addText: {
-    fontSize: 15,
-    fontFamily: "IBMPlexSansArabic_700Bold",
-  },
-  modalBg: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end",
-  },
-  modalCard: {
-    padding: 20,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingBottom: 32,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontFamily: "IBMPlexSansArabic_700Bold",
-    textAlign: "right",
-    marginBottom: 20,
-  },
-  fieldLabel: {
+  txnMeta: {
     fontSize: 13,
-    fontFamily: "IBMPlexSansArabic_700Bold",
-    textAlign: "right",
-    marginBottom: 6,
-    marginTop: 4,
-  },
-  modalInput: {
-    height: 48,
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    fontSize: 14,
     fontFamily: "IBMPlexSansArabic_500Medium",
     textAlign: "right",
-    marginBottom: 12,
+    flex: 1,
   },
-  typeRow: {
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 12,
-    flexWrap: "wrap",
+  txnFooter: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 14,
   },
-  typeChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+  txnFooterText: {
+    fontSize: 12,
+    fontFamily: "IBMPlexSansArabic_500Medium",
+  },
+  methodChip: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 20,
   },
-  modalActions: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 12,
-  },
-  modalBtn: {
-    flex: 1,
-    height: 48,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modalBtnText: {
-    fontSize: 14,
+  methodText: {
+    fontSize: 12,
     fontFamily: "IBMPlexSansArabic_700Bold",
+  },
+  rejectionBox: {
+    flexDirection: "row-reverse",
+    alignItems: "flex-start",
+    gap: 6,
+    marginHorizontal: 16,
+    marginBottom: 14,
+    padding: 10,
+    borderRadius: 10,
+  },
+  rejectionText: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: "IBMPlexSansArabic_500Medium",
+    color: "#dc2626",
+    textAlign: "right",
+    writingDirection: "rtl",
   },
 });

@@ -109,7 +109,7 @@ export default function MoreScreen() {
         >
           <MenuRow icon="user" label="الملف الشخصي" onPress={() => router.push("/profile")} />
           <MenuRow icon="heart" label="المفضلة" onPress={() => router.push("/favorites")} />
-          <MenuRow icon="credit-card" label="المدفوعات" onPress={() => router.push("/payments")} />
+          <MenuRow icon="credit-card" label="سجل المدفوعات" onPress={() => router.push("/payments")} />
           <MenuRow icon="map-pin" label="العنوان" onPress={() => router.push("/address")} />
         </View>
 

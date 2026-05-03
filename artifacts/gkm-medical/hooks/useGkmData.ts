@@ -662,6 +662,25 @@ export function useToggleFavorite() {
 
 // ---------- Payments (manual transfer verification) ----------
 
+export function useMyPayments() {
+  return useQuery({
+    queryKey: ["my_payments"],
+    queryFn: async () => {
+      const userId = await getUserId();
+      const { data, error } = await supabase
+        .from("payments")
+        .select("*, appointment:appointments(appointment_date, appointment_time, status), doctor:doctors(name_ar, specialty_ar)")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as (Payment & {
+        appointment: { appointment_date: string; appointment_time: string; status: string } | null;
+        doctor: { name_ar: string; specialty_ar: string } | null;
+      })[];
+    },
+  });
+}
+
 export function useCreatePayment() {
   const qc = useQueryClient();
   return useMutation({
