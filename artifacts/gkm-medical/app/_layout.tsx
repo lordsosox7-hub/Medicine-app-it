@@ -75,7 +75,7 @@ function RootLayoutNav() {
       <Stack.Screen name="vitals" options={{ title: "المؤشرات الصحية" }} />
       <Stack.Screen name="favorites" options={{ title: "المفضلة" }} />
       <Stack.Screen name="profile" options={{ title: "الملف الشخصي" }} />
-      <Stack.Screen name="payments" options={{ title: "المدفوعات" }} />
+      <Stack.Screen name="payments" options={{ headerShown: false }} />
       <Stack.Screen name="address" options={{ title: "العنوان" }} />
       <Stack.Screen name="notifications" options={{ title: "الإشعارات" }} />
       <Stack.Screen name="notification-settings" options={{ title: "إعدادات الإشعارات" }} />
