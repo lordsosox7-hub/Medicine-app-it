@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Platform,
-  Alert,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
@@ -37,6 +36,8 @@ export default function TicketScreen() {
   useRealtimePayment(appointmentId ?? undefined);
   const cancelAppointment = useCancelAppointment();
   const cancelWithRefund = useCreateRefundAndCancel();
+  const [cancelMode, setCancelMode] = useState<"idle" | "confirm">("idle");
+  const [cancelResult, setCancelResult] = useState<{ refundAmount: number } | null>(null);
 
   const apt = appointments?.find((a) => a.id === appointmentId);
   const doc = apt?.doctor as any;
@@ -47,67 +48,27 @@ export default function TicketScreen() {
     !isAppointmentPast(apt.appointment_date, apt.appointment_time);
   const refundable = apt ? isRefundWindowOpen(apt.appointment_date, apt.appointment_time) : false;
 
-  const handleCancel = () => {
+  const handleConfirmWithRefund = async () => {
     if (!apt) return;
-    if (refundable) {
-      Alert.alert(
-        "إلغاء الموعد",
-        "يمكنك استرداد 95% من المبلغ المدفوع (يُخصم 5% رسوم استرداد) لأن الموعد بعد أكثر من ساعتين.",
-        [
-          { text: "تراجع", style: "cancel" },
-          {
-            text: "إلغاء مع استرداد (95%)",
-            style: "destructive",
-            onPress: async () => {
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-              cancelAppointmentReminder(apt.id);
-              try {
-                const result = await cancelWithRefund.mutateAsync(apt.id);
-                if (result.hasRefund) {
-                  Alert.alert(
-                    "✅ تم تقديم طلب الاسترداد",
-                    `سيتم استرداد ${Math.round(result.refundAmount)} ج.س خلال 3-5 أيام عمل.`,
-                    [{ text: "حسناً", onPress: () => router.back() }],
-                  );
-                } else {
-                  router.back();
-                }
-              } catch {
-                Alert.alert("خطأ", "تعذّر إلغاء الموعد، يرجى المحاولة مرة أخرى.");
-              }
-            },
-          },
-          {
-            text: "إلغاء بدون استرداد",
-            style: "destructive",
-            onPress: () => {
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-              cancelAppointment.mutate(apt.id);
-              cancelAppointmentReminder(apt.id);
-              router.back();
-            },
-          },
-        ],
-      );
-    } else {
-      Alert.alert(
-        "إلغاء الموعد",
-        "لا يمكن الاسترداد لأن الموعد خلال أقل من ساعتين. هل تريد الإلغاء بدون استرداد؟",
-        [
-          { text: "تراجع", style: "cancel" },
-          {
-            text: "إلغاء بدون استرداد",
-            style: "destructive",
-            onPress: () => {
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-              cancelAppointment.mutate(apt.id);
-              cancelAppointmentReminder(apt.id);
-              router.back();
-            },
-          },
-        ],
-      );
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    cancelAppointmentReminder(apt.id);
+    try {
+      const result = await cancelWithRefund.mutateAsync(apt.id);
+      if (result.hasRefund) {
+        setCancelResult({ refundAmount: result.refundAmount });
+      } else {
+        router.back();
+      }
+    } catch {
+      setCancelMode("idle");
     }
+  };
+
+  const handleConfirmNoRefund = () => {
+    if (!apt) return;
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    cancelAppointment.mutate(apt.id, { onSuccess: () => router.back() });
+    cancelAppointmentReminder(apt.id);
   };
 
   // Derive the strip state from appointment + payment data
@@ -276,65 +237,142 @@ export default function TicketScreen() {
           </View>
         </View>
 
-        {/* Cancel button — only for upcoming appointments */}
+        {/* Cancel / refund section — only for future upcoming appointments */}
         {canCancel && (
-          <View style={{ gap: 10 }}>
-            {refundable ? (
-              <>
-                <View
-                  style={[
-                    styles.refundBanner,
-                    { backgroundColor: colors.accents.green.bg, borderColor: colors.success + "44" },
-                  ]}
-                >
-                  <Feather name="rotate-ccw" size={15} color={colors.success} />
-                  <Text style={[styles.refundBannerText, { color: colors.success }]}>
-                    يمكنك الإلغاء مع استرداد 95% من المبلغ (5% رسوم)
-                  </Text>
-                </View>
+          <View
+            style={[
+              styles.cancelCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            {/* ── Refund success state ── */}
+            {cancelResult ? (
+              <View style={{ gap: 10, alignItems: "center" }}>
+                <Feather name="check-circle" size={32} color={colors.success} />
+                <Text style={[styles.cancelCardTitle, { color: colors.foreground }]}>
+                  تم تقديم طلب الاسترداد
+                </Text>
+                <Text style={[styles.cancelCardBody, { color: colors.mutedForeground }]}>
+                  سيتم استرداد {Math.round(cancelResult.refundAmount)} ج.س خلال 3-5 أيام عمل.
+                </Text>
                 <TouchableOpacity
-                  onPress={handleCancel}
+                  onPress={() => router.back()}
                   activeOpacity={0.8}
-                  disabled={cancelWithRefund.isPending || cancelAppointment.isPending}
-                  style={[styles.cancelBtn, { backgroundColor: colors.accents.red.bg, borderColor: colors.danger + "44" }]}
+                  style={[styles.actionBtn, { backgroundColor: colors.primarySoft }]}
                 >
-                  {cancelWithRefund.isPending ? (
-                    <ActivityIndicator size="small" color={colors.danger} />
-                  ) : (
-                    <>
-                      <Feather name="x-circle" size={16} color={colors.danger} />
-                      <Text style={[styles.cancelBtnText, { color: colors.danger }]}>إلغاء الموعد</Text>
-                    </>
-                  )}
+                  <Text style={[styles.actionBtnText, { color: colors.primary }]}>حسناً</Text>
                 </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <View
-                  style={[
-                    styles.refundBanner,
-                    { backgroundColor: `${colors.warning}18`, borderColor: colors.warning + "44" },
-                  ]}
-                >
-                  <Feather name="alert-circle" size={15} color={colors.warning} />
-                  <Text style={[styles.refundBannerText, { color: colors.warning }]}>
-                    لا يمكن الاسترداد — الموعد خلال أقل من ساعتين
+              </View>
+            ) : cancelMode === "confirm" ? (
+              /* ── Confirmation state ── */
+              <View style={{ gap: 10 }}>
+                <Text style={[styles.cancelCardTitle, { color: colors.foreground }]}>
+                  تأكيد الإلغاء
+                </Text>
+                {refundable ? (
+                  <Text style={[styles.cancelCardBody, { color: colors.mutedForeground }]}>
+                    سيتم استرداد 95% من المبلغ المدفوع (يُخصم 5% رسوم). اختر طريقة الإلغاء:
                   </Text>
+                ) : (
+                  <Text style={[styles.cancelCardBody, { color: colors.mutedForeground }]}>
+                    الموعد خلال أقل من ساعتين — لا يمكن استرداد المبلغ. هل تريد الإلغاء؟
+                  </Text>
+                )}
+                <View style={styles.actionRow}>
+                  {/* Back */}
+                  <TouchableOpacity
+                    onPress={() => setCancelMode("idle")}
+                    activeOpacity={0.8}
+                    style={[styles.actionBtn, { flex: 1, backgroundColor: colors.muted }]}
+                  >
+                    <Text style={[styles.actionBtnText, { color: colors.mutedForeground }]}>تراجع</Text>
+                  </TouchableOpacity>
+
+                  {refundable ? (
+                    /* Refund cancel */
+                    <TouchableOpacity
+                      onPress={handleConfirmWithRefund}
+                      disabled={cancelWithRefund.isPending}
+                      activeOpacity={0.8}
+                      style={[styles.actionBtn, { flex: 1, backgroundColor: colors.accents.green.bg }]}
+                    >
+                      {cancelWithRefund.isPending ? (
+                        <ActivityIndicator size="small" color={colors.success} />
+                      ) : (
+                        <Text style={[styles.actionBtnText, { color: colors.success }]}>
+                          إلغاء مع استرداد 95%
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+                  ) : (
+                    /* No-refund cancel */
+                    <TouchableOpacity
+                      onPress={handleConfirmNoRefund}
+                      disabled={cancelAppointment.isPending}
+                      activeOpacity={0.8}
+                      style={[styles.actionBtn, { flex: 1, backgroundColor: colors.accents.red.bg }]}
+                    >
+                      {cancelAppointment.isPending ? (
+                        <ActivityIndicator size="small" color={colors.danger} />
+                      ) : (
+                        <Text style={[styles.actionBtnText, { color: colors.danger }]}>
+                          تأكيد الإلغاء
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+                  )}
+
+                  {/* Also offer no-refund option when refund is available */}
+                  {refundable && (
+                    <TouchableOpacity
+                      onPress={handleConfirmNoRefund}
+                      disabled={cancelAppointment.isPending}
+                      activeOpacity={0.8}
+                      style={[styles.actionBtn, { flex: 1, backgroundColor: colors.accents.red.bg }]}
+                    >
+                      {cancelAppointment.isPending ? (
+                        <ActivityIndicator size="small" color={colors.danger} />
+                      ) : (
+                        <Text style={[styles.actionBtnText, { color: colors.danger }]}>
+                          إلغاء بدون استرداد
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            ) : (
+              /* ── Idle state: show cancel trigger button ── */
+              <>
+                <View style={styles.cancelCardHeader}>
+                  <View style={[styles.cancelIconWrap, { backgroundColor: refundable ? colors.accents.green.bg : `${colors.warning}18` }]}>
+                    <Feather
+                      name={refundable ? "rotate-ccw" : "alert-circle"}
+                      size={18}
+                      color={refundable ? colors.success : colors.warning}
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.cancelCardTitle, { color: colors.foreground }]}>
+                      {refundable ? "إلغاء مع استرداد" : "إلغاء الموعد"}
+                    </Text>
+                    <Text style={[styles.cancelCardBody, { color: colors.mutedForeground }]}>
+                      {refundable
+                        ? "يمكنك استرداد 95% من المبلغ (5% رسوم)"
+                        : "لا يمكن الاسترداد — الموعد خلال أقل من ساعتين"}
+                    </Text>
+                  </View>
                 </View>
                 <TouchableOpacity
-                  onPress={handleCancel}
+                  onPress={() => setCancelMode("confirm")}
                   activeOpacity={0.8}
-                  disabled={cancelAppointment.isPending}
-                  style={[styles.cancelBtn, { backgroundColor: colors.muted, borderColor: colors.border }]}
+                  style={[
+                    styles.cancelBtn,
+                    { backgroundColor: colors.accents.red.bg, borderColor: colors.danger + "44" },
+                  ]}
                 >
-                  {cancelAppointment.isPending ? (
-                    <ActivityIndicator size="small" color={colors.mutedForeground} />
-                  ) : (
-                    <>
-                      <Feather name="x-circle" size={16} color={colors.mutedForeground} />
-                      <Text style={[styles.cancelBtnText, { color: colors.mutedForeground }]}>إلغاء بدون استرداد</Text>
-                    </>
-                  )}
+                  <Feather name="x-circle" size={16} color={colors.danger} />
+                  <Text style={[styles.cancelBtnText, { color: colors.danger }]}>إلغاء الموعد</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -569,5 +607,54 @@ const styles = StyleSheet.create({
   cancelBtnText: {
     fontSize: 15,
     fontFamily: "IBMPlexSansArabic_700Bold",
+  },
+  cancelCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 16,
+    gap: 12,
+  },
+  cancelCardHeader: {
+    flexDirection: "row-reverse",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  cancelIconWrap: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cancelCardTitle: {
+    fontSize: 15,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    textAlign: "right",
+    writingDirection: "rtl",
+  },
+  cancelCardBody: {
+    fontSize: 13,
+    fontFamily: "IBMPlexSansArabic_400Regular",
+    textAlign: "right",
+    writingDirection: "rtl",
+    lineHeight: 20,
+    marginTop: 2,
+  },
+  actionRow: {
+    flexDirection: "row-reverse",
+    gap: 8,
+    marginTop: 4,
+  },
+  actionBtn: {
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actionBtnText: {
+    fontSize: 13,
+    fontFamily: "IBMPlexSansArabic_700Bold",
+    textAlign: "center",
   },
 });

@@ -3,84 +3,25 @@ import { View, Text, StyleSheet, ScrollView, Platform, Alert, ActivityIndicator 
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAppointments, useCancelAppointment, useDeleteAppointment, useCreateRefundAndCancel, isRefundWindowOpen, useAutoMarkNoShow } from "@/hooks/useGkmData";
+import { useAppointments, useDeleteAppointment, useAutoMarkNoShow } from "@/hooks/useGkmData";
 import { BrandHeader } from "@/components/BrandHeader";
 import { AppointmentCard } from "@/components/AppointmentCard";
 import { EmptyState } from "@/components/EmptyState";
 import { GradientButton } from "@/components/GradientButton";
 import * as Haptics from "expo-haptics";
-import { cancelAppointmentReminder } from "@/lib/pushNotifications";
 
 export default function AppointmentsScreen() {
   const router = useRouter();
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { data: appointments, isLoading } = useAppointments();
-  const cancelAppointment = useCancelAppointment();
   const deleteAppointment = useDeleteAppointment();
-  const cancelWithRefund = useCreateRefundAndCancel();
 
   useAutoMarkNoShow(appointments);
 
+  // Tapping a card navigates to the ticket page which has the inline cancel/refund UI
   const handlePress = (appointment: any) => {
-    if (appointment.status !== "upcoming") return;
-
-    const refundable = isRefundWindowOpen(appointment.appointment_date, appointment.appointment_time);
-
-    if (refundable) {
-      Alert.alert(
-        "إلغاء الموعد",
-        "يمكنك استرداد 95% من المبلغ المدفوع (يُخصم 5% رسوم استرداد) لأن الموعد بعد أكثر من ساعتين.",
-        [
-          { text: "تراجع", style: "cancel" },
-          {
-            text: "إلغاء مع استرداد (95%)",
-            style: "destructive",
-            onPress: async () => {
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-              cancelAppointmentReminder(appointment.id);
-              try {
-                const result = await cancelWithRefund.mutateAsync(appointment.id);
-                if (result.hasRefund) {
-                  Alert.alert(
-                    "✅ تم تقديم طلب الاسترداد",
-                    `سيتم استرداد ${Math.round(result.refundAmount)} ج.س خلال 3-5 أيام عمل.`,
-                  );
-                }
-              } catch {
-                Alert.alert("خطأ", "تعذّر إلغاء الموعد، يرجى المحاولة مرة أخرى.");
-              }
-            },
-          },
-          {
-            text: "إلغاء بدون استرداد",
-            style: "destructive",
-            onPress: () => {
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-              cancelAppointment.mutate(appointment.id);
-              cancelAppointmentReminder(appointment.id);
-            },
-          },
-        ],
-      );
-    } else {
-      Alert.alert(
-        "إلغاء الموعد",
-        "لا يمكن الاسترداد عند الإلغاء قبل أقل من ساعتين من الموعد.",
-        [
-          { text: "تراجع", style: "cancel" },
-          {
-            text: "إلغاء بدون استرداد",
-            style: "destructive",
-            onPress: () => {
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-              cancelAppointment.mutate(appointment.id);
-              cancelAppointmentReminder(appointment.id);
-            },
-          },
-        ],
-      );
-    }
+    router.push(`/ticket/${appointment.id}`);
   };
 
   const handleDelete = (appointment: any) => {
