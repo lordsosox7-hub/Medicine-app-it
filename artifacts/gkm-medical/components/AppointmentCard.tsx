@@ -60,8 +60,10 @@ export function AppointmentCard({ appointment, onPress, onDelete, onTicket }: Ap
 
   // If the appointment is stored as "upcoming" but its datetime has already passed, show it as "فائت"
   const displayStatus =
-    appointment.status === "upcoming" &&
-    isAppointmentPast(appointment.appointment_date, appointment.appointment_time)
+    appointment.status === "no_show"
+      ? "missed"
+      : appointment.status === "upcoming" &&
+        isAppointmentPast(appointment.appointment_date, appointment.appointment_time)
       ? "missed"
       : appointment.status;
 

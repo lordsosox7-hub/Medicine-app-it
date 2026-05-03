@@ -8,6 +8,7 @@ import {
   type MedicalFile,
   type Message,
   type Payment,
+  type Refund,
   supabase,
 } from "@/lib/supabase";
 import { getUserId } from "@/lib/userId";
@@ -852,6 +853,157 @@ export function useMarkDbNotificationRead() {
       qc.invalidateQueries({ queryKey: ["user_notifications"] });
     },
   });
+}
+
+// ---------- Refunds & No-Show ----------
+
+function appointmentDatetime(dateStr: string, timeStr: string): Date {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const { hours, minutes } = parseArabicTimeTo24h(timeStr);
+  return new Date(year, month - 1, day, hours, minutes, 0, 0);
+}
+
+export function isRefundWindowOpen(dateStr: string, timeStr: string): boolean {
+  try {
+    const apptTime = appointmentDatetime(dateStr, timeStr);
+    return apptTime.getTime() - Date.now() > 2 * 60 * 60 * 1000;
+  } catch {
+    return false;
+  }
+}
+
+function isAppointmentNoShow(dateStr: string, timeStr: string): boolean {
+  try {
+    const apptTime = appointmentDatetime(dateStr, timeStr);
+    return Date.now() > apptTime.getTime() + 30 * 60 * 1000;
+  } catch {
+    return false;
+  }
+}
+
+export function useCreateRefundAndCancel() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (appointmentId: string): Promise<{ hasRefund: boolean; refundAmount: number }> => {
+      const userId = await getUserId();
+
+      const { data: payment } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("appointment_id", appointmentId)
+        .eq("status", "confirmed")
+        .maybeSingle();
+
+      const { error: cancelError } = await supabase
+        .from("appointments")
+        .update({ status: "cancelled" })
+        .eq("id", appointmentId);
+      if (cancelError) throw cancelError;
+
+      if (payment) {
+        const feeAmount = Math.round(payment.amount * 0.05);
+        const refundAmount = payment.amount - feeAmount;
+
+        await supabase.from("refunds").insert({
+          appointment_id: appointmentId,
+          payment_id: payment.id,
+          user_id: userId,
+          original_amount: payment.amount,
+          fee_amount: feeAmount,
+          refund_amount: refundAmount,
+          reason: "patient_cancelled",
+          status: "pending",
+        });
+
+        await supabase.from("notifications").insert({
+          user_id: userId,
+          kind: "refund",
+          title_ar: "🔄 طلب استرداد مقدم",
+          body_ar: `تم إلغاء موعدك. سيتم استرداد ${Math.round(refundAmount)} ج.س (بعد خصم 5% رسوم) خلال 3-5 أيام عمل.`,
+          ref_id: appointmentId,
+        });
+
+        return { hasRefund: true, refundAmount };
+      }
+
+      return { hasRefund: false, refundAmount: 0 };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+      qc.invalidateQueries({ queryKey: ["refund"] });
+      qc.invalidateQueries({ queryKey: ["user_notifications"] });
+    },
+  });
+}
+
+export function useRefundByAppointment(appointmentId?: string) {
+  return useQuery({
+    queryKey: ["refund", appointmentId ?? ""],
+    enabled: !!appointmentId,
+    queryFn: async (): Promise<Refund | null> => {
+      if (!appointmentId) return null;
+      const { data, error } = await supabase
+        .from("refunds")
+        .select("*")
+        .eq("appointment_id", appointmentId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as Refund | null) ?? null;
+    },
+  });
+}
+
+export function usePendingRefunds() {
+  return useQuery({
+    queryKey: ["pending_refunds"],
+    queryFn: async (): Promise<Refund[]> => {
+      const { data, error } = await supabase
+        .from("refunds")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Refund[];
+    },
+    refetchInterval: 10000,
+  });
+}
+
+export function useUpdateRefundStatus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { id: string; status: "processed" | "rejected" }) => {
+      const { error } = await supabase
+        .from("refunds")
+        .update({ status: input.status, processed_at: new Date().toISOString() })
+        .eq("id", input.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["pending_refunds"] });
+    },
+  });
+}
+
+export function useAutoMarkNoShow(appointments: Appointment[] | undefined) {
+  const qc = useQueryClient();
+  const ranRef = useRef(false);
+  useEffect(() => {
+    if (!appointments || appointments.length === 0 || ranRef.current) return;
+    const noShowIds = appointments
+      .filter((a) => a.status === "upcoming" && isAppointmentNoShow(a.appointment_date, a.appointment_time))
+      .map((a) => a.id);
+    if (noShowIds.length === 0) return;
+    ranRef.current = true;
+    supabase
+      .from("appointments")
+      .update({ status: "no_show" })
+      .in("id", noShowIds)
+      .then(() => {
+        qc.invalidateQueries({ queryKey: ["appointments"] });
+      });
+  }, [appointments, qc]);
 }
 
 // ---------- Admin: Doctor management ----------

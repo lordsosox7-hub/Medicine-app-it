@@ -44,9 +44,23 @@ export type Appointment = {
   doctor_id: string;
   appointment_date: string;
   appointment_time: string;
-  status: "upcoming" | "completed" | "cancelled";
+  status: "upcoming" | "completed" | "cancelled" | "no_show";
   created_at: string;
   doctor?: Doctor;
+};
+
+export type Refund = {
+  id: string;
+  appointment_id: string;
+  payment_id: string | null;
+  user_id: string;
+  original_amount: number;
+  fee_amount: number;
+  refund_amount: number;
+  reason: string;
+  status: "pending" | "processed" | "rejected";
+  created_at: string;
+  processed_at: string | null;
 };
 
 export type Message = {

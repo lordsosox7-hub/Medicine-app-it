@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { useColors } from "@/hooks/useColors";
 
 interface StatusPillProps {
-  status: "upcoming" | "completed" | "cancelled" | "missed" | "normal" | "high" | "low";
+  status: "upcoming" | "completed" | "cancelled" | "no_show" | "missed" | "refund_pending" | "normal" | "high" | "low";
 }
 
 export function StatusPill({ status }: StatusPillProps) {
@@ -29,10 +29,20 @@ export function StatusPill({ status }: StatusPillProps) {
       bg = colors.muted;
       text = colors.mutedForeground;
       break;
+    case "no_show":
+      label = "لم يحضر";
+      bg = `${colors.warning}20`;
+      text = colors.warning;
+      break;
     case "missed":
       label = "فائت";
       bg = `${colors.warning}20`;
       text = colors.warning;
+      break;
+    case "refund_pending":
+      label = "استرداد جارٍ";
+      bg = "#fef3c720";
+      text = "#d97706";
       break;
     case "normal":
       label = "طبيعي";

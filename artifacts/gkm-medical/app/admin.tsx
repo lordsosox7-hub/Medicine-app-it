@@ -38,8 +38,10 @@ import {
   type NewDoctorInput,
   type AppointmentWithPatient,
   type DoctorAdminRow,
+  usePendingRefunds,
+  useUpdateRefundStatus,
 } from "@/hooks/useGkmData";
-import type { Appointment, Payment, Doctor, Conversation } from "@/lib/supabase";
+import type { Appointment, Payment, Doctor, Conversation, Refund } from "@/lib/supabase";
 import {
   isAdminLoggedIn,
   logoutAdmin,
@@ -57,6 +59,7 @@ type AdminTab =
   | "chats"
   | "appointments"
   | "payments"
+  | "refunds"
   | "revenue"
   | "scanner"
   | "settings";
@@ -71,6 +74,7 @@ const TABS: Array<{
   { id: "chats", label: "المحادثات", icon: "message-square" },
   { id: "appointments", label: "المواعيد", icon: "calendar" },
   { id: "payments", label: "المدفوعات", icon: "credit-card" },
+  { id: "refunds", label: "الاستردادات", icon: "rotate-ccw" },
   { id: "revenue", label: "الإيرادات", icon: "trending-up" },
   { id: "scanner", label: "ماسح QR", icon: "camera" },
   { id: "settings", label: "الإعدادات", icon: "settings" },
@@ -88,6 +92,7 @@ const APPT_STATUS_LABEL: Record<Appointment["status"], string> = {
   upcoming: "قادم",
   completed: "مكتمل",
   cancelled: "ملغى",
+  no_show: "لم يحضر",
 };
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -211,6 +216,7 @@ export default function AdminScreen() {
         {tab === "chats" && <ChatMonitorTab />}
         {tab === "appointments" && <AppointmentsTab />}
         {tab === "payments" && <PaymentsTab />}
+        {tab === "refunds" && <RefundsTab />}
         {tab === "revenue" && <RevenueTab />}
         {tab === "scanner" && <ScannerTab />}
         {tab === "settings" && <SettingsTab />}
@@ -1780,12 +1786,13 @@ function ScannerTab() {
 
 function StatusPill({ status }: { status: Appointment["status"] }) {
   const colors = useColors();
-  const map = {
+  const map: Record<Appointment["status"], { bg: string; fg: string }> = {
     upcoming: { bg: colors.primarySoft, fg: colors.primary },
     completed: { bg: colors.accents.green.bg, fg: colors.success },
     cancelled: { bg: colors.accents.red.bg, fg: colors.danger },
-  } as const;
-  const t = map[status];
+    no_show: { bg: `${colors.warning}22`, fg: colors.warning },
+  };
+  const t = map[status] ?? map.cancelled;
   return (
     <View style={[styles.pill, { backgroundColor: t.bg }]}>
       <Text
@@ -1990,6 +1997,150 @@ function PaymentsTab() {
         );
       }}
     />
+  );
+}
+
+// ====================================================================
+// Refunds tab (Arabic)
+// ====================================================================
+
+const REFUND_STATUS_LABEL: Record<Refund["status"], string> = {
+  pending: "قيد المعالجة",
+  processed: "تم الاسترداد",
+  rejected: "مرفوض",
+};
+
+function RefundsTab() {
+  const colors = useColors();
+  const { data: refunds, isLoading } = usePendingRefunds();
+  const updateStatus = useUpdateRefundStatus();
+  const [actingId, setActingId] = useState<string>("");
+
+  if (isLoading) {
+    return (
+      <View style={styles.empty}>
+        <ActivityIndicator color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (!refunds || refunds.length === 0) {
+    return (
+      <View style={styles.empty}>
+        <Text style={{ color: colors.mutedForeground, fontFamily: "IBMPlexSansArabic_400Regular" }}>
+          لا توجد طلبات استرداد
+        </Text>
+      </View>
+    );
+  }
+
+  const handle = async (id: string, status: "processed" | "rejected") => {
+    setActingId(id);
+    await updateStatus.mutateAsync({ id, status });
+    setActingId("");
+  };
+
+  return (
+    <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+      {refunds.map((r) => (
+        <View
+          key={r.id}
+          style={{
+            backgroundColor: colors.card,
+            borderRadius: 14,
+            padding: 14,
+            gap: 6,
+            borderWidth: 1,
+            borderColor: colors.border,
+          }}
+        >
+          <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" }}>
+            <View
+              style={[
+                styles.pill,
+                {
+                  backgroundColor:
+                    r.status === "pending"
+                      ? `${colors.warning}22`
+                      : r.status === "processed"
+                        ? colors.accents.green.bg
+                        : colors.accents.red.bg,
+                },
+              ]}
+            >
+              <Text
+                style={{
+                  color:
+                    r.status === "pending"
+                      ? colors.warning
+                      : r.status === "processed"
+                        ? colors.success
+                        : colors.danger,
+                  fontFamily: "IBMPlexSansArabic_700Bold",
+                  fontSize: 11,
+                }}
+              >
+                {REFUND_STATUS_LABEL[r.status]}
+              </Text>
+            </View>
+            <Text style={{ color: colors.foreground, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 14 }}>
+              {new Date(r.created_at).toLocaleDateString("ar-SA")}
+            </Text>
+          </View>
+
+          <View style={{ flexDirection: "row-reverse", gap: 16 }}>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "IBMPlexSansArabic_400Regular", fontSize: 13 }}>
+              المبلغ الأصلي: {r.original_amount} ج.س
+            </Text>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "IBMPlexSansArabic_400Regular", fontSize: 13 }}>
+              الرسوم: {r.fee_amount} ج.س
+            </Text>
+            <Text style={{ color: colors.success, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 13 }}>
+              الاسترداد: {r.refund_amount} ج.س
+            </Text>
+          </View>
+
+          {r.status === "pending" && (
+            <View style={{ flexDirection: "row-reverse", gap: 10, marginTop: 6 }}>
+              <Pressable
+                onPress={() => handle(r.id, "processed")}
+                disabled={actingId === r.id}
+                style={{
+                  flex: 1,
+                  backgroundColor: colors.accents.green.bg,
+                  borderRadius: 8,
+                  padding: 10,
+                  alignItems: "center",
+                }}
+              >
+                {actingId === r.id ? (
+                  <ActivityIndicator size="small" color={colors.success} />
+                ) : (
+                  <Text style={{ color: colors.success, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 13 }}>
+                    تأكيد الاسترداد
+                  </Text>
+                )}
+              </Pressable>
+              <Pressable
+                onPress={() => handle(r.id, "rejected")}
+                disabled={actingId === r.id}
+                style={{
+                  flex: 1,
+                  backgroundColor: colors.accents.red.bg,
+                  borderRadius: 8,
+                  padding: 10,
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ color: colors.danger, fontFamily: "IBMPlexSansArabic_700Bold", fontSize: 13 }}>
+                  رفض الطلب
+                </Text>
+              </Pressable>
+            </View>
+          )}
+        </View>
+      ))}
+    </ScrollView>
   );
 }
 
