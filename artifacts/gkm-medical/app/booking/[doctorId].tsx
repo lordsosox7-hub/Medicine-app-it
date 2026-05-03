@@ -9,7 +9,7 @@ import { GradientButton } from "@/components/GradientButton";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 
-const TIME_SLOTS = ['10:30 صباحاً','11:30 صباحاً','12:30 ظهراً','02:30 ظهراً','04:30 مساءً','06:30 مساءً'];
+const TIME_SLOTS = ['10:30 صباحاً','11:30 صباحاً','12:30 ظهراً','02:30 ظهراً','04:30 مساءً'];
 
 const SLOT_HOURS_24: Record<string, { h: number; m: number }> = {
   '10:30 صباحاً': { h: 10, m: 30 },
@@ -17,7 +17,6 @@ const SLOT_HOURS_24: Record<string, { h: number; m: number }> = {
   '12:30 ظهراً':  { h: 12, m: 30 },
   '02:30 ظهراً':  { h: 14, m: 30 },
   '04:30 مساءً':  { h: 16, m: 30 },
-  '06:30 مساءً':  { h: 18, m: 30 },
 };
 
 function isSlotPast(slot: string, selectedDate: string): boolean {
