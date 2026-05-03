@@ -7,13 +7,23 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Platform,
+  Alert,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { AppointmentQR } from "@/components/AppointmentQR";
-import { useAppointments, usePaymentByAppointment, useRealtimePayment } from "@/hooks/useGkmData";
+import {
+  useAppointments,
+  usePaymentByAppointment,
+  useRealtimePayment,
+  useCancelAppointment,
+  useCreateRefundAndCancel,
+  isRefundWindowOpen,
+} from "@/hooks/useGkmData";
+import { cancelAppointmentReminder } from "@/lib/pushNotifications";
 import { StatusPill } from "@/components/StatusPill";
 
 export default function TicketScreen() {
@@ -24,9 +34,77 @@ export default function TicketScreen() {
   const { data: appointments, isLoading } = useAppointments();
   const { data: payment } = usePaymentByAppointment(appointmentId ?? undefined);
   useRealtimePayment(appointmentId ?? undefined);
+  const cancelAppointment = useCancelAppointment();
+  const cancelWithRefund = useCreateRefundAndCancel();
 
   const apt = appointments?.find((a) => a.id === appointmentId);
   const doc = apt?.doctor as any;
+
+  const canCancel = apt?.status === "upcoming";
+  const refundable = apt ? isRefundWindowOpen(apt.appointment_date, apt.appointment_time) : false;
+
+  const handleCancel = () => {
+    if (!apt) return;
+    if (refundable) {
+      Alert.alert(
+        "إلغاء الموعد",
+        "يمكنك استرداد 95% من المبلغ المدفوع (يُخصم 5% رسوم استرداد) لأن الموعد بعد أكثر من ساعتين.",
+        [
+          { text: "تراجع", style: "cancel" },
+          {
+            text: "إلغاء مع استرداد (95%)",
+            style: "destructive",
+            onPress: async () => {
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+              cancelAppointmentReminder(apt.id);
+              try {
+                const result = await cancelWithRefund.mutateAsync(apt.id);
+                if (result.hasRefund) {
+                  Alert.alert(
+                    "✅ تم تقديم طلب الاسترداد",
+                    `سيتم استرداد ${Math.round(result.refundAmount)} ج.س خلال 3-5 أيام عمل.`,
+                    [{ text: "حسناً", onPress: () => router.back() }],
+                  );
+                } else {
+                  router.back();
+                }
+              } catch {
+                Alert.alert("خطأ", "تعذّر إلغاء الموعد، يرجى المحاولة مرة أخرى.");
+              }
+            },
+          },
+          {
+            text: "إلغاء بدون استرداد",
+            style: "destructive",
+            onPress: () => {
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+              cancelAppointment.mutate(apt.id);
+              cancelAppointmentReminder(apt.id);
+              router.back();
+            },
+          },
+        ],
+      );
+    } else {
+      Alert.alert(
+        "إلغاء الموعد",
+        "لا يمكن الاسترداد لأن الموعد خلال أقل من ساعتين. هل تريد الإلغاء بدون استرداد؟",
+        [
+          { text: "تراجع", style: "cancel" },
+          {
+            text: "إلغاء بدون استرداد",
+            style: "destructive",
+            onPress: () => {
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+              cancelAppointment.mutate(apt.id);
+              cancelAppointmentReminder(apt.id);
+              router.back();
+            },
+          },
+        ],
+      );
+    }
+  };
 
   // Derive the strip state from appointment + payment data
   const stripState = (() => {
@@ -191,6 +269,71 @@ export default function TicketScreen() {
             </Text>
           </View>
         </View>
+
+        {/* Cancel button — only for upcoming appointments */}
+        {canCancel && (
+          <View style={{ gap: 10 }}>
+            {refundable ? (
+              <>
+                <View
+                  style={[
+                    styles.refundBanner,
+                    { backgroundColor: colors.accents.green.bg, borderColor: colors.success + "44" },
+                  ]}
+                >
+                  <Feather name="rotate-ccw" size={15} color={colors.success} />
+                  <Text style={[styles.refundBannerText, { color: colors.success }]}>
+                    يمكنك الإلغاء مع استرداد 95% من المبلغ (5% رسوم)
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={handleCancel}
+                  activeOpacity={0.8}
+                  disabled={cancelWithRefund.isPending || cancelAppointment.isPending}
+                  style={[styles.cancelBtn, { backgroundColor: colors.accents.red.bg, borderColor: colors.danger + "44" }]}
+                >
+                  {cancelWithRefund.isPending ? (
+                    <ActivityIndicator size="small" color={colors.danger} />
+                  ) : (
+                    <>
+                      <Feather name="x-circle" size={16} color={colors.danger} />
+                      <Text style={[styles.cancelBtnText, { color: colors.danger }]}>إلغاء الموعد</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <View
+                  style={[
+                    styles.refundBanner,
+                    { backgroundColor: `${colors.warning}18`, borderColor: colors.warning + "44" },
+                  ]}
+                >
+                  <Feather name="alert-circle" size={15} color={colors.warning} />
+                  <Text style={[styles.refundBannerText, { color: colors.warning }]}>
+                    لا يمكن الاسترداد — الموعد خلال أقل من ساعتين
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={handleCancel}
+                  activeOpacity={0.8}
+                  disabled={cancelAppointment.isPending}
+                  style={[styles.cancelBtn, { backgroundColor: colors.muted, borderColor: colors.border }]}
+                >
+                  {cancelAppointment.isPending ? (
+                    <ActivityIndicator size="small" color={colors.mutedForeground} />
+                  ) : (
+                    <>
+                      <Feather name="x-circle" size={16} color={colors.mutedForeground} />
+                      <Text style={[styles.cancelBtnText, { color: colors.mutedForeground }]}>إلغاء بدون استرداد</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        )}
 
         {/* Info note */}
         <View style={[styles.note, { backgroundColor: colors.primarySoft, borderColor: colors.primary + "33" }]}>
@@ -392,5 +535,33 @@ const styles = StyleSheet.create({
     textAlign: "right",
     writingDirection: "rtl",
     lineHeight: 20,
+  },
+  refundBanner: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  refundBannerText: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: "IBMPlexSansArabic_500Medium",
+    textAlign: "right",
+    writingDirection: "rtl",
+  },
+  cancelBtn: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  cancelBtnText: {
+    fontSize: 15,
+    fontFamily: "IBMPlexSansArabic_700Bold",
   },
 });
