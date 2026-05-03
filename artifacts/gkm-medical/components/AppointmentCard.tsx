@@ -35,11 +35,10 @@ function isAppointmentPast(dateStr: string, timeStr: string): boolean {
 interface AppointmentCardProps {
   appointment: Appointment;
   onPress?: () => void;
-  onDelete?: () => void;
   onTicket?: () => void;
 }
 
-export function AppointmentCard({ appointment, onPress, onDelete, onTicket }: AppointmentCardProps) {
+export function AppointmentCard({ appointment, onPress, onTicket }: AppointmentCardProps) {
   const colors = useColors();
   const router = useRouter();
   const doc = appointment.doctor;
@@ -104,17 +103,6 @@ export function AppointmentCard({ appointment, onPress, onDelete, onTicket }: Ap
           </Text>
         </View>
         <StatusPill status={displayStatus as any} />
-        {onDelete && (
-          <PressableScale
-            onPress={onDelete}
-            scaleTo={0.85}
-            style={[styles.deleteBtn, { backgroundColor: colors.destructive + "1A" }]}
-            hitSlop={8}
-            accessibilityLabel="حذف الموعد"
-          >
-            <Feather name="trash-2" size={16} color={colors.destructive} />
-          </PressableScale>
-        )}
       </View>
 
       {/* Divider */}
@@ -230,13 +218,6 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     fontFamily: "IBMPlexSansArabic_700Bold",
     flexShrink: 1,
-  },
-  deleteBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
   },
   qrBtn: {
     width: 32,

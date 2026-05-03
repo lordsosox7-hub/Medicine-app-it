@@ -1,47 +1,25 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, Platform, Alert, ActivityIndicator } from "react-native";
+import { View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAppointments, useDeleteAppointment, useAutoMarkNoShow } from "@/hooks/useGkmData";
+import { useAppointments, useAutoMarkNoShow } from "@/hooks/useGkmData";
 import { BrandHeader } from "@/components/BrandHeader";
 import { AppointmentCard } from "@/components/AppointmentCard";
 import { EmptyState } from "@/components/EmptyState";
 import { GradientButton } from "@/components/GradientButton";
-import * as Haptics from "expo-haptics";
+import { Platform } from "react-native";
 
 export default function AppointmentsScreen() {
   const router = useRouter();
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { data: appointments, isLoading } = useAppointments();
-  const deleteAppointment = useDeleteAppointment();
 
   useAutoMarkNoShow(appointments);
 
-  // Tapping a card navigates to the ticket page which has the inline cancel/refund UI
   const handlePress = (appointment: any) => {
     router.push(`/ticket/${appointment.id}`);
-  };
-
-  const handleDelete = (appointment: any) => {
-    const doDelete = () => {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-      deleteAppointment.mutate(appointment.id);
-    };
-    if (Platform.OS === "web") {
-      const ok = typeof window !== "undefined" && window.confirm("هل تريد حذف هذا الموعد نهائياً؟");
-      if (ok) doDelete();
-    } else {
-      Alert.alert(
-        "حذف الموعد",
-        "هل تريد حذف هذا الموعد نهائياً؟ لا يمكن التراجع.",
-        [
-          { text: "تراجع", style: "cancel" },
-          { text: "حذف", style: "destructive", onPress: doDelete },
-        ],
-      );
-    }
   };
 
   const isWeb = Platform.OS === "web";
@@ -65,7 +43,6 @@ export default function AppointmentsScreen() {
               key={apt.id} 
               appointment={apt} 
               onPress={() => handlePress(apt)}
-              onDelete={() => handleDelete(apt)}
             />
           ))}
         </ScrollView>
