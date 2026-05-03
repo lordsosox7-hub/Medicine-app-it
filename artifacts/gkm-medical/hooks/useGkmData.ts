@@ -872,6 +872,15 @@ export function isRefundWindowOpen(dateStr: string, timeStr: string): boolean {
   }
 }
 
+export function isAppointmentPast(dateStr: string, timeStr: string): boolean {
+  try {
+    const apptTime = appointmentDatetime(dateStr, timeStr);
+    return Date.now() >= apptTime.getTime();
+  } catch {
+    return false;
+  }
+}
+
 function isAppointmentNoShow(dateStr: string, timeStr: string): boolean {
   try {
     const apptTime = appointmentDatetime(dateStr, timeStr);

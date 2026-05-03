@@ -22,6 +22,7 @@ import {
   useCancelAppointment,
   useCreateRefundAndCancel,
   isRefundWindowOpen,
+  isAppointmentPast,
 } from "@/hooks/useGkmData";
 import { cancelAppointmentReminder } from "@/lib/pushNotifications";
 import { StatusPill } from "@/components/StatusPill";
@@ -40,7 +41,10 @@ export default function TicketScreen() {
   const apt = appointments?.find((a) => a.id === appointmentId);
   const doc = apt?.doctor as any;
 
-  const canCancel = apt?.status === "upcoming";
+  // Only allow cancellation when: status is upcoming AND appointment hasn't passed yet
+  const canCancel =
+    apt?.status === "upcoming" &&
+    !isAppointmentPast(apt.appointment_date, apt.appointment_time);
   const refundable = apt ? isRefundWindowOpen(apt.appointment_date, apt.appointment_time) : false;
 
   const handleCancel = () => {
@@ -112,6 +116,8 @@ export default function TicketScreen() {
       return { color: "#dc2626", text: "ملغي",               icon: "x-circle"    } as const;
     if (apt?.status === "completed")
       return { color: "#16a34a", text: "مكتمل",              icon: "check-circle" } as const;
+    if (apt?.status === "no_show")
+      return { color: "#d97706", text: "لم يحضر",            icon: "alert-circle" } as const;
     if (payment?.status === "pending")
       return { color: "#dc2626", text: "بانتظار تأكيد الدفع", icon: "clock"        } as const;
     if (payment?.status === "confirmed")
