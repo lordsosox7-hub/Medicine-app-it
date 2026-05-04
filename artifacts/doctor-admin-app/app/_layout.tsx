@@ -1,6 +1,7 @@
 import {
   IBMPlexSansArabic_400Regular,
   IBMPlexSansArabic_500Medium,
+  IBMPlexSansArabic_600SemiBold,
   IBMPlexSansArabic_700Bold,
   useFonts,
 } from "@expo-google-fonts/ibm-plex-sans-arabic";
@@ -66,6 +67,7 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     IBMPlexSansArabic_400Regular,
     IBMPlexSansArabic_500Medium,
+    IBMPlexSansArabic_600SemiBold,
     IBMPlexSansArabic_700Bold,
   });
 

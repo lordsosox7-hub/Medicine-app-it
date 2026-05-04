@@ -1,17 +1,11 @@
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
+  View, Text, TextInput, StyleSheet, ActivityIndicator,
+  TouchableOpacity, KeyboardAvoidingView, Platform, Alert, ScrollView,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { loginDoctorAdmin, type DoctorAdminSession } from "@/lib/auth";
 
@@ -21,14 +15,16 @@ interface Props {
 
 export default function LoginScreen({ onLogin }: Props) {
   const colors = useColors();
+  const insets = useSafeAreaInsets();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [focusedField, setFocusedField] = useState<"username" | "password" | null>(null);
 
   const handleLogin = async () => {
     if (!username.trim() || !password) {
-      Alert.alert("خطأ", "الرجاء إدخال اسم المستخدم وكلمة المرور");
+      Alert.alert("تنبيه", "الرجاء إدخال اسم المستخدم وكلمة المرور");
       return;
     }
     setBusy(true);
@@ -40,43 +36,68 @@ export default function LoginScreen({ onLogin }: Props) {
         onLogin(session);
       }
     } catch {
-      Alert.alert("خطأ", "حدث خطأ أثناء تسجيل الدخول، حاول مجدداً");
+      Alert.alert("خطأ", "حدث خطأ أثناء تسجيل الدخول، يرجى المحاولة مجدداً");
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <LinearGradient colors={[colors.gradientFrom, colors.gradientTo]} style={styles.gradient}>
+    <LinearGradient
+      colors={[colors.gradientFrom, colors.gradientTo]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.gradient}
+    >
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.flex}
       >
-        <View style={styles.inner}>
+        <ScrollView
+          contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 24 }]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           {/* Brand */}
           <View style={styles.brand}>
-            <View style={[styles.brandIcon, { backgroundColor: "rgba(255,255,255,0.2)" }]}>
-              <Ionicons name="medkit" size={40} color="#fff" />
+            <View style={styles.brandIconWrap}>
+              <View style={styles.brandIconRing}>
+                <Ionicons name="medkit" size={42} color="#fff" />
+              </View>
             </View>
-            <Text style={styles.brandName}>بوابة الطبيب</Text>
-            <Text style={styles.brandSub}>نظام راحة الطبي</Text>
+            <Text style={[styles.brandName, { fontFamily: "IBMPlexSansArabic_700Bold" }]}>بوابة الطبيب</Text>
+            <Text style={[styles.brandSub, { fontFamily: "IBMPlexSansArabic_400Regular" }]}>نظام راحة الطبي — لوحة إدارة المواعيد</Text>
           </View>
 
           {/* Card */}
           <View style={[styles.card, { backgroundColor: colors.card }]}>
-            <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "IBMPlexSansArabic_700Bold" }]}>
-              تسجيل الدخول
-            </Text>
-            <Text style={[styles.cardSub, { color: colors.mutedForeground, fontFamily: "IBMPlexSansArabic_400Regular" }]}>
-              أدخل بيانات حسابك لمتابعة مواعيد طبيبك
-            </Text>
+            <View style={styles.cardHeader}>
+              <View style={[styles.cardHeaderIcon, { backgroundColor: colors.primarySoft }]}>
+                <Ionicons name="lock-closed" size={20} color={colors.primary} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "IBMPlexSansArabic_700Bold" }]}>
+                  تسجيل الدخول
+                </Text>
+                <Text style={[styles.cardSub, { color: colors.mutedForeground, fontFamily: "IBMPlexSansArabic_400Regular" }]}>
+                  أدخل بيانات حسابك للمتابعة
+                </Text>
+              </View>
+            </View>
 
             {/* Username */}
             <View style={styles.field}>
               <Text style={[styles.label, { color: colors.mutedForeground, fontFamily: "IBMPlexSansArabic_500Medium" }]}>
                 اسم المستخدم
               </Text>
-              <View style={[styles.inputRow, { borderColor: colors.border, backgroundColor: colors.secondary }]}>
+              <View style={[
+                styles.inputRow,
+                {
+                  borderColor: focusedField === "username" ? colors.primary : colors.border,
+                  backgroundColor: colors.secondary,
+                  borderWidth: focusedField === "username" ? 1.5 : 1,
+                },
+              ]}>
                 <TextInput
                   style={[styles.input, { color: colors.foreground, fontFamily: "IBMPlexSansArabic_400Regular" }]}
                   value={username}
@@ -86,8 +107,10 @@ export default function LoginScreen({ onLogin }: Props) {
                   autoCapitalize="none"
                   autoCorrect={false}
                   textAlign="right"
+                  onFocus={() => setFocusedField("username")}
+                  onBlur={() => setFocusedField(null)}
                 />
-                <Ionicons name="person-outline" size={18} color={colors.mutedForeground} style={styles.inputIcon} />
+                <Ionicons name="person-outline" size={18} color={focusedField === "username" ? colors.primary : colors.mutedForeground} />
               </View>
             </View>
 
@@ -96,7 +119,14 @@ export default function LoginScreen({ onLogin }: Props) {
               <Text style={[styles.label, { color: colors.mutedForeground, fontFamily: "IBMPlexSansArabic_500Medium" }]}>
                 كلمة المرور
               </Text>
-              <View style={[styles.inputRow, { borderColor: colors.border, backgroundColor: colors.secondary }]}>
+              <View style={[
+                styles.inputRow,
+                {
+                  borderColor: focusedField === "password" ? colors.primary : colors.border,
+                  backgroundColor: colors.secondary,
+                  borderWidth: focusedField === "password" ? 1.5 : 1,
+                },
+              ]}>
                 <TextInput
                   style={[styles.input, { color: colors.foreground, fontFamily: "IBMPlexSansArabic_400Regular" }]}
                   value={password}
@@ -108,12 +138,14 @@ export default function LoginScreen({ onLogin }: Props) {
                   textAlign="right"
                   onSubmitEditing={handleLogin}
                   returnKeyType="done"
+                  onFocus={() => setFocusedField("password")}
+                  onBlur={() => setFocusedField(null)}
                 />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.inputIcon}>
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} hitSlop={8}>
                   <Ionicons
                     name={showPassword ? "eye-off-outline" : "eye-outline"}
                     size={18}
-                    color={colors.mutedForeground}
+                    color={focusedField === "password" ? colors.primary : colors.mutedForeground}
                   />
                 </TouchableOpacity>
               </View>
@@ -129,9 +161,10 @@ export default function LoginScreen({ onLogin }: Props) {
               {busy ? (
                 <ActivityIndicator color="#fff" size="small" />
               ) : (
-                <Text style={[styles.btnText, { fontFamily: "IBMPlexSansArabic_700Bold" }]}>
-                  تسجيل الدخول
-                </Text>
+                <>
+                  <Ionicons name="log-in-outline" size={18} color="#fff" />
+                  <Text style={[styles.btnText, { fontFamily: "IBMPlexSansArabic_700Bold" }]}>تسجيل الدخول</Text>
+                </>
               )}
             </TouchableOpacity>
           </View>
@@ -139,7 +172,7 @@ export default function LoginScreen({ onLogin }: Props) {
           <Text style={[styles.footer, { fontFamily: "IBMPlexSansArabic_400Regular" }]}>
             للدعم التقني تواصل مع مدير النظام
           </Text>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
@@ -148,37 +181,38 @@ export default function LoginScreen({ onLogin }: Props) {
 const styles = StyleSheet.create({
   gradient: { flex: 1 },
   flex: { flex: 1 },
-  inner: { flex: 1, justifyContent: "center", padding: 24, gap: 28 },
-  brand: { alignItems: "center", gap: 12 },
-  brandIcon: { width: 84, height: 84, borderRadius: 26, alignItems: "center", justifyContent: "center" },
-  brandName: { fontSize: 28, fontFamily: "IBMPlexSansArabic_700Bold", color: "#fff" },
-  brandSub: { fontSize: 14, color: "rgba(255,255,255,0.75)", fontFamily: "IBMPlexSansArabic_400Regular" },
-  card: {
-    borderRadius: 20,
-    padding: 24,
-    gap: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 10,
+  scroll: { flexGrow: 1, justifyContent: "center", paddingHorizontal: 24, gap: 28 },
+  brand: { alignItems: "center", gap: 14 },
+  brandIconWrap: { alignItems: "center", justifyContent: "center" },
+  brandIconRing: {
+    width: 96, height: 96, borderRadius: 28,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderWidth: 2, borderColor: "rgba(255,255,255,0.3)",
+    alignItems: "center", justifyContent: "center",
   },
+  brandName: { fontSize: 30, color: "#fff" },
+  brandSub: { fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: "center" },
+  card: {
+    borderRadius: 24, padding: 24, gap: 18,
+    shadowColor: "#000", shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18, shadowRadius: 24, elevation: 12,
+  },
+  cardHeader: { flexDirection: "row-reverse", alignItems: "center", gap: 12 },
+  cardHeaderIcon: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" },
   cardTitle: { fontSize: 20, textAlign: "right" },
-  cardSub: { fontSize: 13, textAlign: "right", marginTop: -8 },
-  field: { gap: 6 },
+  cardSub: { fontSize: 13, textAlign: "right", marginTop: 2 },
+  field: { gap: 8 },
   label: { fontSize: 13, textAlign: "right" },
   inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    height: 50,
-    gap: 10,
+    flexDirection: "row", alignItems: "center",
+    borderRadius: 14, paddingHorizontal: 14, height: 52, gap: 10,
   },
-  inputIcon: { flexShrink: 0 },
-  input: { flex: 1, fontSize: 14 },
-  btn: { height: 52, borderRadius: 14, alignItems: "center", justifyContent: "center", marginTop: 4 },
+  input: { flex: 1, fontSize: 15 },
+  btn: {
+    height: 54, borderRadius: 16,
+    alignItems: "center", justifyContent: "center",
+    flexDirection: "row", gap: 10, marginTop: 4,
+  },
   btnText: { color: "#fff", fontSize: 16 },
   footer: { textAlign: "center", color: "rgba(255,255,255,0.6)", fontSize: 12 },
 });

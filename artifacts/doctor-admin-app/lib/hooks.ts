@@ -19,11 +19,10 @@ export function useDoctorAppointments(doctorId: string) {
 
   const fetchAppointments = useCallback(async () => {
     if (!doctorId) return;
+    setIsLoading(true);
     const { data: rows, error: err } = await supabase
       .from("appointments")
-      .select(
-        "id, user_id, doctor_id, appointment_date, appointment_time, status, created_at",
-      )
+      .select("id, user_id, doctor_id, appointment_date, appointment_time, status, created_at")
       .eq("doctor_id", doctorId)
       .order("appointment_date", { ascending: false })
       .order("appointment_time", { ascending: true });
@@ -34,9 +33,9 @@ export function useDoctorAppointments(doctorId: string) {
       return;
     }
 
-    const enriched: AppointmentWithPatient[] = (rows ?? []).map((r: any) => ({
+    const enriched: AppointmentWithPatient[] = (rows ?? []).map((r: any, i: number) => ({
       ...r,
-      patient_name: null,
+      patient_name: `مريض #${r.id.slice(0, 6).toUpperCase()}`,
     }));
 
     setData(enriched);
@@ -44,31 +43,36 @@ export function useDoctorAppointments(doctorId: string) {
   }, [doctorId]);
 
   useEffect(() => {
-    setIsLoading(true);
     fetchAppointments();
-
     const channel = supabase
       .channel(`doctor-appts-${doctorId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "appointments",
-          filter: `doctor_id=eq.${doctorId}`,
-        },
-        () => {
-          fetchAppointments();
-        },
-      )
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "appointments",
+        filter: `doctor_id=eq.${doctorId}`,
+      }, fetchAppointments)
       .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, [doctorId, fetchAppointments]);
 
   return { data, isLoading, error, refetch: fetchAppointments };
+}
+
+export async function completeAppointment(appointmentId: string): Promise<void> {
+  const { error } = await supabase
+    .from("appointments")
+    .update({ status: "completed" })
+    .eq("id", appointmentId);
+  if (error) throw error;
+}
+
+export async function cancelAppointment(appointmentId: string): Promise<void> {
+  const { error } = await supabase
+    .from("appointments")
+    .update({ status: "cancelled" })
+    .eq("id", appointmentId);
+  if (error) throw error;
 }
 
 export interface ScanResult {
@@ -88,7 +92,10 @@ export async function markTicketScanned(
 
   if (error || !data) return { status: "not_found", appointment: null };
 
-  const appt = { ...data, patient_name: null } as AppointmentWithPatient;
+  const appt: AppointmentWithPatient = {
+    ...data,
+    patient_name: `مريض #${data.id.slice(0, 6).toUpperCase()}`,
+  };
 
   if (data.doctor_id !== doctorId) return { status: "wrong_doctor", appointment: appt };
   if (data.status === "completed") return { status: "already_used", appointment: appt };
@@ -100,6 +107,5 @@ export async function markTicketScanned(
     .eq("id", appointmentId);
 
   if (updateError) throw updateError;
-
   return { status: "marked_used", appointment: { ...appt, status: "completed" } };
 }
