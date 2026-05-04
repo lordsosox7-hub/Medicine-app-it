@@ -53,13 +53,6 @@ export default function NotificationsScreen() {
     if (!item.read) await markRead([item.id]);
     if (item.kind === "appointment") {
       router.push("/(tabs)/appointments");
-    } else if (item.kind === "message") {
-      if (item.conversationId) {
-        const did = item.doctorId ? `?doctorId=${item.doctorId}` : "";
-        router.push(`/chat/${item.conversationId}${did}` as any);
-      } else {
-        router.push("/(tabs)/chats");
-      }
     } else if (item.kind === "payment") {
       router.push("/(tabs)/appointments");
     }

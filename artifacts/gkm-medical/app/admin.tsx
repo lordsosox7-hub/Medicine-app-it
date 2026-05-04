@@ -21,8 +21,6 @@ import {
   useAllAppointmentsWithPatients,
   useMarkTicketScanned,
   useDoctors,
-  useMessages,
-  useRealtimeMessages,
   usePendingPayments,
   useUpdatePaymentStatus,
   useCreateDoctor,
@@ -30,7 +28,6 @@ import {
   useDeleteDoctor,
   useAdminUsers,
   useDeleteUser,
-  useAllConversations,
   useDoctorAdmins,
   useCreateDoctorAdmin,
   useDeleteDoctorAdmin,
@@ -41,7 +38,7 @@ import {
   usePendingRefunds,
   useUpdateRefundStatus,
 } from "@/hooks/useGkmData";
-import type { Appointment, Payment, Doctor, Conversation, Refund } from "@/lib/supabase";
+import type { Appointment, Payment, Doctor, Refund } from "@/lib/supabase";
 import {
   isAdminLoggedIn,
   logoutAdmin,
@@ -56,7 +53,6 @@ import {
 type AdminTab =
   | "doctors"
   | "users"
-  | "chats"
   | "appointments"
   | "payments"
   | "refunds"
@@ -71,7 +67,6 @@ const TABS: Array<{
 }> = [
   { id: "doctors", label: "الأطباء", icon: "user-plus" },
   { id: "users", label: "المرضى", icon: "users" },
-  { id: "chats", label: "المحادثات", icon: "message-square" },
   { id: "appointments", label: "المواعيد", icon: "calendar" },
   { id: "payments", label: "المدفوعات", icon: "credit-card" },
   { id: "refunds", label: "الاستردادات", icon: "rotate-ccw" },
@@ -213,7 +208,6 @@ export default function AdminScreen() {
 
         {tab === "doctors" && <DoctorsTab />}
         {tab === "users" && <UsersTab />}
-        {tab === "chats" && <ChatMonitorTab />}
         {tab === "appointments" && <AppointmentsTab />}
         {tab === "payments" && <PaymentsTab />}
         {tab === "refunds" && <RefundsTab />}
@@ -966,10 +960,6 @@ function UsersTab() {
                   icon="bookmark"
                   text={`${item.appointments_count} موعد`}
                 />
-                <MetaChip
-                  icon="message-circle"
-                  text={`${item.conversations_count} محادثة`}
-                />
               </View>
 
               {item.last_seen_at && (
@@ -1013,312 +1003,6 @@ function UsersTab() {
         />
       )}
     </>
-  );
-}
-
-// ====================================================================
-// Chat monitor tab
-// ====================================================================
-
-function ChatMonitorTab() {
-  const colors = useColors();
-  const { data: conversations, isLoading } = useAllConversations();
-  const [selectedId, setSelectedId] = useState<string>("");
-  const [search, setSearch] = useState("");
-
-  const filtered = useMemo(() => {
-    const list = conversations ?? [];
-    const q = search.trim();
-    if (!q) return list;
-    return list.filter(
-      (c) =>
-        (c.doctor?.name_ar ?? "").includes(q) ||
-        c.user_id.includes(q) ||
-        (c.last_message ?? "").includes(q),
-    );
-  }, [conversations, search]);
-
-  const selected = useMemo(
-    () => filtered.find((c) => c.id === selectedId) ?? null,
-    [filtered, selectedId],
-  );
-
-  if (selected) {
-    return (
-      <ConversationViewer
-        conversation={selected}
-        onBack={() => setSelectedId("")}
-      />
-    );
-  }
-
-  return (
-    <>
-      <View style={styles.toolbar}>
-        <View
-          style={[
-            styles.searchWrap,
-            { backgroundColor: colors.input, borderColor: colors.border },
-          ]}
-        >
-          <Feather name="search" size={16} color={colors.mutedForeground} />
-          <TextInput
-            value={search}
-            onChangeText={setSearch}
-            placeholder="ابحث في المحادثات..."
-            placeholderTextColor={colors.mutedForeground}
-            style={[styles.searchInput, { color: colors.foreground }]}
-          />
-        </View>
-        <View
-          style={[
-            styles.countBadge,
-            { backgroundColor: colors.primarySoft },
-          ]}
-        >
-          <Text
-            style={{
-              color: colors.primary,
-              fontFamily: "IBMPlexSansArabic_700Bold",
-              fontSize: 13,
-            }}
-          >
-            {filtered.length}
-          </Text>
-        </View>
-      </View>
-
-      {isLoading ? (
-        <View style={styles.empty}>
-          <ActivityIndicator color={colors.primary} />
-        </View>
-      ) : filtered.length === 0 ? (
-        <View style={styles.empty}>
-          <Feather
-            name="message-square"
-            size={42}
-            color={colors.mutedForeground}
-          />
-          <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
-            لا توجد محادثات حالياً.
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={filtered}
-          keyExtractor={(c) => c.id}
-          contentContainerStyle={{ padding: 16, gap: 10 }}
-          renderItem={({ item }) => (
-            <Pressable
-              onPress={() => setSelectedId(item.id)}
-              style={[
-                styles.card,
-                { backgroundColor: colors.card, borderColor: colors.border },
-              ]}
-            >
-              <View style={styles.rowReverse}>
-                <View
-                  style={[
-                    styles.avatar,
-                    { backgroundColor: colors.primarySoft },
-                  ]}
-                >
-                  <Feather
-                    name="message-circle"
-                    size={18}
-                    color={colors.primary}
-                  />
-                </View>
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text
-                    style={[styles.cardTitle, { color: colors.foreground }]}
-                    numberOfLines={1}
-                  >
-                    {item.doctor?.name_ar ?? "طبيب محذوف"}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.cardSub,
-                      { color: colors.mutedForeground },
-                    ]}
-                    numberOfLines={1}
-                  >
-                    مع المريض {item.user_id.slice(0, 8)}
-                  </Text>
-                </View>
-                <Feather
-                  name="chevron-left"
-                  size={20}
-                  color={colors.mutedForeground}
-                />
-              </View>
-
-              <View
-                style={[
-                  styles.lastMsgBox,
-                  {
-                    backgroundColor: colors.muted,
-                    borderColor: colors.border,
-                  },
-                ]}
-              >
-                <Text
-                  style={{
-                    color: colors.foreground,
-                    fontFamily: "IBMPlexSansArabic_500Medium",
-                    fontSize: 13,
-                    textAlign: "right",
-                  }}
-                  numberOfLines={2}
-                >
-                  {item.last_message ?? "لم يتم تبادل أي رسائل بعد."}
-                </Text>
-              </View>
-
-              {item.last_message_at && (
-                <Text
-                  style={{
-                    color: colors.mutedForeground,
-                    fontFamily: "IBMPlexSansArabic_500Medium",
-                    fontSize: 11.5,
-                    textAlign: "right",
-                  }}
-                >
-                  {new Date(item.last_message_at).toLocaleString("ar")}
-                </Text>
-              )}
-            </Pressable>
-          )}
-        />
-      )}
-    </>
-  );
-}
-
-function ConversationViewer({
-  conversation,
-  onBack,
-}: {
-  conversation: Conversation;
-  onBack: () => void;
-}) {
-  const colors = useColors();
-  const { data: messages, isLoading } = useMessages(conversation.id);
-  useRealtimeMessages(conversation.id);
-
-  return (
-    <View style={styles.flex}>
-      <View
-        style={[
-          styles.viewerHeader,
-          { backgroundColor: colors.card, borderBottomColor: colors.border },
-        ]}
-      >
-        <Pressable onPress={onBack} hitSlop={8}>
-          <Feather name="chevron-right" size={24} color={colors.foreground} />
-        </Pressable>
-        <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <Text
-            style={[styles.cardTitle, { color: colors.foreground }]}
-            numberOfLines={1}
-          >
-            {conversation.doctor?.name_ar ?? "طبيب محذوف"}
-          </Text>
-          <Text
-            style={[styles.cardSub, { color: colors.mutedForeground }]}
-            numberOfLines={1}
-          >
-            المريض {conversation.user_id.slice(0, 8)}
-          </Text>
-        </View>
-        <View
-          style={[
-            styles.eyeBadge,
-            { backgroundColor: colors.accents.amber.bg },
-          ]}
-        >
-          <Feather name="eye" size={14} color={colors.accents.amber.color} />
-          <Text
-            style={{
-              color: colors.accents.amber.color,
-              fontFamily: "IBMPlexSansArabic_700Bold",
-              fontSize: 11,
-            }}
-          >
-            مراقبة
-          </Text>
-        </View>
-      </View>
-
-      {isLoading ? (
-        <View style={styles.empty}>
-          <ActivityIndicator color={colors.primary} />
-        </View>
-      ) : (messages?.length ?? 0) === 0 ? (
-        <View style={styles.empty}>
-          <Feather name="inbox" size={42} color={colors.mutedForeground} />
-          <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
-            لا توجد رسائل في هذه المحادثة.
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={messages ?? []}
-          keyExtractor={(m) => m.id}
-          contentContainerStyle={{ padding: 16, gap: 10 }}
-          renderItem={({ item }) => {
-            const isDoctor = item.sender === "doctor";
-            return (
-              <View
-                style={[
-                  styles.msgBubble,
-                  {
-                    alignSelf: isDoctor ? "flex-start" : "flex-end",
-                    backgroundColor: isDoctor
-                      ? colors.primarySoft
-                      : colors.card,
-                    borderColor: colors.border,
-                  },
-                ]}
-              >
-                <Text
-                  style={{
-                    color: isDoctor ? colors.primary : colors.mutedForeground,
-                    fontFamily: "IBMPlexSansArabic_700Bold",
-                    fontSize: 11,
-                    marginBottom: 4,
-                    textAlign: "right",
-                  }}
-                >
-                  {isDoctor ? "الطبيب" : "المريض"}
-                </Text>
-                <Text
-                  style={{
-                    color: colors.foreground,
-                    fontFamily: "IBMPlexSansArabic_500Medium",
-                    fontSize: 14,
-                    textAlign: "right",
-                  }}
-                >
-                  {item.text}
-                </Text>
-                <Text
-                  style={{
-                    color: colors.mutedForeground,
-                    fontFamily: "IBMPlexSansArabic_500Medium",
-                    fontSize: 10.5,
-                    marginTop: 4,
-                    textAlign: "right",
-                  }}
-                >
-                  {new Date(item.created_at).toLocaleString("ar")}
-                </Text>
-              </View>
-            );
-          }}
-        />
-      )}
-    </View>
   );
 }
 

@@ -3,7 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Feather } from "@expo/vector-icons";
 import {
   useAppointments,
-  useConversations,
   useUserNotifications,
   useMarkDbNotificationRead,
 } from "@/hooks/useGkmData";
@@ -16,7 +15,7 @@ import {
 
 export type NotificationItem = {
   id: string;
-  kind: "appointment" | "message" | "system" | "payment";
+  kind: "appointment" | "system" | "payment";
   title: string;
   body: string;
   timestamp: string;
@@ -24,7 +23,6 @@ export type NotificationItem = {
   iconBg: string;
   iconColor: string;
   doctorId?: string;
-  conversationId?: string;
   appointmentId?: string;
   dbId?: string;
   read: boolean;
@@ -44,7 +42,6 @@ function formatArDate(dateStr: string): string {
 
 export function useNotifications() {
   const { data: appointments } = useAppointments();
-  const { data: conversations } = useConversations();
   const { data: dbNotifications } = useUserNotifications();
   const markDbRead = useMarkDbNotificationRead();
   const qc = useQueryClient();
@@ -107,27 +104,6 @@ export function useNotifications() {
         });
       });
 
-    // ── Recent conversation messages ─────────────────────────────────────────
-    (conversations ?? [])
-      .filter((c) => c.last_message && c.last_message_at)
-      .forEach((c) => {
-        const id = `msg:${c.id}:${c.last_message_at}`;
-        const docName = c.doctor?.name_ar ?? "طبيب";
-        list.push({
-          id,
-          kind: "message",
-          title: `رسالة جديدة من ${docName}`,
-          body: c.last_message ?? "",
-          timestamp: c.last_message_at as string,
-          icon: "message-circle",
-          iconBg: "#e7f7ee",
-          iconColor: "#16a34a",
-          doctorId: c.doctor_id,
-          conversationId: c.id,
-          read: false,
-        });
-      });
-
     // ── Static welcome / system message ─────────────────────────────────────
     list.push({
       id: "system:welcome",
@@ -155,7 +131,7 @@ export function useNotifications() {
         const tb = new Date(b.timestamp).getTime() || 0;
         return tb - ta;
       });
-  }, [appointments, conversations, dbNotifications, readIds, clearedIds]);
+  }, [appointments, dbNotifications, readIds, clearedIds]);
 
   const unreadCount = useMemo(
     () => items.filter((it) => !it.read).length,
@@ -194,7 +170,6 @@ export function useNotifications() {
 
   const refresh = useCallback(() => {
     qc.invalidateQueries({ queryKey: ["appointments"] });
-    qc.invalidateQueries({ queryKey: ["conversations"] });
     qc.invalidateQueries({ queryKey: ["user_notifications"] });
   }, [qc]);
 

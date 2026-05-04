@@ -76,20 +76,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="chats"
-        options={{
-          title: "المحادثات",
-          tabBarIcon: ({ focused }) => (
-            <AnimatedTabIcon
-              name="message-circle"
-              focused={focused}
-              activeColor={colors.primary}
-              inactiveColor={colors.mutedForeground}
-            />
-          ),
-        }}
-      />
+
       <Tabs.Screen
         name="appointments"
         options={{

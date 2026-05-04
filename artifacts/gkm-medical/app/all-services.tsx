@@ -64,15 +64,7 @@ export default function AllServicesScreen() {
           iconBg: a.amber.bg,
           onPress: () => router.push("/(tabs)/appointments"),
         },
-        {
-          key: "chats",
-          label: "المحادثات",
-          subtitle: "تواصل مع طبيبك",
-          iconNode: <Feather name="message-circle" size={22} color={a.teal.color} />,
-          iconColor: a.teal.color,
-          iconBg: a.teal.bg,
-          onPress: () => router.push("/(tabs)/chats"),
-        },
+
         {
           key: "favorites",
           label: "المفضلة",

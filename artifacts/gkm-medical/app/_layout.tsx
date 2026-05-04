@@ -66,7 +66,7 @@ function RootLayoutNav() {
       <Stack.Screen name="payment/[appointmentId]" options={{ title: "الدفع" }} />
       <Stack.Screen name="booking-confirmed/[appointmentId]" options={{ headerShown: false, gestureEnabled: false }} />
       <Stack.Screen name="ticket/[appointmentId]" options={{ headerShown: false }} />
-      <Stack.Screen name="chat/[id]" options={{ headerShown: false }} />
+
       <Stack.Screen name="medical-file" options={{ title: "الملف الطبي" }} />
       <Stack.Screen name="medical-file-edit" options={{ title: "تعديل الملف الطبي" }} />
       <Stack.Screen name="lab-results" options={{ title: "نتائج التحاليل" }} />
