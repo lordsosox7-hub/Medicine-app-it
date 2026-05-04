@@ -179,7 +179,7 @@ export default function DoctorProfileScreen() {
 
       <View style={[styles.bottomBar, { backgroundColor: colors.card, borderTopColor: colors.border, paddingBottom: insets.bottom || 16 }]}>
         <View style={styles.priceContainer}>
-          <Text style={[styles.priceLabel, { color: colors.mutedForeground }]}>سعر الاستشارة</Text>
+          <Text style={[styles.priceLabel, { color: colors.mutedForeground }]}>سعر المقابلة</Text>
           <Text style={[styles.priceValue, { color: colors.foreground }]}>{doctor.price} ج.س</Text>
         </View>
         <GradientButton 
