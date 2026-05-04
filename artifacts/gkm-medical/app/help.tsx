@@ -32,9 +32,9 @@ export default function HelpScreen() {
 
   const contact = (kind: "phone" | "email" | "whatsapp") => {
     const targets = {
-      phone: "tel:+966500000000",
-      email: "mailto:support@rahah.app",
-      whatsapp: "https://wa.me/966500000000",
+      phone: "tel:+00249908123165",
+      email: "mailto:lordsosox9@gmail.com",
+      whatsapp: "https://wa.me/00249908123165",
     };
     Linking.openURL(targets[kind]).catch(() => {
       const msg = "تعذّر فتح الرابط";
